@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.streetanomaly.ruleroad",
+      "sha256_cert_fingerprints": [
+        "9A:87:60:AE:57:60:FF:D2:5B:62:BA:2A:E1:6C:F1:CB:EB:F4:42:53:76:2F:D6:92:11:D3:EA:0C:E7:53:08:C4"
+      ]
+    }
+  }
+]
