@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Street Anomaly: every town has one strange rule. Live by it, find the catch, learn the lesson.">
 <title>Rule Road</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#14213D">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rule Road">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:title" content="Rule Road by Street Anomaly">
+<meta property="og:description" content="Every town has one strange rule. Live by it, find the catch, learn the lesson.">
+<meta property="og:image" content="https://streetanomaly.netlify.app/icons/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@500;700;900&family=Atkinson+Hyperlegible:wght@400;700&family=Overpass+Mono:wght@600&display=swap">
 <style>
@@ -30,6 +40,7 @@
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body {
   background:
     radial-gradient(60% 30% at 15% 0%, rgba(255,210,63,.10), transparent 70%),
@@ -173,6 +184,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .field label { font-size: 13px; color: var(--muted); font-family: var(--font-sign); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .field input { background: var(--night); color: var(--fg); border: 2px solid var(--line); border-radius: 10px; padding: 12px 14px; font: inherit; width: 100%; }
 .copybox { background: var(--night); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; font-size: 15px; color: var(--muted); user-select: all; white-space: pre-wrap; overflow-wrap: anywhere; }
+.install { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.install img { width: 44px; height: 44px; border-radius: 10px; flex: none; }
+.install div { flex: 1; min-width: 0; font-size: 14px; color: var(--muted); line-height: 1.35; }
+.install div strong { color: var(--fg); display: block; font-size: 15px; }
+.install .go { flex: none; align-self: center; padding: 10px 14px; font-size: 14px; }
 .toast { min-height: 1.4em; text-align: center; color: var(--leaf); font-size: 14px; margin: 0; }
 a { color: var(--sign); }
 .foot { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); text-align: center; }
@@ -421,6 +437,20 @@ function topbar(back) {
   </div>`;
 }
 
+/* install as an app: Chrome/Android gives a prompt, iPhone needs Share → Add to Home Screen */
+let installEvt = null;
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+let installHidden = false; try { installHidden = localStorage.getItem("rule-road-install-hidden") === "1"; } catch {}
+function installCard() {
+  if (isStandalone() || installHidden) return "";
+  if (installEvt) return `<div class="install"><img src="/icons/icon-192.png" alt=""><div><strong>Play it like an app</strong>Add Rule Road to your home screen. Works offline.</div><button class="go" data-act="install">Install</button></div>`;
+  if (isIOS()) return `<div class="install"><img src="/icons/icon-192.png" alt=""><div><strong>Play it like an app</strong>Tap the Share button, then “Add to Home Screen”.</div><button class="go ghost" data-act="hideinstall">Got it</button></div>`;
+  return "";
+}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if (S.screen === "home") render(); });
+window.addEventListener("appinstalled", () => { installEvt = null; render(); });
+
 function renderHome() {
   const total = Object.values(S.stars).reduce((a, b) => a + b, 0);
   const stops = TOWNS.map((T, i) => {
@@ -443,6 +473,7 @@ function renderHome() {
     <div class="pole"></div>
     <p>Every town has one strange rule. Live one day by it. Make your choices, find the catch, and see what the rule teaches you.</p>
   </section>
+  ${installCard()}
   <p class="howto"><strong>How to play:</strong> pick a town, choose what you'd do, and watch the numbers change. Each town hides a twist halfway through. Earn up to 3 stars per town.</p>
   <div class="total">Stars collected: <b>${total} / ${TOWNS.length * 3}</b></div>
   <nav class="road" aria-label="Towns">
@@ -626,6 +657,8 @@ function bindFan() {
 $app.addEventListener("click", e => {
   const b = e.target.closest("[data-act]"); if (!b) return;
   const act = b.dataset.act;
+  if (act === "install") { if (installEvt) { installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; render(); }); } return; }
+  if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
   if (act === "sound") { Sound.on = !Sound.on; Sound.init(); if (Sound.on) Sound.pluck(); render(); return; }
   if (Sound.on) Sound.init();
   if (act === "home") { S.screen = "home"; Sound.pluck(); render(); window.scrollTo(0, 0); }
@@ -646,6 +679,7 @@ $app.addEventListener("click", e => {
 window.claude?.hot?.snapshot?.(() => ({ screen: S.screen, t: S.t, step: S.step, phase: S.phase, s: S.s, res: S.res, lastResult: S.lastResult, fan: S.fan }));
 function start(data) { if (data && data.screen) Object.assign(S, data); render(); }
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("/sw.js").catch(() => {});
 </script>
 </body>
 </html>
