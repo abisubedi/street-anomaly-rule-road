@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Street Anomaly: every town has one strange rule. Live by it, find the catch, learn the lesson.">
+<title>Rule Road</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@500;700;900&family=Atkinson+Hyperlegible:wght@400;700&family=Overpass+Mono:wght@600&display=swap">
+<style>
+/* Layout: one phone-width night street. The road runs down the page; each town is a yellow sign on a pole. */
+:root {
+  color-scheme: dark;
+  --night: #14213D;        /* brand night navy */
+  --night-deep: #0B1428;
+  --asphalt: #1C2A4A;
+  --line: #2D3D63;
+  --sign: #FFD23F;         /* street-sign yellow */
+  --sign-ink: #14130C;
+  --gold: #E9B949;         /* coin gold */
+  --red: #E63946;          /* warning red */
+  --leaf: #7BD389;         /* life-town green, sits beside the yellow */
+  --fg: #EEF1F8;
+  --muted: #9AA7C4;
+  --card: #18264A;
+  --font-sign: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Verdana", system-ui, sans-serif;
+  --font-num: "Overpass Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background:
+    radial-gradient(60% 30% at 15% 0%, rgba(255,210,63,.10), transparent 70%),
+    radial-gradient(50% 25% at 90% 35%, rgba(255,210,63,.06), transparent 70%),
+    var(--night-deep);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.app {
+  max-width: 520px; margin: 0 auto; min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--sign); outline-offset: 3px; }
+
+/* top bar */
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--font-sign); font-weight: 900; letter-spacing: .14em; font-size: 12px; text-transform: uppercase; color: var(--muted); }
+.brand b { color: var(--sign); }
+.iconbtn { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--muted); }
+.iconbtn:hover { color: var(--fg); border-color: var(--muted); }
+
+/* the sign: core visual */
+.sign {
+  background: var(--sign); color: var(--sign-ink);
+  border-radius: 14px; padding: 6px;
+  box-shadow: 0 0 0 3px var(--sign-ink) inset, 0 18px 40px -12px rgba(255,210,63,.35);
+}
+.sign-inner { border: 3px solid var(--sign-ink); border-radius: 9px; padding: 16px 18px 18px; }
+.sign .kicker { font-family: var(--font-sign); font-weight: 900; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; }
+.sign .rule { font-family: var(--font-sign); font-weight: 900; font-size: clamp(26px, 7vw, 34px); line-height: 1.04; text-transform: uppercase; text-wrap: balance; margin-top: 6px; }
+.pole { width: 14px; height: 34px; margin: 0 auto; background: linear-gradient(90deg, #5B6680, #A8B2C8 45%, #5B6680); }
+
+/* home */
+.hero { display: flex; flex-direction: column; gap: 0; padding-top: 6px; }
+.hero .sign { transform-origin: 50% 0; animation: swing 1.6s cubic-bezier(.3,1.6,.5,1) both; }
+.hero .rule { font-size: clamp(40px, 12vw, 58px); }
+.hero .rule .flicker { animation: flicker 6s infinite; }
+.hero p { margin: 14px 0 0; color: var(--muted); font-size: 16px; }
+.howto { color: var(--muted); font-size: 15px; margin: 0; text-wrap: pretty; }
+.howto strong { color: var(--fg); }
+
+.road { position: relative; display: flex; flex-direction: column; gap: 14px; padding-block: 8px; }
+.road::before {
+  content: ""; position: absolute; left: 27px; top: 0; bottom: 0; width: 4px;
+  background: repeating-linear-gradient(to bottom, var(--sign) 0 18px, transparent 18px 34px); opacity: .55;
+}
+.stop {
+  position: relative; display: grid; grid-template-columns: 58px 1fr; gap: 12px; align-items: center;
+  text-align: left; background: transparent; border: 0; padding: 0;
+}
+.mile {
+  width: 58px; height: 58px; border-radius: 10px; background: var(--night); border: 2px solid var(--line);
+  display: grid; place-items: center; text-align: center; z-index: 1;
+  font-family: var(--font-sign); font-weight: 900; line-height: 1;
+}
+.mile small { display: block; font-size: 9px; letter-spacing: .16em; color: var(--muted); }
+.mile span { font-size: 22px; }
+.stop-card {
+  min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, transform .15s;
+}
+.stop:hover .stop-card { border-color: var(--sign); transform: translateX(3px); }
+.stop .tags { display: flex; gap: 8px; align-items: center; font-size: 12px; font-family: var(--font-sign); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.tag-money { color: var(--gold); }
+.tag-life { color: var(--leaf); }
+.stop .tname { font-family: var(--font-sign); font-weight: 900; font-size: 20px; line-height: 1.1; }
+.stop .trule { color: var(--muted); font-size: 15px; line-height: 1.35; }
+.stars { margin-left: auto; letter-spacing: 2px; color: var(--sign); font-size: 14px; }
+.stars .off { color: var(--line); }
+.stop.done .mile { border-color: var(--sign); color: var(--sign); }
+.stop.yours .mile { background: var(--sign); color: var(--sign-ink); border-color: var(--sign); }
+.total { font-family: var(--font-sign); font-weight: 700; font-size: 14px; color: var(--muted); letter-spacing: .06em; }
+.total b { color: var(--sign); font-family: var(--font-num); }
+
+/* town screen */
+.meters { display: flex; flex-wrap: wrap; gap: 10px; }
+.meter {
+  flex: 1 1 140px; min-width: 0; background: var(--night); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.meter .ml { font-size: 12px; font-family: var(--font-sign); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.meter .mv { font-family: var(--font-num); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--gold); }
+.meter.life .mv { color: var(--leaf); }
+.meter .mv.bump { animation: bump .45s ease; }
+.meter .mv.drop { animation: drop .45s ease; color: var(--red); }
+.track { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.track i { display: block; height: 100%; background: currentColor; border-radius: 99px; transition: width .5s ease; }
+.meter .track { color: var(--gold); }
+.meter.life .track { color: var(--leaf); }
+.meter.low .track, .meter.low .mv { color: var(--red); }
+
+.mini-sign { display: inline-flex; align-self: flex-start; gap: 8px; align-items: center; background: var(--sign); color: var(--sign-ink); border-radius: 6px; padding: 4px 10px; font-family: var(--font-sign); font-weight: 900; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.scene { display: flex; flex-direction: column; gap: 14px; animation: rise .35s ease both; }
+.when { font-family: var(--font-sign); font-weight: 900; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--sign); }
+.story { font-size: 21px; line-height: 1.4; margin: 0; text-wrap: pretty; }
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.choice {
+  text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 14px 16px;
+  display: flex; gap: 12px; align-items: center; justify-content: space-between; transition: border-color .12s, background .12s;
+}
+.choice:hover:not(:disabled) { border-color: var(--sign); background: #1E2E57; }
+.choice:disabled { opacity: .42; cursor: not-allowed; }
+.choice .cost { flex: none; font-family: var(--font-num); font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 99px; padding: 2px 8px; white-space: nowrap; }
+.result { background: var(--night); border-left: 4px solid var(--sign); border-radius: 0 12px 12px 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; animation: rise .3s ease both; }
+.result p { margin: 0; }
+.result .night { color: var(--muted); font-style: italic; }
+.result .night strong { color: var(--gold); font-style: normal; font-family: var(--font-num); }
+.go {
+  align-self: stretch; background: var(--sign); color: var(--sign-ink); border: 0; border-radius: 12px; padding: 15px 18px;
+  font-family: var(--font-sign); font-weight: 900; font-size: 17px; letter-spacing: .1em; text-transform: uppercase;
+}
+.go:hover { filter: brightness(1.06); }
+.go.ghost { background: transparent; color: var(--fg); border: 2px solid var(--line); }
+.go.ghost:hover { border-color: var(--muted); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row > * { flex: 1 1 160px; }
+
+/* rehook: the pattern interrupt */
+.rehook { background: var(--red); color: #fff; border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; animation: shake .5s ease both; }
+.rehook .k { font-family: var(--font-sign); font-weight: 900; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; opacity: .85; }
+.rehook p { margin: 0; font-size: 21px; line-height: 1.35; font-weight: 700; text-wrap: pretty; }
+
+/* ending */
+.end-stars { font-size: 44px; letter-spacing: 8px; color: var(--sign); text-align: center; line-height: 1; }
+.end-stars .off { color: var(--line); }
+.end-stars span { display: inline-block; animation: pop .5s cubic-bezier(.3,1.8,.5,1) both; }
+.end-stars span:nth-child(2) { animation-delay: .15s; } .end-stars span:nth-child(3) { animation-delay: .3s; }
+.lesson { text-align: center; font-family: var(--font-sign); font-weight: 900; font-size: clamp(24px, 6.5vw, 30px); line-height: 1.12; color: var(--sign); text-wrap: balance; margin: 0; }
+.lesson-k { text-align: center; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); font-family: var(--font-sign); font-weight: 700; }
+.cta { text-align: center; color: var(--fg); margin: 0; font-size: 18px; }
+.loop { color: var(--muted); text-align: center; font-style: italic; margin: 0; }
+
+/* your town */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; color: var(--muted); font-family: var(--font-sign); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.field input { background: var(--night); color: var(--fg); border: 2px solid var(--line); border-radius: 10px; padding: 12px 14px; font: inherit; width: 100%; }
+.copybox { background: var(--night); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; font-size: 15px; color: var(--muted); user-select: all; white-space: pre-wrap; overflow-wrap: anywhere; }
+.toast { min-height: 1.4em; text-align: center; color: var(--leaf); font-size: 14px; margin: 0; }
+a { color: var(--sign); }
+.foot { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); text-align: center; }
+
+@keyframes swing { 0% { transform: rotate(-9deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: rotate(0); } }
+@keyframes flicker { 0%, 92%, 100% { opacity: 1; } 93% { opacity: .35; } 95% { opacity: 1; } 96% { opacity: .5; } }
+@keyframes rise { from { transform: translateY(8px); opacity: .0; } to { transform: none; opacity: 1; } }
+@keyframes bump { 40% { transform: scale(1.25); } }
+@keyframes drop { 40% { transform: translateY(4px); } }
+@keyframes shake { 0% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 100% { transform: none; } }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<script>
+/* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
+const TOWNS = [
+{
+  id: "M1", track: "money", name: "Doubleton", rule: "every coin you save doubles at midnight.",
+  hook: "So why does one kid here have a heavy jar… and his best friend has nothing?",
+  meters: [{ k: "jar", label: "Coins in jar" }],
+  init: () => ({ jar: 0, opened: false }),
+  steps: [
+    { when: "Day 1", text: "You find a shiny coin on the sidewalk. The candy shop is right there.",
+      choices: [
+        { t: "Drop it in your jar", fx: s => { s.jar += 1; }, say: "Clink. One lonely coin." },
+        { t: "Buy a gumball", say: "Sweet! Gone in ten seconds." }],
+      night: s => { const a = s.jar; s.jar *= 2; return a ? `Midnight. The jar glows. <strong>${a} → ${s.jar}</strong>` : "Midnight. The jar glows… but zero doubled is still zero."; } },
+    { when: "Day 2", text: s => "Grandma slips you 1 coin. Then your friend sells cool stickers. 2 coins each.",
+      enter: s => { s.jar += 1; },
+      choices: [
+        { t: "Keep saving", say: "You walk past the stickers. It stings a little." },
+        { t: "Buy a sticker", cost: "−2", need: s => s.jar >= 2, fx: s => { s.jar -= 2; }, say: "It's a cool sticker. Your jar feels lighter." }],
+      night: s => { const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
+    { rehook: "The jar only doubles if it stays CLOSED all day. Open it, and the magic skips a night." },
+    { when: "Day 3", text: "Your big brother shakes the jar. “Open it! Let's count them!”",
+      choices: [
+        { t: "Keep it closed", fx: s => { s.opened = false; }, say: "“Later,” you say. He rolls his eyes." },
+        { t: "Open it and count", fx: s => { s.opened = true; }, say: s => `${s.jar} coins! It feels great… for a minute.` }],
+      night: s => { if (s.opened) return "Midnight. Nothing. The jar stays quiet."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
+    { when: "Day 4", text: "The fair is in town! The Ferris wheel costs 5 coins.",
+      choices: [
+        { t: "Watch from the ground", say: "The lights are pretty from down here too." },
+        { t: "Ride the Ferris wheel", cost: "−5", need: s => s.jar >= 5, fx: s => { s.jar -= 5; s.opened = true; }, say: "Wheee! You had to open the jar to pay." }],
+      night: s => { if (s.opened) return "Midnight. The jar was opened today. No magic."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
+  ],
+  rate: s => s.jar >= 20 ? 3 : s.jar >= 8 ? 2 : 1,
+  ending: s => s.jar >= 20 ? `${s.jar} coins. And it started with one coin on the sidewalk.` : s.jar >= 8 ? `${s.jar} coins. Good! But every time you opened the jar, it cost you a night.` : `${s.jar} coins. The fun stuff was fun. The jar stayed small.`,
+  lesson: "Savings grow best when you leave them alone.",
+  cta: "So… would YOU have opened the jar?"
+},
+{
+  id: "L1", track: "life", name: "Hushwick", rule: "you only get 10 words a day.",
+  hook: "So why is one kid saving her words like they're gold?",
+  meters: [{ k: "words", label: "Words left", max: 10 }, { k: "heart", label: "Friendship", life: true }],
+  init: () => ({ words: 10, heart: 0 }),
+  steps: [
+    { when: "7:00 a.m.", text: "Mom made you breakfast before work.",
+      choices: [
+        { t: "“Thank you, Mom!”", w: 3, h: 1, say: "She smiles all the way to the bus." },
+        { t: "(Just nod)", w: 0, h: 0, say: "She nods back. A quiet morning." },
+        { t: "“Eggs AGAIN? I wanted pancakes.”", w: 5, h: -1, say: "Her smile drops. Five words, gone." }] },
+    { when: "8:15 a.m.", text: "On the bus, your friend Mia looks like she's been crying.",
+      choices: [
+        { t: "“Are you okay?”", w: 3, h: 2, say: "She tells you everything. You just listen." },
+        { t: "(Sit close to her)", w: 0, h: 1, say: "You sit close. It helps a little." },
+        { t: "“Cheer up, it's no big deal.”", w: 6, h: -1, say: "She turns to the window. Six words that didn't help." }] },
+    { rehook: "At 8 p.m., Grandpa calls from far away. He calls every night. You'll want words left for him." },
+    { when: "12:30 p.m.", text: "A kid laughs at your shoes in front of everyone.",
+      choices: [
+        { t: "“Your shoes are worse. And your haircut.”", w: 7, h: -2, say: "Everyone goes “Ooooh.” You feel worse, not better." },
+        { t: "“Nice try.”", w: 2, h: 0, say: "He shrugs. It's over." },
+        { t: "(Smile and keep eating)", w: 0, h: 1, say: "He gets bored. Mia gives you a thumbs up." }] },
+    { when: "2:00 p.m.", text: "Your teacher asks who can explain the answer: 3 × 4.",
+      choices: [
+        { t: "“It's twelve. Three groups of four.”", w: 6, h: 1, say: "Gold star! But that cost six words." },
+        { t: "(Walk up and draw it on the board)", w: 0, h: 1, say: "Three circles, four dots each. Same gold star. Zero words." }] },
+    { when: "8:00 p.m.", text: "The phone rings. It's Grandpa. “I miss you, kiddo.”",
+      choices: [
+        { t: "“I love you.”", w: 3, h: 3, say: "He goes quiet. Then: “That made my whole week.”" },
+        { t: "“Miss you too, Grandpa.”", w: 4, h: 3, say: "You can hear him smiling." },
+        { t: "(Silence. You're out of words.)", w: 0, h: 0, say: "He waits. “Goodnight, kiddo.” Click." }] },
+  ],
+  rate: s => s.heart >= 6 ? 3 : s.heart >= 3 ? 2 : 1,
+  ending: s => s.heart >= 6 ? `You used ${10 - s.words} words, and every one mattered.` : s.heart >= 3 ? "Some words helped. Some just used up the day." : "You ran out of words before you ran out of things that mattered.",
+  lesson: "Fewer words, chosen well, say the most.",
+  cta: "So… what would YOU say with only 10 words?"
+},
+{
+  id: "M2", track: "money", name: "Greenpenny", rule: "money grows on trees, but only if you water it every day.",
+  hook: "So why does one tree here sparkle… and the one next door is bare?",
+  meters: [{ k: "coins", label: "Coins on tree" }, { k: "streak", label: "Days in a row" }],
+  init: () => ({ coins: 0, streak: 0 }),
+  water: true,
+  steps: [
+    { when: "Day 1", text: "You plant your money seed. The watering can is by the door.",
+      choices: [{ t: "Water it now", water: 1, say: "A tiny sprout pops up." }, { t: "Water it tomorrow", water: 0, say: "The seed waits." }] },
+    { when: "Day 2", text: "Your friends are playing ball outside. They're yelling your name.",
+      choices: [{ t: "Water first, then play", water: 1, say: "Two minutes of watering. Then you score a goal." }, { t: "Play all day", water: 0, say: "Great game. You forgot the tree." }] },
+    { when: "Day 3", text: "A brand-new episode of your favorite show just came out.",
+      choices: [{ t: "Water it during the ads", water: 1, say: "You're back before the show starts again." }, { t: "Watch now, water later", water: 0, say: "“Later” never came." }] },
+    { rehook: "Rain doesn't count. The tree only drinks water from YOUR hands." },
+    { when: "Day 4", text: "It's pouring rain. Your boots are already wet.",
+      choices: [{ t: "Water it anyway", water: 1, say: "You look silly watering in the rain. The tree glows." }, { t: "The rain will do it", water: 0, say: "The tree shivers. Rain isn't you." }] },
+    { when: "Day 5", text: "You're so tired. It's just one day, right?",
+      choices: [{ t: "Water it, half asleep", water: 1, say: "Eyes half closed. Still did it." }, { t: "Skip just this once", water: 0, say: "Just once. That's how it always starts." }] },
+  ],
+  rate: s => s.coins >= 15 ? 3 : s.coins >= 6 ? 2 : 1,
+  ending: s => s.coins >= 15 ? `${s.coins} golden leaves. Five days, no skips. The neighbors are staring.` : s.coins >= 6 ? `${s.coins} golden leaves. Every skipped day cut your tree in half.` : `${s.coins} leaves. The tree never got going.`,
+  lesson: "Tiny habits, every single day, grow the biggest trees.",
+  cta: "So… would YOU water it in the rain?"
+},
+{
+  id: "L2", track: "life", name: "Saidsville", rule: "whatever you say about someone comes true for one hour.",
+  hook: "So why did the grumpiest man in town just hand out free lemonade?",
+  meters: [{ k: "smiles", label: "Town smiles", life: true }],
+  init: () => ({ smiles: 0 }),
+  steps: [
+    { when: "9:00 a.m.", text: "Mr. Bram next door is grumpy again. He's yelling at a pigeon.",
+      choices: [
+        { t: "“He's actually really kind.”", fx: s => { s.smiles += 2; }, say: "He stops. He blinks. Then he hands out free lemonade to the whole street." },
+        { t: "“He's a grumpy old troll.”", fx: s => { s.smiles -= 2; }, say: "POOF. He's a real troll for an hour. The little kids run." },
+        { t: "(Say nothing)", say: "The pigeon flies off. Nothing changes." }] },
+    { when: "11:00 a.m.", text: "Your teammate misses an easy goal. She looks at the ground.",
+      choices: [
+        { t: "“She'll score the next one.”", fx: s => { s.smiles += 2; }, say: "Two minutes later: GOAL. She points right at you." },
+        { t: "“She's the worst player ever.”", fx: s => { s.smiles -= 2; }, say: "She trips over the ball. Then again. Your team loses." }] },
+    { when: "12:30 p.m.", text: "The new kid sits alone at lunch.",
+      choices: [
+        { t: "“He seems really funny.”", fx: s => { s.smiles += 2; }, say: "He tells one joke and the whole table laughs. Milk comes out of a nose." },
+        { t: "“He's kind of weird.”", fx: s => { s.smiles -= 1; }, say: "He starts humming at his sandwich. Now everyone moves away." }] },
+    { rehook: "It works on YOU, too. Whatever you say about yourself comes true for one hour." },
+    { when: "1:55 p.m.", text: "Big spelling test in five minutes. You look in the bathroom mirror.",
+      choices: [
+        { t: "“I'm ready. I studied.”", fx: s => { s.smiles += 2; }, say: "Every word comes easy. Even “necessary.”" },
+        { t: "“I'm going to fail.”", fx: s => { s.smiles -= 2; }, say: "Your mind goes blank. You can't even spell “cat.”" },
+        { t: "“I can do hard things.”", fx: s => { s.smiles += 2; }, say: "The hard words still feel hard. You get them anyway." }] },
+  ],
+  rate: s => s.smiles >= 6 ? 3 : s.smiles >= 2 ? 2 : 1,
+  ending: s => s.smiles >= 6 ? "Lemonade, a goal, a new friend and a perfect test. All from what you said." : s.smiles >= 2 ? "A good day, mostly. One or two words came true the wrong way." : "A troll, a lost game and a blank test. Words did all of that.",
+  lesson: "Kind words come true more often than you think.",
+  cta: "So… what would YOU say about your best friend?"
+},
+{
+  id: "M3", track: "money", name: "Yawnmore", rule: "every time you buy something you don't need, you lose an hour of sleep.",
+  hook: "So why is the kid with the most toys falling asleep in class?",
+  meters: [{ k: "sleep", label: "Sleep tonight", max: 9, unit: "h" }, { k: "coins", label: "Coins", max: 12 }],
+  init: () => ({ sleep: 9, coins: 12, shoes: false }),
+  steps: [
+    { when: "At the mall", text: "You have 12 coins. A glowing fidget spinner costs 3.",
+      choices: [
+        { t: "Buy the spinner", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.sleep -= 1; }, say: "So cool. You yawn a little." },
+        { t: "Spin it once and put it back", say: "That was fun for free." }] },
+    { when: "Shoe store", text: "Your school shoes have a hole in them. New ones cost 6.",
+      choices: [
+        { t: "Buy the shoes", cost: "−6", need: s => s.coins >= 6, fx: s => { s.coins -= 6; s.shoes = true; }, say: "You needed these. No yawn at all." },
+        { t: "Keep the coins", say: "Your toe pokes out of the hole. Hm." }] },
+    { when: "Snack stand", text: "A candy cane as big as your arm. 2 coins.",
+      choices: [
+        { t: "Buy the giant candy cane", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.sleep -= 1; }, say: "Sticky fingers. Heavy eyes." },
+        { t: "Drink from the fountain", say: "Cold water. Free." }] },
+    { rehook: "The lost hours come out of TONIGHT. And tomorrow is the big game." },
+    { when: "Checkout", text: "“Buy 2 keychains, get 1 FREE!” That's 3 coins.",
+      choices: [
+        { t: "Grab the 3 keychains", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.sleep -= 3; }, say: "Three things you don't need. Even the free one counts. Three hours, gone." },
+        { t: "Walk out the door", say: "The sign blinks at you. You keep walking." }] },
+  ],
+  rate: s => { const r = s.sleep >= 9 ? 3 : s.sleep >= 7 ? 2 : 1; return s.shoes ? r : Math.min(r, 2); },
+  ending: s => {
+    if (!s.shoes) return `${s.sleep} hours of sleep. But you skipped the shoes you really needed. Saving isn't the same as never buying.`;
+    return s.sleep >= 9 ? "Nine full hours. New shoes. You win the big game." : s.sleep >= 7 ? `${s.sleep} hours. Not bad. A little slow in the second half.` : `${s.sleep} hours. You fall asleep on the bench during the big game.`;
+  },
+  lesson: "Buy what you need. Then sleep easy.",
+  cta: "So… would YOU trade an hour of sleep for a keychain?"
+},
+{
+  id: "L3", track: "life", name: "Chargeville", rule: "your phone battery is your energy. At 0%, so are you.",
+  hook: "So why is one kid bouncing off the walls… and her brother can't get off the couch?",
+  meters: [{ k: "bat", label: "Your battery", max: 100, unit: "%", battery: true }],
+  init: () => ({ bat: 60 }),
+  steps: [
+    { when: "7:00 a.m.", text: "You wake up at 60%. Your phone is right there.",
+      choices: [
+        { t: "Scroll videos in bed", fx: s => { s.bat -= 25; }, say: "Fun! Then getting up feels like lifting a car." },
+        { t: "Eat breakfast by the window", fx: s => { s.bat += 10; }, say: "Sunlight on your face. +10%." }] },
+    { when: "Recess", text: "Everyone's playing tag. Your phone game has a new level.",
+      choices: [
+        { t: "Play tag", fx: s => { s.bat += 15; }, say: "You're out of breath and fully awake." },
+        { t: "Play the new level", fx: s => { s.bat -= 20; }, say: "You beat the level. You feel like a wet sock." }] },
+    { when: "3:30 p.m.", text: "Grandma video-calls just to say hi.",
+      choices: [
+        { t: "Answer the call", fx: s => { s.bat -= 5; }, say: "Screens cost a little. Grandma's laugh is worth it." },
+        { t: "Decline and keep watching your show", fx: s => { s.bat -= 15; }, say: "Three episodes later, you don't remember any of them." }] },
+    { rehook: "You can't plug yourself in. You only charge OFF-screen. And your best friend's party is at 6. You need 40% to go." },
+    { when: "5:00 p.m.", text: "One hour until the party.",
+      choices: [
+        { t: "Take a short nap", fx: s => { s.bat += 20; }, say: "Twenty minutes. You wake up buzzing." },
+        { t: "Read a comic", fx: s => { s.bat += 10; }, say: "A good story, no screen. +10%." },
+        { t: "Just one more episode", fx: s => { s.bat -= 20; }, say: "It was not just one." }] },
+  ],
+  rate: s => s.bat >= 75 ? 3 : s.bat >= 40 ? 2 : 1,
+  ending: s => s.bat >= 75 ? `${s.bat}%. You dance all night at the party.` : s.bat >= 40 ? `${s.bat}%. You make it to the party, a little sleepy.` : `${s.bat}%. You sleep through the party. Your friend texts: “where r u?”`,
+  lesson: "Charge yourself off-screen before you hit zero.",
+  cta: "So… what's YOUR battery at right now?"
+},
+];
+
+/* ---------- saved stars (per viewer, optional) ---------- */
+const KEY = "rule-road-stars-v1";
+function loadStars() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } }
+function saveStars(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch {} }
+
+/* ---------- tiny synth: plucks, a drone for the catch, a swell for the lesson ---------- */
+const Sound = {
+  ctx: null, on: false,
+  init() { if (!this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch { this.ctx = null; } } if (this.ctx && this.ctx.state === "suspended") this.ctx.resume(); },
+  tone(f, d = .25, type = "triangle", v = .14, when = 0) {
+    if (!this.on || !this.ctx) return;
+    const c = this.ctx, t = c.currentTime + when, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t + d + .05);
+  },
+  pluck() { this.tone(660, .18); this.tone(990, .14, "sine", .06, .03); },
+  good() { [784, 988, 1319].forEach((f, i) => this.tone(f, .3, "sine", .1, i * .07)); },
+  bad() { this.tone(180, .35, "sawtooth", .07); this.tone(140, .4, "sine", .1, .05); },
+  drone() { this.tone(73, 1.4, "sawtooth", .06); this.tone(110, 1.4, "sine", .08); },
+  swell() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 1.2, "sine", .07, i * .12)); },
+};
+
+/* ---------- state ---------- */
+let S = { screen: "home", t: 0, step: 0, phase: "arrive", s: null, res: null, stars: loadStars(), fan: { rule: "", lesson: "" } };
+const $app = document.getElementById("app");
+const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const val = (x, s) => typeof x === "function" ? x(s) : x;
+const starRow = (n, cls = "stars") => `<span class="${cls}" aria-label="${n || 0} of 3 stars">${[1, 2, 3].map(i => `<span class="${i <= (n || 0) ? "" : "off"}">★</span>`).join("")}</span>`;
+
+function topbar(back) {
+  return `<div class="bar">
+    ${back ? `<button class="iconbtn" data-act="home">← Rule Road</button>` : `<div class="brand"><b>Street Anomaly</b> · Rule Road</div>`}
+    <button class="iconbtn" data-act="sound" aria-pressed="${Sound.on}">${Sound.on ? "Sound on" : "Sound off"}</button>
+  </div>`;
+}
+
+function renderHome() {
+  const total = Object.values(S.stars).reduce((a, b) => a + b, 0);
+  const stops = TOWNS.map((T, i) => {
+    const st = S.stars[T.id];
+    return `<button class="stop ${st ? "done" : ""}" data-act="town" data-i="${i}">
+      <span class="mile"><span><small>MILE</small>${i + 1}</span></span>
+      <span class="stop-card">
+        <span class="tags"><span class="${T.track === "money" ? "tag-money" : "tag-life"}">${T.track === "money" ? "Money town" : "Life town"}</span>${starRow(st)}</span>
+        <span class="tname">${T.name}</span>
+        <span class="trule">In this town, ${esc(T.rule)}</span>
+      </span>
+    </button>`;
+  }).join("");
+  return `${topbar(false)}
+  <section class="hero">
+    <div class="sign"><div class="sign-inner">
+      <div class="kicker">Now entering</div>
+      <div class="rule">In <span class="flicker">this</span> town…</div>
+    </div></div>
+    <div class="pole"></div>
+    <p>Every town has one strange rule. Live one day by it. Make your choices, find the catch, and see what the rule teaches you.</p>
+  </section>
+  <p class="howto"><strong>How to play:</strong> pick a town, choose what you'd do, and watch the numbers change. Each town hides a twist halfway through. Earn up to 3 stars per town.</p>
+  <div class="total">Stars collected: <b>${total} / ${TOWNS.length * 3}</b></div>
+  <nav class="road" aria-label="Towns">
+    ${stops}
+    <button class="stop yours" data-act="fan">
+      <span class="mile"><span><small>MILE</small>${TOWNS.length + 1}</span></span>
+      <span class="stop-card">
+        <span class="tags"><span class="tag-money">Your town</span></span>
+        <span class="tname">Make your own rule</span>
+        <span class="trule">Invent a town. The best rules can become a real episode.</span>
+      </span>
+    </button>
+  </nav>
+  <div class="foot">All towns are fiction. Lessons are general ideas, not financial advice.<br>Watch new towns every day at <a href="https://www.youtube.com/@StreetAnomalyTV" target="_blank" rel="noopener">@StreetAnomalyTV</a></div>`;
+}
+
+function meters(T, s) {
+  return `<div class="meters">${T.meters.map(m => {
+    const v = s[m.k], max = m.max;
+    const low = m.battery ? v < 40 : (m.k === "words" ? v <= 3 : m.k === "sleep" ? v < 7 : false);
+    const pct = max ? Math.max(0, Math.min(100, v / max * 100)) : null;
+    return `<div class="meter ${m.life ? "life" : ""} ${low ? "low" : ""}">
+      <div class="ml">${m.label}</div>
+      <div class="mv" data-k="${m.k}">${v}${m.unit || ""}</div>
+      ${pct !== null ? `<div class="track"><i style="width:${pct}%"></i></div>` : ""}
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function renderTown() {
+  const T = TOWNS[S.t], s = S.s;
+  const tagLabel = T.track === "money" ? "Money town" : "Life town";
+  if (S.phase === "arrive") {
+    return `${topbar(true)}
+    <section class="hero">
+      <div class="sign"><div class="sign-inner">
+        <div class="kicker">${T.name} · Mile ${S.t + 1}</div>
+        <div class="rule">In this town, ${esc(T.rule)}</div>
+      </div></div>
+      <div class="pole"></div>
+    </section>
+    <p class="story">${esc(T.hook)}</p>
+    <button class="go" data-act="begin">Enter ${T.name}</button>`;
+  }
+  if (S.phase === "end") {
+    const n = S.res;
+    return `${topbar(true)}
+    <div class="mini-sign">${T.name} · ${tagLabel}</div>
+    ${meters(T, s)}
+    <div class="end-stars">${starRow(n, "")}</div>
+    <p class="story" style="text-align:center">${esc(T.ending(s))}</p>
+    <div class="lesson-k">The lesson</div>
+    <p class="lesson">${esc(T.lesson)}</p>
+    <p class="cta">${esc(T.cta)}</p>
+    <p class="loop">Because in this town, ${esc(T.rule)}</p>
+    <div class="row">
+      <button class="go ghost" data-act="again">Play ${T.name} again</button>
+      ${S.t + 1 < TOWNS.length ? `<button class="go" data-act="town" data-i="${S.t + 1}">Next town →</button>` : `<button class="go" data-act="fan">Make your own town →</button>`}
+    </div>`;
+  }
+  const st = T.steps[S.step];
+  if (st.rehook) {
+    return `${topbar(true)}
+    <div class="mini-sign">${T.name} · ${tagLabel}</div>
+    ${meters(T, s)}
+    <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p></div>
+    <button class="go" data-act="next">Keep going</button>`;
+  }
+  const r = S.phase === "result" ? S.lastResult : null;
+  const choices = st.choices.map((c, i) => {
+    const words = c.w !== undefined;
+    const ok = c.need ? c.need(s) : (words ? s.words >= c.w : true);
+    const cost = words ? (c.w ? `${c.w} word${c.w > 1 ? "s" : ""}` : "0 words") : (c.cost ? `${c.cost} coins` : "");
+    return `<button class="choice" data-act="pick" data-c="${i}" ${ok && !r ? "" : "disabled"} ${r && r.i === i ? 'style="border-color:var(--sign);opacity:1"' : ""}>
+      <span>${esc(c.t)}</span>${cost ? `<span class="cost">${ok ? cost : "not enough"}</span>` : ""}
+    </button>`;
+  }).join("");
+  return `${topbar(true)}
+  <div class="mini-sign">${T.name} · ${tagLabel}</div>
+  ${meters(T, s)}
+  <section class="scene" ${r ? 'style="animation:none"' : ""}>
+    <div class="when">${esc(st.when)}</div>
+    <p class="story">${esc(val(st.text, s))}</p>
+    <div class="choices">${choices}</div>
+    ${r ? `<div class="result"><p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
+      <button class="go" data-act="next">${S.step + 1 < T.steps.length ? "Next" : "See how it ended"}</button>` : ""}
+  </section>`;
+}
+
+/* fan rule maker: feeds the channel's "comment a rule" loop */
+function renderFan() {
+  const rule = S.fan.rule.trim(), lesson = S.fan.lesson.trim();
+  const shown = rule || "every chore you do adds a brick to your own house.";
+  const copy = `Rule idea for Street Anomaly 🏙️\nIn this town, ${shown}${lesson ? `\nLesson: ${lesson}` : ""}`;
+  return `${topbar(true)}
+  <section class="hero">
+    <div class="sign"><div class="sign-inner">
+      <div class="kicker">Your town · Mile ${TOWNS.length + 1}</div>
+      <div class="rule" id="fanSign">In this town, ${esc(shown)}</div>
+    </div></div>
+    <div class="pole"></div>
+  </section>
+  <div class="field"><label for="fanRule">In this town…</label>
+    <input id="fanRule" maxlength="90" placeholder="every chore you do adds a brick to your own house." value="${esc(S.fan.rule)}"></div>
+  <div class="field"><label for="fanLesson">What does it teach? (optional)</label>
+    <input id="fanLesson" maxlength="60" placeholder="Earning takes effort" value="${esc(S.fan.lesson)}"></div>
+  <div class="copybox" id="copyText">${esc(copy)}</div>
+  <div class="row">
+    <button class="go ghost" data-act="copy">Copy my rule</button>
+    <a class="go" style="text-align:center;text-decoration:none" href="https://www.youtube.com/@StreetAnomalyTV/shorts" target="_blank" rel="noopener">Post it on a Short →</a>
+  </div>
+  <p class="toast" id="toast" aria-live="polite"></p>
+  <p class="howto">Paste your rule in the comments of any Street Anomaly Short. Fan rules get their own episodes.</p>`;
+}
+
+function render() {
+  $app.innerHTML = S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown();
+  if (S.screen === "fan") bindFan();
+}
+
+function animateMeters(before) {
+  if (!before) return;
+  document.querySelectorAll(".mv").forEach(el => {
+    const k = el.dataset.k, a = before[k], b = S.s[k];
+    if (a === undefined || a === b) return;
+    el.classList.add(b > a ? "bump" : "drop");
+  });
+}
+
+function enterStep() {
+  const st = TOWNS[S.t].steps[S.step];
+  if (st && st.enter && !st.rehook) st.enter(S.s);
+  if (st && st.rehook) Sound.drone();
+}
+
+function pick(i) {
+  const T = TOWNS[S.t], st = T.steps[S.step], c = st.choices[i], s = S.s;
+  const before = { ...s };
+  if (c.w !== undefined) { s.words -= c.w; s.heart += c.h || 0; }
+  if (c.water !== undefined) {
+    if (c.water) { s.streak += 1; s.coins += s.streak; } else { s.coins = Math.floor(s.coins / 2); s.streak = 0; }
+  }
+  if (c.fx) c.fx(s);
+  if (s.bat !== undefined) s.bat = Math.max(0, Math.min(100, s.bat));
+  const night = st.night ? st.night(s) : (c.water !== undefined ? (c.water ? `The tree grows <strong>+${s.streak}</strong> coins.` : (before.coins ? `Skipped. The tree drops half: <strong>${before.coins} → ${s.coins}</strong>` : "Skipped. Nothing grows.")) : "");
+  S.lastResult = { i, say: val(c.say, s), night };
+  S.phase = "result";
+  const keys = T.meters.map(m => m.k);
+  const up = keys.some(k => s[k] > before[k]), down = keys.some(k => s[k] < before[k]);
+  down && !up ? Sound.bad() : up ? Sound.good() : Sound.pluck();
+  render(); animateMeters(before);
+}
+
+function next() {
+  const T = TOWNS[S.t];
+  Sound.pluck();
+  if (S.step + 1 >= T.steps.length) {
+    S.phase = "end"; S.res = T.rate(S.s);
+    if ((S.stars[T.id] || 0) < S.res) { S.stars[T.id] = S.res; saveStars(S.stars); }
+    Sound.swell(); render(); return;
+  }
+  S.step += 1; S.phase = "step"; enterStep(); render();
+}
+
+function startTown(i) {
+  S.screen = "town"; S.t = i; S.step = 0; S.phase = "arrive"; S.s = TOWNS[i].init(); S.lastResult = null;
+  render(); window.scrollTo(0, 0);
+}
+
+function bindFan() {
+  const r = document.getElementById("fanRule"), l = document.getElementById("fanLesson");
+  const upd = () => {
+    S.fan.rule = r.value; S.fan.lesson = l.value;
+    const shown = S.fan.rule.trim() || "every chore you do adds a brick to your own house.";
+    document.getElementById("fanSign").textContent = "In this town, " + shown;
+    document.getElementById("copyText").textContent = `Rule idea for Street Anomaly 🏙️\nIn this town, ${shown}${S.fan.lesson.trim() ? `\nLesson: ${S.fan.lesson.trim()}` : ""}`;
+  };
+  r.addEventListener("input", upd); l.addEventListener("input", upd);
+}
+
+$app.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act;
+  if (act === "sound") { Sound.on = !Sound.on; Sound.init(); if (Sound.on) Sound.pluck(); render(); return; }
+  if (Sound.on) Sound.init();
+  if (act === "home") { S.screen = "home"; Sound.pluck(); render(); window.scrollTo(0, 0); }
+  else if (act === "town") { Sound.pluck(); startTown(+b.dataset.i); }
+  else if (act === "again") { Sound.pluck(); startTown(S.t); }
+  else if (act === "begin") { S.phase = "step"; S.step = 0; enterStep(); Sound.pluck(); render(); }
+  else if (act === "pick") pick(+b.dataset.c);
+  else if (act === "next") { next(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  else if (act === "fan") { S.screen = "fan"; Sound.pluck(); render(); window.scrollTo(0, 0); }
+  else if (act === "copy") {
+    const txt = document.getElementById("copyText").textContent, toast = document.getElementById("toast");
+    const fallback = () => { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents(document.getElementById("copyText")); sel.removeAllRanges(); sel.addRange(rg); toast.textContent = "Selected. Press copy on your keyboard."; };
+    try { navigator.clipboard.writeText(txt).then(() => { toast.textContent = "Copied. Paste it in a comment."; }, fallback); } catch { fallback(); }
+  }
+});
+
+/* keep a viewer's place across live updates */
+window.claude?.hot?.snapshot?.(() => ({ screen: S.screen, t: S.t, step: S.step, phase: S.phase, s: S.s, res: S.res, lastResult: S.lastResult, fan: S.fan }));
+function start(data) { if (data && data.screen) Object.assign(S, data); render(); }
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+</body>
+</html>
