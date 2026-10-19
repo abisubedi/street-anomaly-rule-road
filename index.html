@@ -398,6 +398,35 @@ const TOWNS = [
   lesson: "Charge yourself off-screen before you hit zero.",
   cta: "So… what's YOUR battery at right now?"
 },
+{
+  id: "L4", track: "life", name: "Petalton", rule: "every time you say sorry, a flower grows in your yard.",
+  hook: "So why does one yard on Maple Street have nothing but dirt?",
+  meters: [{ k: "flowers", label: "Flowers in your yard", life: true }, { k: "thorns", label: "Thorns" }],
+  init: () => ({ flowers: 0, thorns: 0 }),
+  steps: [
+    { when: "8:00 a.m.", text: "You bump into the mail carrier and her letters go everywhere.",
+      choices: [
+        { t: "Say sorry and help pick them up", fx: s => { s.flowers += 1; }, say: "Pop. A red tulip by your porch." },
+        { t: "Keep walking, you're late", fx: s => { s.thorns += 1; }, say: "Something sharp pokes out of the dirt." }] },
+    { when: "Lunch", text: "You snapped at your little brother for taking the last cookie.",
+      choices: [
+        { t: "Tell him sorry", fx: s => { s.flowers += 1; }, say: "Pop. A pink rose. He gives you half the cookie." },
+        { t: "Say it was his fault", fx: s => { s.thorns += 1; }, say: "Another thorn. He doesn't talk to you all afternoon." }] },
+    { when: "3:00 p.m.", text: "Your soccer ball smashed a flowerpot next door.",
+      choices: [
+        { t: "Knock and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. Your neighbor laughs and lends you a new pot." },
+        { t: "Blame the wind", fx: s => { s.thorns += 2; }, say: "The wind did not do that. Two big thorns." }] },
+    { rehook: "Every sorry you DON'T say grows thorns. And Grandma is coming tonight. If thorns block the gate, she can't get in." },
+    { when: "6:00 p.m.", text: "Grandma's car pulls up. What's the last thing you do?",
+      choices: [
+        { t: "Go back and say every sorry you skipped", fx: s => { s.flowers += s.thorns; s.thorns = 0; }, say: "Pop, pop, pop. The thorns shrink away." },
+        { t: "Hide inside and hope she doesn't notice", fx: s => { s.thorns += 1; }, say: "She notices." }] },
+  ],
+  rate: s => s.thorns === 0 && s.flowers >= 4 ? 3 : s.thorns <= 1 ? 2 : 1,
+  ending: s => s.thorns === 0 ? `${s.flowers} flowers and zero thorns. Grandma walks right in and hugs you.` : s.thorns <= 1 ? `${s.flowers} flowers, one thorn. Grandma squeezes past… carefully.` : `${s.thorns} thorns block the gate. Grandma waves from the sidewalk.`,
+  lesson: "Sorry is a small word. It grows big things.",
+  cta: "So… who do YOU owe a sorry?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
@@ -487,7 +516,7 @@ function renderHome() {
       </span>
     </button>
   </nav>
-  <div class="foot">All towns are fiction. Lessons are general ideas, not financial advice. <a href="/privacy.html">Privacy</a><br>Watch new towns every day at <a href="https://www.youtube.com/@StreetAnomalyTV" target="_blank" rel="noopener">@StreetAnomalyTV</a></div>`;
+  <div class="foot">All towns are fiction. Lessons are general ideas, not financial advice. <a href="/privacy.html">Privacy</a><br>Watch new towns every week at <a href="https://www.youtube.com/@StreetAnomalyTV" target="_blank" rel="noopener">@StreetAnomalyTV</a></div>`;
 }
 
 function meters(T, s) {
