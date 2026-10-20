@@ -427,6 +427,35 @@ const TOWNS = [
   lesson: "Sorry is a small word. It grows big things.",
   cta: "So… who do YOU owe a sorry?"
 },
+{
+  id: "M4", track: "money", name: "Futureville", rule: "your bank account shows you your future self.",
+  hook: "So why did the girl at the bank machine just scream?",
+  meters: [{ k: "saved", label: "Saved", unit: "$" }, { k: "future", label: "Future you", life: true }],
+  init: () => ({ saved: 0, future: 1 }),
+  steps: [
+    { when: "Payday", text: "You just got paid. The screen shows future-you at 75… still working.",
+      choices: [
+        { t: "Move $20 into savings first", fx: s => { s.saved += 20; s.future += 1; }, say: "Future-you looks up and almost smiles." },
+        { t: "Spend it all on new shoes", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Cool shoes. Future-you yawns at work." }] },
+    { when: "Morning", text: "The fancy whipped-cream coffee is calling your name.",
+      choices: [
+        { t: "Make coffee at home, save $5", fx: s => { s.saved += 5; s.future += 1; }, say: "Five dollars. Future-you takes a lunch break in the sun." },
+        { t: "Buy the fancy coffee", fx: s => {}, say: "Delicious. Future-you doesn't change." }] },
+    { when: "Friday night", text: "Your friends want to order the giant pizza again.",
+      choices: [
+        { t: "Split a small one and save $10", fx: s => { s.saved += 10; s.future += 1; }, say: "Still fun. Future-you plants a garden." },
+        { t: "Order the giant one, extra everything", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Future-you is still wiping counters." }] },
+    { rehook: "The screen changes every day… but on your 30th birthday it freezes forever. And your 30th is coming." },
+    { when: "One year later", text: "Last check before the big birthday. What becomes your habit?",
+      choices: [
+        { t: "Keep saving a little every day", fx: s => { s.saved += 30; s.future += 2; }, say: "Small money, every day. Future-you is dancing with grandkids." },
+        { t: "Wait until you earn more", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Later never came." }] },
+  ],
+  rate: s => s.future >= 5 ? 3 : s.future >= 3 ? 2 : 1,
+  ending: s => s.future >= 5 ? `$${s.saved} saved. On your 30th birthday the screen freezes on future-you, laughing in a garden.` : s.future >= 3 ? `$${s.saved} saved. Future-you is smiling… and still working part-time.` : `$${s.saved} saved. The screen freezes on a very tired future-you.`,
+  lesson: "Small money, saved early, grows into a big future.",
+  cta: "So… what would YOUR screen show today?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
