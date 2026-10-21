@@ -485,6 +485,35 @@ const TOWNS = [
   lesson: "Use it up. Fix it. Share it. Waste less.",
   cta: "So… what would come back to YOUR door this week?"
 },
+{
+  id: "M5", track: "money", name: "Leashville", rule: "borrowed money follows you like a dog. Big loans are big dogs.",
+  hook: "So why is one guy being chased down Main Street by three dogs?",
+  meters: [{ k: "dogs", label: "Dogs following you" }, { k: "size", label: "Dog size" }, { k: "free", label: "Freedom", life: true }],
+  init: () => ({ dogs: 0, size: 0, free: 3 }),
+  steps: [
+    { when: "Friday", text: "Concert tickets cost $50. You don't have it right now.",
+      choices: [
+        { t: "Save up and go to the next show", fx: s => { s.free += 1; }, say: "Two weeks later, you go. No puppy." },
+        { t: "Borrow the $50", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A tiny puppy starts trotting behind you." }] },
+    { when: "Big sale", text: "A giant TV is on sale… if you borrow for it.",
+      choices: [
+        { t: "Keep your old TV", fx: s => { s.free += 1; }, say: "It still works. Your shoes are safe." },
+        { t: "Borrow for the giant TV", fx: s => { s.dogs += 1; s.size += 2; s.free -= 1; }, say: "A medium dog moves in. It eats your shoes." }] },
+    { when: "Car lot", text: "A shiny new car. Or your old bike that still works.",
+      choices: [
+        { t: "Keep riding the bike", fx: s => { s.free += 1; }, say: "Wind in your hair. Nothing behind you." },
+        { t: "Borrow for the shiny car", fx: s => { s.dogs += 1; s.size += 4; s.free -= 1; }, say: "A dog the size of a horse sits next to it." }] },
+    { rehook: "If you don't pay them back, the dogs keep growing every month. And your big job interview is next week." },
+    { when: "Next month", text: "Payday. What do you do first?",
+      choices: [
+        { t: "Pay back the smallest dog first, then the next", fx: s => { s.free += s.dogs; s.dogs = 0; s.size = 0; }, say: "Wag, wag… each one runs home." },
+        { t: "Spend it and pay later", fx: s => { s.size = s.size * 2; s.free = Math.max(0, s.free - 1); }, say: "The dogs get bigger. And hungrier." }] },
+  ],
+  rate: s => s.dogs === 0 && s.free >= 5 ? 3 : s.dogs === 0 ? 2 : 1,
+  ending: s => s.dogs === 0 ? "You walk into your new job with nobody behind you." : `${s.dogs} dog${s.dogs > 1 ? "s" : ""} (size ${s.size}) block your door on interview day.`,
+  lesson: "Borrow small. Pay it back fast. Walk free.",
+  cta: "So… how many dogs are following YOU?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
