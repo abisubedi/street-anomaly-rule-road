@@ -456,6 +456,35 @@ const TOWNS = [
   lesson: "Small money, saved early, grows into a big future.",
   cta: "So… what would YOUR screen show today?"
 },
+{
+  id: "L5", track: "life", name: "Boomerang Bay", rule: "everything you throw away comes back in a week.",
+  hook: "So why is one front door blocked by a mountain of junk?",
+  meters: [{ k: "pile", label: "Junk coming back" }, { k: "happy", label: "Happy faces", life: true }],
+  init: () => ({ pile: 0, happy: 0 }),
+  steps: [
+    { when: "Lunch", text: "You're full, but half your sandwich is left.",
+      choices: [
+        { t: "Wrap it up for later", fx: s => { s.happy += 1; }, say: "Afternoon snack: solved." },
+        { t: "Toss it in the trash", fx: s => { s.pile += 1; }, say: "Bye, sandwich… for now." }] },
+    { when: "After school", text: "Your toy robot has one tiny scratch.",
+      choices: [
+        { t: "Give it to the little kid next door", fx: s => { s.happy += 2; }, say: "He holds it up like a trophy." },
+        { t: "Throw it out, it's ruined", fx: s => { s.pile += 1; }, say: "Clunk. Into the bin." }] },
+    { when: "Snack time", text: "Your water bottle is empty.",
+      choices: [
+        { t: "Refill it at the sink", fx: s => { s.happy += 1; }, say: "Same bottle. Fresh water." },
+        { t: "Grab a new one, toss the old", fx: s => { s.pile += 2; }, say: "That's bottle number ten today." }] },
+    { rehook: "Everything you threw away comes back next week… and if you toss it AGAIN, it comes back double. Mom's birthday party is at home on Saturday." },
+    { when: "Friday night", text: "The junk is back, piled against your door.",
+      choices: [
+        { t: "Fix, share and reuse it all", fx: s => { s.happy += s.pile; s.pile = 0; }, say: "Bottles become flower pots for Mom." },
+        { t: "Throw it all out again", fx: s => { s.pile *= 2; }, say: "Uh oh. Double." }] },
+  ],
+  rate: s => s.pile === 0 && s.happy >= 4 ? 3 : s.pile <= 2 ? 2 : 1,
+  ending: s => s.pile === 0 ? `Saturday: an empty doorstep, ${s.happy} happy faces, and Mom loves her flower pots.` : s.pile <= 2 ? `${s.pile} things still come back… but the party goes on.` : `${s.pile} pieces of junk block the door. The party moves to the backyard.`,
+  lesson: "Use it up. Fix it. Share it. Waste less.",
+  cta: "So… what would come back to YOUR door this week?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
