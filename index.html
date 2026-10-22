@@ -514,6 +514,35 @@ const TOWNS = [
   lesson: "Borrow small. Pay it back fast. Walk free.",
   cta: "So… how many dogs are following YOU?"
 },
+{
+  id: "L6", track: "life", name: "Shadowbrook", rule: "your shadow does your chores… but it hates you.",
+  hook: "So why is one girl's shadow taller than her house?",
+  meters: [{ k: "you", label: "Your strength", life: true }, { k: "shadow", label: "Shadow's strength" }],
+  init: () => ({ you: 3, shadow: 1 }),
+  steps: [
+    { when: "After dinner", text: "There's a tall stack of dirty dishes.",
+      choices: [
+        { t: "Wash them yourself", fx: s => { s.you += 1; }, say: "Bubbles everywhere. But you did it." },
+        { t: "\"Shadow, do it.\"", fx: s => { s.shadow += 2; s.you -= 1; }, say: "Your shadow scrubs… and grumbles." }] },
+    { when: "Saturday", text: "Your room looks like a tornado hit it.",
+      choices: [
+        { t: "Clean it up", fx: s => { s.you += 1; }, say: "Clothes folded. Books stacked. Nice." },
+        { t: "\"Shadow, clean it.\"", fx: s => { s.shadow += 2; s.you -= 1; }, say: "It cleans… and glares at you." }] },
+    { when: "Rainy evening", text: "The dog needs a walk. And there's homework.",
+      choices: [
+        { t: "Grab your rain boots", fx: s => { s.you += 2; }, say: "Puddle jumps! The dog loves you." },
+        { t: "\"Shadow!\"", fx: s => { s.shadow += 2; s.you -= 1; }, say: "You stay dry. Your shadow gets bigger." }] },
+    { rehook: "Every chore your shadow does makes it stronger and you weaker. At midnight, if it's stronger than you, you switch places." },
+    { when: "11:30 p.m.", text: "Your shadow is towering over your bed. Thirty minutes left.",
+      choices: [
+        { t: "Get up and do the chores yourself", fx: s => { s.you += 4; s.shadow = Math.max(1, s.shadow - 5); }, say: "Slowly. Badly. But yourself. The shadow shrinks." },
+        { t: "Hide under the blanket", fx: s => { s.shadow += 1; }, say: "The clock ticks. Your shadow grins." }] },
+  ],
+  rate: s => s.you > s.shadow + 3 ? 3 : s.you > s.shadow ? 2 : 1,
+  ending: s => s.you > s.shadow ? "Midnight. Your shadow is normal size again… and it gives you a thumbs up." : "Midnight. You wake up flat on the wall. Your shadow is eating your cereal.",
+  lesson: "Do your own work. It makes YOU stronger.",
+  cta: "So… what chore is YOUR shadow doing right now?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
