@@ -679,6 +679,47 @@ const TOWNS = [
   lesson: "Do your own work. It makes YOU stronger.",
   cta: "So… what chore is YOUR shadow doing right now?"
 },
+{
+  id: "M6", track: "money", name: "Clockwick", rule: "every price tag shows how many hours of your life it costs.",
+  hook: "So why did one girl just put a giant TV back on the shelf?",
+  meters: [{ k: "free", label: "Free weekend hours", max: 48, unit: "h" }, { k: "happy", label: "Happy moments", life: true }],
+  init: () => ({ free: 30, happy: 0 }),
+  steps: [
+    { when: "Monday", text: "A fancy whipped-cream cocoa. The tag glows: 45 minutes.",
+      choices: [
+        { t: "Make cocoa at home", fx: s => { s.happy += 1; }, say: "Just as cozy. Zero minutes gone." },
+        { t: "Buy the fancy cocoa", fx: s => { s.free -= 1; }, say: "Yum. The tag eats almost an hour." }] },
+    { when: "Tuesday", text: "Sparkly sneakers you'd wear once. The tag glows: 14 hours.",
+      choices: [
+        { t: "Your old sneakers still work", fx: s => { s.happy += 1; }, say: "Still comfy. Fourteen hours stay yours." },
+        { t: "Buy them anyway", fx: s => { s.free -= 14; }, say: "So shiny… and fourteen hours lighter." }] },
+    { when: "Wednesday", text: "A glitter phone case. Your old one is fine. 3 hours.",
+      choices: [
+        { t: "Keep your old case", fx: s => { s.happy += 1; }, say: "Same phone. Same you. Three free hours." },
+        { t: "Buy the glitter one", fx: s => { s.free -= 3; }, say: "Sparkly! Three hours gone." }] },
+    { when: "Thursday", text: "A book you've wanted for months, for school AND fun. 2 hours.",
+      choices: [
+        { t: "Buy the book", fx: s => { s.free -= 2; s.happy += 2; }, say: "Worth every minute. Some things ARE worth it." },
+        { t: "Skip it to save hours", fx: s => {}, say: "Saved two hours… but you really wanted it." }] },
+    { rehook: "The hours on the tag come out of your WEEKENDS. And Grandma needs a visit. The plane ticket costs 30 hours." },
+    { when: "Friday", text: "Huge mall sale! A giant TV: 60 hours. Everyone is grabbing one.",
+      choices: [
+        { t: "Put it back and walk away", fx: s => { s.happy += 1; }, say: "The crowd rushes past. You smile." },
+        { t: "Grab it before it's gone", fx: s => { s.free -= 60; }, say: "Huge TV. Zero weekends left. For a long time." }] },
+    { when: "Saturday", text: "Your closet is full of clothes you never wore.",
+      choices: [
+        { t: "Sell them at a yard sale", fx: s => { s.free += 15; s.happy += 1; }, say: "Each tag turns to gold dust. +15 hours." },
+        { t: "Keep them, just in case", fx: s => {}, say: "They stay in the closet. So do your hours." }] },
+    { when: "Sunday", text: "Grandma calls. “Can you come soon, sweetie?”",
+      choices: [
+        { t: "Buy the plane ticket (30 hours)", need: s => s.free >= 30, fx: s => { s.free -= 30; s.happy += 4; s.visit = true; }, say: "Cookies, laughing, flour on your noses. The tag says: free." },
+        { t: "“Next month, Grandma.”", fx: s => { s.happy -= 1; }, say: "She says it's okay. It doesn't feel okay." }] },
+  ],
+  rate: s => s.visit && s.happy >= 7 ? 3 : (s.visit || s.free >= 20) ? 2 : 1,
+  ending: s => s.visit ? `You made it to Grandma's with ${Math.max(0, s.free)} free hours left. Best weekend ever.` : `${Math.max(0, s.free)} free hours. Not enough for the ticket. Grandma waits another month.`,
+  lesson: "Before you buy, ask: is it worth my hours?",
+  cta: "So… how many hours are hiding in YOUR closet?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
