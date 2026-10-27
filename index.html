@@ -761,6 +761,43 @@ const TOWNS = [
   lesson: "Walk in their shoes before you judge their day.",
   cta: "So… who would YOU swap with?"
 },
+{
+  id: "L8", track: "life", name: "Gigglewick", rule: "laughing out loud makes you float.",
+  hook: "So why is Grandpa Joe the only one still standing on the ground?",
+  meters: [{ k: "gig", label: "Grandpa's giggles", life: true }, { k: "close", label: "You & Grandpa" }],
+  init: () => ({ gig: 0, close: 2 }),
+  steps: [
+    { when: "Breakfast", text: "Your little brother laughs at his cereal and bonks his head on the ceiling. Grandpa Joe doesn't even look up.",
+      choices: [
+        { t: "Ask Grandpa when he last laughed", fx: s => { s.close += 2; }, say: "\"Eleven years,\" he says. \"I just… stopped.\"" },
+        { t: "Laugh at him for being grumpy", fx: s => { s.close -= 1; }, say: "You float up. He frowns down at you." }] },
+    { when: "Monday", text: "Mission Laugh, day one. You grab a long white feather.",
+      choices: [
+        { t: "Tickle his nose, very gently", fx: s => { s.gig += 1; }, say: "His mustache twitches. Almost!" },
+        { t: "Tickle his feet while he naps", fx: s => { s.close -= 1; }, say: "He wakes up grumpy. Zero giggles." }] },
+    { when: "Tuesday", text: "You hide a whoopee cushion on his chair.",
+      choices: [
+        { t: "Sit on it yourself first and laugh", fx: s => { s.gig += 1; s.close += 1; }, say: "You float to the ceiling. Grandpa's eyebrow goes up." },
+        { t: "Wait for him to sit on it", fx: s => { s.gig += 0; }, say: "PFFFT. He just sighs. \"Very funny.\"" }] },
+    { rehook: "Saturday is the Sky Picnic. The whole town laughs its way up to the clouds. If Grandpa can't laugh by then… you go up without him." },
+    { when: "Wednesday", text: "You have forty knock-knock jokes on index cards.",
+      choices: [
+        { t: "Read them all, super fast", fx: s => { s.gig -= 1; }, say: "Joke 40. He yawns. Big yawn." },
+        { t: "Ask Grandpa to tell YOU his favorite joke", fx: s => { s.gig += 2; s.close += 2; }, say: "He tells an old one about a duck. You both snort." }] },
+    { when: "Thursday", text: "Grandpa shows you an old photo of himself, laughing, floating over the town.",
+      choices: [
+        { t: "\"What made you laugh back then?\"", fx: s => { s.close += 2; s.gig += 1; }, say: "\"Silly things. Balloons. Your grandma's jokes.\"" },
+        { t: "Put the photo back. It's sad.", fx: s => { s.close -= 1; }, say: "He goes quiet for the rest of the day." }] },
+    { when: "Saturday morning", text: "Everyone lifts off. You float up… and look down. Grandpa stands alone on the empty street.",
+      choices: [
+        { t: "Float back down with fifty balloons", fx: s => { s.gig += 3; s.close += 2; s.floated = true; }, say: "He rises one inch… POP! Every balloon at once. He lands on his bottom. Squeak. And he LAUGHS." },
+        { t: "Keep floating up to the picnic", fx: s => { s.close -= 2; }, say: "The clouds are fun. But the picnic feels kind of empty." }] },
+  ],
+  rate: s => s.floated && s.gig >= 6 && s.close >= 7 ? 3 : s.floated ? 2 : 1,
+  ending: s => s.floated ? "Grandpa Joe floats higher than anyone. Eleven years of laughs, all at once. He hugs you on top of a cloud." : "You eat sky sandwiches on a cloud. Way down below, Grandpa Joe is still standing on the street.",
+  lesson: "Joy isn't childish. It's what lifts you up.",
+  cta: "So… what's the last thing that made YOU laugh out loud?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
