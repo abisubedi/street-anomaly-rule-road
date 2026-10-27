@@ -720,6 +720,47 @@ const TOWNS = [
   lesson: "Before you buy, ask: is it worth my hours?",
   cta: "So… how many hours are hiding in YOUR closet?"
 },
+{
+  id: "L7", track: "life", name: "Flipside", rule: "kids are in charge… and adults go to school. One week every year.",
+  hook: "So why is one dad riding the school bus with a tiny backpack?",
+  meters: [{ k: "und", label: "Understanding Dad", life: true }, { k: "home", label: "House in one piece" }],
+  init: () => ({ und: 1, home: 3 }),
+  steps: [
+    { when: "Monday", text: "You're the boss now. Dad waves from the school bus with your tiny backpack.",
+      choices: [
+        { t: "Wave back: \"Good luck, Dad!\"", fx: s => { s.und += 1; }, say: "He gives you a nervous thumbs up." },
+        { t: "Shout: \"School is EASY!\"", fx: s => { s.und -= 1; }, say: "He sighs. The bus pulls away." }] },
+    { when: "Breakfast", text: "Time to make toast for yourself. The toaster dial goes up to 10.",
+      choices: [
+        { t: "Read the dial and pick 3", fx: s => { s.home += 1; }, say: "Golden toast. You're a natural." },
+        { t: "Turn it to 10. Faster!", fx: s => { s.home -= 1; }, say: "Black toast. Smoke alarm. Oops." }] },
+    { when: "Tuesday", text: "The laundry is piled up like a mountain.",
+      choices: [
+        { t: "Sort it and wash one load", fx: s => { s.home += 2; }, say: "One load done. The mountain is a hill now." },
+        { t: "Shove it all in the closet", fx: s => { s.home -= 1; }, say: "The closet door won't close anymore." }] },
+    { rehook: "If nobody learns something by Friday, the swap never ends. Dad stays in 4th grade. You pay the bills. Forever." },
+    { when: "Wednesday", text: "Envelopes arrive. Bills! You count your coins… and gulp.",
+      choices: [
+        { t: "Call Grandma and ask how bills work", fx: s => { s.und += 2; s.home += 1; }, say: "\"Your dad does this every month, sweetie.\" Whoa." },
+        { t: "Hide them under the couch", fx: s => { s.home -= 2; }, say: "Out of sight… not out of the mailbox." }] },
+    { when: "Wednesday night", text: "The kitchen sink bursts! Water sprays everywhere.",
+      choices: [
+        { t: "Turn the little valve under the sink", fx: s => { s.home += 1; }, say: "The spray stops. Dad showed you that once!" },
+        { t: "Stuff a towel in it", fx: s => { s.home -= 2; }, say: "Now the towel is a fountain too." }] },
+    { when: "Thursday", text: "Dad comes home with a D on his quiz. He looks really sad.",
+      choices: [
+        { t: "Sit with him and listen", fx: s => { s.und += 2; }, say: "\"Fractions are HARD,\" he says. You know the feeling." },
+        { t: "\"Told you school was easy.\"", fx: s => { s.und -= 2; }, say: "He goes to his room. Quiet." }] },
+    { when: "Thursday, 7 p.m.", text: "You're SO tired. Being a grown-up is a lot.",
+      choices: [
+        { t: "Knock on Dad's door: \"Fractions for the sink?\"", fx: s => { s.und += 3; s.home += 2; s.learned = true; }, say: "You stay up together. Fractions. Wrenches. Laughing." },
+        { t: "Fall asleep on the couch", fx: s => { s.home -= 1; }, say: "Zzz… the bills slide off your lap." }] },
+  ],
+  rate: s => s.learned && s.und >= 6 && s.home >= 5 ? 3 : s.learned ? 2 : 1,
+  ending: s => s.learned ? "Friday: Dad aces his test, the class claps, and you swap back. You make him tea. \"Long day, Dad?\"" : "Friday comes. Nobody learned anything. The school bus honks for Dad… again. And again.",
+  lesson: "Walk in their shoes before you judge their day.",
+  cta: "So… who would YOU swap with?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
