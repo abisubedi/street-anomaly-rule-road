@@ -798,6 +798,43 @@ const TOWNS = [
   lesson: "Joy isn't childish. It's what lifts you up.",
   cta: "So… what's the last thing that made YOU laugh out loud?"
 },
+{
+  id: "M7", track: "money", name: "Inchwood", rule: "every new thing you buy makes your house one inch smaller.",
+  hook: "So why is your dog's house bigger than yours?",
+  meters: [{ k: "inch", label: "House height (inches)", life: true }, { k: "joy", label: "Room to live" }],
+  init: () => ({ inch: 60, joy: 2 }),
+  steps: [
+    { when: "Monday", text: "A flash sale pops up: a sixth pair of shoes, half price!",
+      choices: [
+        { t: "Wear the five pairs you already have", fx: s => { s.joy += 1; }, say: "Your house stays put. Your feet are fine." },
+        { t: "Buy them. It's a deal!", fx: s => { s.inch -= 1; }, say: "Squish. The ceiling drops one inch." }] },
+    { when: "Tuesday", text: "A lamp shaped like a duck. It's so silly. You love it.",
+      choices: [
+        { t: "Take a photo of it instead", fx: s => { s.joy += 1; }, say: "You laugh at the photo all day. Free." },
+        { t: "Buy the duck lamp", fx: s => { s.inch -= 1; }, say: "Quack. Squish. One more inch gone." }] },
+    { when: "Wednesday", text: "Three phone cases… for one phone. Pink, mint and lilac.",
+      choices: [
+        { t: "Pick ONE color", fx: s => { s.inch -= 1; s.joy += 1; }, say: "One inch. You actually use it every day." },
+        { t: "Get all three", fx: s => { s.inch -= 3; s.joy -= 1; }, say: "Three inches. Two cases sit in a drawer." }] },
+    { rehook: "If your house hits zero inches… it's gone. With everything inside. And tonight is the Midnight Mega Sale." },
+    { when: "11 p.m.", text: "Your cart has 40 things in it. Your house has 40 inches left.",
+      choices: [
+        { t: "Remove. Remove. Remove.", fx: s => { s.joy += 2; s.cleared = true; }, say: "Your cart is empty. Your heart is pounding. Your house is still here." },
+        { t: "Buy just half of them", fx: s => { s.inch -= 20; }, say: "Squish ×20. You can't sit up in bed anymore." }] },
+    { when: "Saturday", text: "Your yard is full of things you never used. A treadmill. A bread maker. Shoes.",
+      choices: [
+        { t: "Give it all to neighbors who need it", fx: s => { s.inch += 25; s.joy += 3; s.gave = true; }, say: "Every thing that leaves… the house grows back one inch!" },
+        { t: "Shove it all back inside", fx: s => { s.joy -= 2; }, say: "You crawl in sideways. It's very crowded." }] },
+    { when: "Sunday", text: "Your neighbor invites you to a big dinner party.",
+      choices: [
+        { t: "Host it at your place instead", need: s => s.gave, fx: s => { s.joy += 2; }, say: "Twelve people, one table, lots of room." },
+        { t: "Go, but buy a new outfit first", fx: s => { s.inch -= 1; }, say: "Squish. You're wearing it once." }] },
+  ],
+  rate: s => s.cleared && s.gave && s.inch >= 70 ? 3 : (s.cleared || s.gave) ? 2 : 1,
+  ending: s => s.gave ? `Your house stands ${s.inch} inches tall. You walk through the front door standing up, and the dog moves back inside.` : `Your house is ${Math.max(0, s.inch)} inches tall. You crawl in at night, and the dog's house is still bigger.`,
+  lesson: "More stuff doesn't mean more life.",
+  cta: "So… what's one thing YOU bought and never used?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
