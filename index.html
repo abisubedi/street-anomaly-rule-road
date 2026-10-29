@@ -835,6 +835,43 @@ const TOWNS = [
   lesson: "More stuff doesn't mean more life.",
   cta: "So… what's one thing YOU bought and never used?"
 },
+{
+  id: "L9", track: "life", name: "Hugsdale", rule: "every hug adds one minute to your day.",
+  hook: "So why is one dad always exactly one minute late?",
+  meters: [{ k: "min", label: "Extra minutes today", life: true }, { k: "yumi", label: "Yumi's smile" }],
+  init: () => ({ min: 0, yumi: 2 }),
+  steps: [
+    { when: "Monday, 7:58", text: "You're Kenji. Coffee in one hand, briefcase in the other. Yumi opens her arms at the door.",
+      choices: [
+        { t: "Put the coffee down and hug her", fx: s => { s.min += 1; s.yumi += 2; }, say: "One minute added. You catch the bus with time to spare." },
+        { t: "\"No time, kiddo.\"", fx: s => { s.yumi -= 1; }, say: "The bus pulls away. You missed it by one minute." }] },
+    { when: "Monday, 9:00", text: "The mailman waves at you with open arms. Everyone here hugs the mailman.",
+      choices: [
+        { t: "Hug the mailman", fx: s => { s.min += 1; }, say: "Awkward. But one more minute!" },
+        { t: "Wave and keep running", fx: s => { s.min += 0; }, say: "You run. You're still late." }] },
+    { when: "Tuesday", text: "Your big meeting starts in two minutes. Your coworker looks stressed.",
+      choices: [
+        { t: "Give her a quick hug first", fx: s => { s.min += 1; }, say: "She smiles. You both walk in right on time." },
+        { t: "Sprint past everyone", fx: s => { s.yumi += 0; }, say: "The door closes as you reach it. One minute late." }] },
+    { rehook: "The clock in your hallway doesn't count time. It counts hugs. And this year, yours says zero." },
+    { when: "Wednesday", text: "It's Yumi's school play tonight, and you're stuck at your desk.",
+      choices: [
+        { t: "Leave now, run all the way", fx: s => { s.yumi += 2; s.play = true; }, say: "You slide into the back row as she says her line. She sees you." },
+        { t: "Finish one more email", fx: s => { s.yumi -= 2; }, say: "You arrive as the curtain closes. By one minute." }] },
+    { when: "Thursday morning", text: "You grab your keys… and stop. Yumi isn't at the door today.",
+      choices: [
+        { t: "Knock on her door, kneel down, hug her", fx: s => { s.min += 3; s.yumi += 3; s.hugged = true; }, say: "One minute. Then another. Then another. For the first time ever, you're early." },
+        { t: "Leave quietly. You're late.", fx: s => { s.yumi -= 2; }, say: "The hug clock doesn't move." }] },
+    { when: "Sunday", text: "You have some extra time today. What do you do with it?",
+      choices: [
+        { t: "Fly a kite in the park with Yumi", need: s => s.hugged, fx: s => { s.yumi += 2; s.min += 2; }, say: "Two extra hours. A red kite. Lots of laughing." },
+        { t: "Catch up on work", fx: s => { s.yumi -= 1; }, say: "The inbox is empty. So is the hallway." }] },
+  ],
+  rate: s => s.hugged && s.yumi >= 9 && s.min >= 6 ? 3 : s.hugged ? 2 : 1,
+  ending: s => s.hugged ? `Your day stretched by ${s.min} minutes… and you spent the extra time with Yumi.` : "You saved every minute… and still ran out of time. The hug clock says zero.",
+  lesson: "Hugs don't cost time. They give it back.",
+  cta: "So… who's the first person YOU'D hug tomorrow?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
