@@ -872,6 +872,39 @@ const TOWNS = [
   lesson: "Hugs don't cost time. They give it back.",
   cta: "So… who's the first person YOU'D hug tomorrow?"
 },
+{
+  id: "L3b", track: "life", name: "Chargeville: Kai's Turn", rule: "your phone battery is your energy. At 0%, so are you.",
+  hook: "So why is the fastest kid in town crawling up the stairs?",
+  meters: [{ k: "bat", label: "Kai's battery %", life: true }, { k: "jada", label: "Jada's trust" }],
+  init: () => ({ bat: 100, jada: 2 }),
+  steps: [
+    { when: "Monday night", text: "You're Kai. You just downloaded your first game. It's 9 p.m. and you're winning.",
+      choices: [
+        { t: "Play until midnight", fx: s => { s.bat -= 20; }, say: "You beat level 12. Eighty percent… and your eyes feel heavy." },
+        { t: "One more level, then bed", fx: s => { s.bat -= 5; }, say: "You put it down at 95%. You sleep like a rock." }] },
+    { when: "Tuesday breakfast", text: "Your cereal is getting soggy. A new video just dropped.",
+      choices: [
+        { t: "Watch it at the table", fx: s => { s.bat -= 30; }, say: "In math class, your head hits the desk. Fifty percent." },
+        { t: "Eat and race Jada to the bus", fx: s => { s.bat += 5; s.jada += 1; }, say: "You win by a mile. Jada laughs." }] },
+    { when: "Wednesday", text: "Recess soccer. The ball rolls right to you.",
+      choices: [
+        { t: "Check your phone first", fx: s => { s.bat -= 25; }, say: "You swing… and miss. Everyone laughs." },
+        { t: "Kick it hard", fx: s => { s.bat += 10; }, say: "Goal! You feel the battery tick up." }] },
+    { rehook: "In this town, if you hit 0%, you sleep for a whole day. And the Kite Race is Saturday." },
+    { when: "Friday night", text: "Jada holds out her hand. \"Give me the phone.\"",
+      choices: [
+        { t: "Hand it over", fx: s => { s.jada += 3; s.gave = true; }, say: "She smiles and pulls out her old red kite. \"Your turn.\"" },
+        { t: "Hold it tighter", fx: s => { s.bat -= 10; s.jada -= 1; }, say: "Three percent. Your eyes start to close…" }] },
+    { when: "Saturday morning", text: "The hill is covered in kites. Your battery is blinking.",
+      choices: [
+        { t: "Grab the red kite and run", need: s => s.gave, fx: s => { s.bat = 100; s.won = true; }, say: "Twenty… sixty… ninety… You cross the finish line at 100%." },
+        { t: "Charge your phone first", fx: s => { s.bat = Math.max(s.bat, 1); }, say: "The phone fills up. You don't. The race starts without you." }] },
+  ],
+  rate: s => s.won && s.jada >= 6 ? 3 : s.won ? 2 : 1,
+  ending: s => s.won ? "You won the Kite Race at 100%… with your phone still at home." : "Your phone hit 100%. You didn't. You slept through the race.",
+  lesson: "The best charger in this town is the sky.",
+  cta: "So… what percent are YOU at right now?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
