@@ -638,6 +638,43 @@ const TOWNS = [
   lesson: "Borrow small. Pay it back fast. Walk free.",
   cta: "So… how many dogs are following YOU?"
 },
+{
+  id: "L-fallback", track: "life", name: "Tockfield", rule: "when the clocks fall back, the extra hour falls from the sky, and you catch it in a jar.",
+  hook: "So why does one grandma have 60 hours hidden in jars?",
+  meters: [{ k: "jars", label: "Hours saved in jars" }, { k: "joy", label: "Memories", life: true }],
+  init: () => ({ jars: 54, joy: 2, theo: false }),
+  steps: [
+    { when: "Fall-back night", text: "A glowing hour drops into your jar. Your neighbor says, \"Sleep in!\"",
+      choices: [
+        { t: "Spend it baking cookies with your grandson", fx: s => { s.joy += 2; }, say: "Flour everywhere. He'll remember this." },
+        { t: "Label it \"Someday\" and put it on the shelf", fx: s => { s.jars += 1; }, say: "Another jar glows in the pantry." }] },
+    { when: "The next year", text: "Another hour falls. Your old friend calls to talk.",
+      choices: [
+        { t: "Spend the hour on the phone with her", fx: s => { s.joy += 2; }, say: "You laugh until midnight." },
+        { t: "Save it for something important", fx: s => { s.jars += 1; }, say: "The shelf gets heavier." }] },
+    { when: "Another year", text: "Theo asks what \"Someday\" means.",
+      choices: [
+        { t: "Show him one of the jars", fx: s => { s.joy += 1; }, say: "His eyes go wide in the golden light." },
+        { t: "Say, \"Something important\"", fx: s => { s.jars += 1; }, say: "He nods. He doesn't really get it." }] },
+    { rehook: "In this town, an hour can only wait 60 years. At 2 a.m. on fall-back night, the oldest jar melts." },
+    { when: "1:50 a.m.", text: "Your first jar, from 1966, is starting to drip.",
+      choices: [
+        { t: "Wake Theo up", fx: s => { s.theo = true; s.joy += 1; }, say: "He blinks awake in his Halloween cape." },
+        { t: "Let him sleep and watch the jar alone", fx: s => { s.jars -= 1; }, say: "Drip… drip… it's gone." }] },
+    { when: "1:59 a.m.", text: "Everyone says to open the oldest jar and rest.",
+      choices: [
+        { t: "Open ALL of them", fx: s => { s.joy += s.jars; s.jars = 0; }, say: "Golden light floods the kitchen. The clock stops at 2:00." },
+        { t: "Open just the oldest one", fx: s => { s.jars -= 1; s.joy += 1; }, say: "One hour. You fall asleep in it." }] },
+    { when: "Sixty hours", text: "The whole town is frozen. What do you do first?",
+      choices: [
+        { t: "Blanket fort, pancakes, and your secret card trick", fx: s => { s.joy += 3; }, say: "Theo will tell this story forever." },
+        { t: "Tidy the pantry", fx: s => { s.joy += 0; }, say: "The shelves are very clean." }] },
+  ],
+  rate: s => s.jars === 0 && s.theo && s.joy >= 65 ? 3 : s.theo && s.joy >= 10 ? 2 : 1,
+  ending: s => s.jars === 0 ? "Monday morning: every jar is empty, and you've never felt so full." : `${s.jars} jars still glow on the shelf, waiting for someday.`,
+  lesson: "Someday is a day of the week you never get. Spend the hour now.",
+  cta: "This weekend your clock gives you one hour back. Who are you spending it on?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
