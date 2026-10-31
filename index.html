@@ -675,6 +675,39 @@ const TOWNS = [
   lesson: "Someday is a day of the week you never get. Spend the hour now.",
   cta: "This weekend your clock gives you one hour back. Who are you spending it on?"
 },
+{
+  id: "L-kindlights", track: "life", name: "Glowick", rule: "the streetlights only turn on when someone says something kind.",
+  hook: "So why is one street the only dark one in town?",
+  meters: [{ k: "lit", label: "Lamps lit on your street" }, { k: "friends", label: "Neighbors who wave back", life: true }],
+  init: () => ({ lit: 0, friends: 0, spoke: false }),
+  steps: [
+    { when: "Monday, 5 p.m.", text: "You're the mail carrier. It's already dark. Mrs. Patel is trimming her roses.",
+      choices: [
+        { t: "Tell her the roses are the best on the street", fx: s => { s.lit += 1; s.friends += 1; s.spoke = true; }, say: "Click. Her porch lamp glows." },
+        { t: "Drop the mail and keep walking", fx: s => {}, say: "Still dark. She squints at the mailbox." }] },
+    { when: "Tuesday", text: "Danny zooms past on his bike, way faster than last week.",
+      choices: [
+        { t: "Shout, \"You got really fast!\"", fx: s => { s.lit += 1; s.friends += 1; s.spoke = true; }, say: "Click. He rings his bell twice." },
+        { t: "Nod and say nothing", fx: s => {}, say: "He wobbles home in the dark." }] },
+    { when: "Wednesday", text: "The bus driver waits an extra second so you can get on.",
+      choices: [
+        { t: "\"Best bus driver ever!\"", fx: s => { s.lit += 1; s.friends += 1; }, say: "Click, click. The bus stop glows." },
+        { t: "Just sit down", fx: s => {}, say: "The bus rolls on through the dark." }] },
+    { rehook: "In this town, if a street stays dark all week, its lights get taken away. For the whole winter." },
+    { when: "Thursday", text: "Kids walk home with flashlights. One trips on a crack.",
+      choices: [
+        { t: "Help her up and say she's brave", fx: s => { s.lit += 2; s.friends += 1; }, say: "Click, click. Two lamps light the crack." },
+        { t: "Point at the crack and keep going", fx: s => {}, say: "Dark again." }] },
+    { when: "Friday, last chance", text: "Forty years of nice things you noticed and never said.",
+      choices: [
+        { t: "Go door to door and say every one", fx: s => { s.lit += 8; s.friends += 4; }, say: "Click, click, click… the whole street turns gold." },
+        { t: "It's too late to start now", fx: s => {}, say: "The lamps on your street go out for winter." }] },
+  ],
+  rate: s => s.lit >= 12 ? 3 : s.lit >= 5 ? 2 : 1,
+  ending: s => s.lit >= 12 ? "By six, your street is the brightest in town." : s.lit > 0 ? `${s.lit} lamp${s.lit > 1 ? "s" : ""} glow on your street. A few dark gaps remain.` : "Your street goes dark for the whole winter.",
+  lesson: "Kind words only work out loud.",
+  cta: "Who's someone you should say something kind to today?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
