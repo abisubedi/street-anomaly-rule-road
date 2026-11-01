@@ -708,6 +708,39 @@ const TOWNS = [
   lesson: "Kind words only work out loud.",
   cta: "Who's someone you should say something kind to today?"
 },
+{
+  id: "L-voice", track: "life", name: "Hushford", rule: "if you skip Election Day, you lose your voice until the next one.",
+  hook: "So why can one grandpa only whisper?",
+  meters: [{ k: "voice", label: "Your voice (0 = whisper)" }, { k: "years", label: "Years whispering" }, { k: "joy", label: "Moments shared", life: true }],
+  init: () => ({ voice: 0, years: 50, joy: 1, went: false }),
+  steps: [
+    { when: "Saturday", text: "You're Walt. Your dog Biscuit is across the yard. You try to call her.",
+      choices: [
+        { t: "Walk over and pat her instead", fx: s => { s.joy += 1; }, say: "She wags. She never hears you, but she knows you." },
+        { t: "Whisper louder", fx: s => {}, say: "Nothing. She sniffs the flowers." }] },
+    { when: "Sunday", text: "Lily's big game. Everyone is cheering for her.",
+      choices: [
+        { t: "Make a giant sign since you can't shout", fx: s => { s.joy += 2; }, say: "She sees it from the court and grins." },
+        { t: "Stay home, there's no point if you can't cheer", fx: s => {}, say: "She looks at the empty seat." }] },
+    { when: "Monday", text: "Lily turns 18. \"Grandpa… does one vote really matter?\"",
+      choices: [
+        { t: "Write: \"Let's find out together\"", fx: s => { s.joy += 1; s.went = true; }, say: "She reads it twice and hugs you." },
+        { t: "Shrug, like you did at 24", fx: s => {}, say: "She shrugs back." }] },
+    { rehook: "In this town, if you go with someone for their very first time, you BOTH get your voices back. Even after 50 years." },
+    { when: "Tuesday morning", text: "Lily is at the door with her coat on.",
+      choices: [
+        { t: "Grab your cardigan and go with her", fx: s => { s.went = true; s.joy += 1; }, say: "Old friends wave at you inside." },
+        { t: "Wait outside on the bench, like always", fx: s => { s.went = false; }, say: "You watch the door close." }] },
+    { when: "At the table", text: "A volunteer smiles and holds out a card. To you.",
+      choices: [
+        { t: "Take it", fx: s => { if (s.went) { s.voice = 10; s.years = 0; s.joy += 4; } }, say: "Lily covers her mouth. You laugh, OUT LOUD." },
+        { t: "\"Not me, just her\"", fx: s => {}, say: "Another year of whispering." }] },
+  ],
+  rate: s => s.voice > 0 && s.joy >= 9 ? 3 : s.voice > 0 ? 2 : 1,
+  ending: s => s.voice > 0 ? "Biscuit comes running from three streets away." : "You whisper \"proud of you\". Lily doesn't hear it.",
+  lesson: "Your voice only works if you use it.",
+  cta: "Who are YOU walking in with this Election Day?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
