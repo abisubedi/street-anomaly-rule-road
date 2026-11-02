@@ -675,6 +675,35 @@ const TOWNS = [
   lesson: "Someday is a day of the week you never get. Spend the hour now.",
   cta: "This weekend your clock gives you one hour back. Who are you spending it on?"
 },
+{
+  id: "M8", track: "money", name: "Tillsbury", rule: "your wallet talks, and it warns you before you spend.",
+  hook: "So why did one wallet scream in the middle of the mall?",
+  meters: [{ k: "cash", label: "Dollars in your wallet" }, { k: "trust", label: "Wallet's trust", life: true }],
+  init: () => ({ cash: 32, trust: 2, gift: false }),
+  steps: [
+    { rehook: "Here's what nobody tells you: hit zero and your wallet falls asleep for a month, right before Black Friday. And your mom's birthday IS Black Friday." },
+    { when: "Early sale", text: "A shiny blender, 70% off. \"You HAVE a blender!\" the wallet yells.",
+      choices: [
+        { t: "Listen and walk past it", fx: s => { s.trust += 2; }, say: "The wallet purrs. You keep your $32." },
+        { t: "Buy it anyway", fx: s => { s.cash -= 29; s.trust -= 1; }, say: "Beep. Three dollars left." }] },
+    { when: "Giant sign", text: "\"Mystery box. Three dollars.\" Everyone is grabbing one. \"Don't,\" the wallet whispers.",
+      choices: [
+        { t: "Zip it shut and walk out", fx: s => { s.trust += 2; }, say: "Behind you, someone opens the box. One sock." },
+        { t: "Grab a box", fx: s => { s.cash -= 3; s.trust -= 2; }, say: "One sock. And your wallet goes quiet." }] },
+    { when: "Payday", text: "Your paycheck lands. Black Friday is two weeks away.",
+      choices: [
+        { t: "Put some away for mom's present", fx: s => { s.cash += 28; s.trust += 1; }, say: "The wallet hums a happy tune." },
+        { t: "Treat yourself to light-up slippers", fx: s => { s.cash += 5; s.trust -= 1; }, say: "They light up. Your wallet doesn't." }] },
+    { when: "Black Friday", text: "It's mom's birthday. What's the plan?",
+      choices: [
+        { t: "Buy her present with your saved money", fx: s => { if (s.cash >= 25) { s.gift = true; s.cash -= 25; s.trust += 2; } }, say: "You check your wallet and head for the door." },
+        { t: "Make her a card instead", fx: s => { s.trust += 1; }, say: "She loves it. She still wishes you'd come to dinner." }] },
+  ],
+  rate: s => s.gift && s.trust >= 7 ? 3 : s.gift ? 2 : 1,
+  ending: s => s.gift ? "Your mom opens her present, and your wallet is very quiet." : "No present this year. Your wallet says nothing at all.",
+  lesson: "The best deal is the one you don't need.",
+  cta: "What's the worst thing YOU ever bought on sale?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
