@@ -704,6 +704,31 @@ const TOWNS = [
   lesson: "The best deal is the one you don't need.",
   cta: "What's the worst thing YOU ever bought on sale?"
 },
+{
+  id: "M-jobs", track: "money", name: "Tagwick", rule: "a coin with no job gets up and leaves.",
+  hook: "So why does your sister always have money left?",
+  meters: [{ k: "cash", label: "Coins you still have" }, { k: "plan", label: "Your plan", life: true }],
+  init: () => ({ cash: 100, plan: 1, paid: false, helped: false }),
+  steps: [
+    { rehook: "Here's what nobody tells you: runaway coins never come back. And the first freeze hits on Friday. Your heater is dead, and fixing it costs 80 coins." },
+    { when: "Payday", text: "You get 100 coins. They're already wobbling in your hand.",
+      choices: [
+        { t: "Tie a tag on 80 of them: HEATER", fx: s => { s.plan += 3; }, say: "The tagged coins settle down and go quiet." },
+        { t: "Stuff them all in your pocket", fx: s => { s.cash -= 60; s.plan -= 1; }, say: "By lunch, they're rolling down the street. You catch forty." }] },
+    { when: "Lunch", text: "The coins with no job start rolling toward the door. A snack cart is right outside.",
+      choices: [
+        { t: "Give the leftovers a job: FOOD", fx: s => { s.plan += 2; }, say: "They stop rolling. Lunch is packed for the week." },
+        { t: "Let them go, it's only a few", fx: s => { s.cash -= 15; s.plan -= 1; }, say: "A few turns into fifteen." }] },
+    { when: "Friday", text: "Frost on the window. The repair truck is outside, and it wants 80 coins.",
+      choices: [
+        { t: "Pay for the repair", fx: s => { if (s.cash >= 80) { s.paid = true; s.cash -= 80; s.plan += 1; } }, say: "You count out your coins at the door." },
+        { t: "Ask your sister for help", fx: s => { s.helped = true; s.plan += 1; }, say: "She opens a drawer and hands you a jar. The tag has your name on it." }] },
+  ],
+  rate: s => s.paid && s.plan >= 6 ? 3 : s.paid || s.helped ? 2 : 1,
+  ending: s => s.paid ? "Your heater hums back on, and your own coins paid for it." : s.helped ? "Your heater hums back on. Your sister makes less than you, and she paid for it." : "You come up short. The truck drives off, and the house stays cold.",
+  lesson: "Money with no job finds the door.",
+  cta: "If your money had a job, what would it be?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
