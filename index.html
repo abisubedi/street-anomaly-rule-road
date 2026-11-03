@@ -729,6 +729,33 @@ const TOWNS = [
   lesson: "Money with no job finds the door.",
   cta: "If your money had a job, what would it be?"
 },
+{
+  id: "M-chain", track: "money", name: "Halfnight", rule: "every coin you save doubles at midnight.",
+  hook: "So why does almost everyone here quit one night too early?",
+  meters: [{ k: "jar", label: "Coins in jar" }],
+  init: () => ({ jar: 1, resets: 0 }),
+  steps: [
+    { rehook: "Here's what nobody tells you: spend just one, and the whole jar drops back to one. Your house sells in twenty nights, and the price is a million coins. You have one." },
+    { when: "Night 1", text: "Your friend buys a donut with his coin and laughs at your jar. The donut costs one.",
+      choices: [
+        { t: "Drop your coin in the jar", say: "Clink. One lonely coin, and your friend is still laughing." },
+        { t: "Buy the donut too", fx: s => { s.resets += 1; }, say: "Delicious. You start your jar over tomorrow." }] },
+    { when: "Night 10", text: s => s.resets ? "Halfway there, and you're still way behind." : "Halfway there. A thousand coins. Not even close. Is this even working?",
+      enter: s => { s.jar = s.resets ? 512 : 1024; },
+      choices: [
+        { t: "Keep going", say: "You put the jar back on the windowsill." },
+        { t: "Quit and spend one on lunch", fx: s => { s.jar = 1; s.resets += 1; }, say: "Good lunch. The jar drops back to one." }] },
+    { when: "Night 19", text: s => s.jar > 1 ? "Half a million coins, and you haven't eaten all day. What's one coin, out of half a million?" : "Nine nights left, and you're nowhere near. The donut smells amazing.",
+      enter: s => { if (s.jar > 1) s.jar = s.resets ? 262144 : 524288; else s.jar = 512; },
+      choices: [
+        { t: "Let the coin go", fx: s => { s.jar *= 2; }, say: "You open your fingers. Midnight. The jar glows." },
+        { t: "Buy the donut", fx: s => { s.jar = 1; s.resets += 1; }, say: "It's a great donut. The jar drops back to one." }] },
+  ],
+  rate: s => s.jar >= 1000000 ? 3 : s.jar > 1 ? 2 : 1,
+  ending: s => s.jar >= 1000000 ? "A million coins. They jam the front door, and the house is yours." : s.jar > 1 ? "You kept going, but you started late. You come up short on the last night." : "One coin in the jar, and the house is sold.",
+  lesson: "One night made half of it. Most people quit the night before.",
+  cta: "What would you have done on night nineteen?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
