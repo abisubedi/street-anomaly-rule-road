@@ -781,6 +781,35 @@ const TOWNS = [
   lesson: "Everything costs hours. So ask which ones.",
   cta: "What did YOU buy that cost you more hours than it was worth?"
 },
+{
+  id: "M-shrink", track: "money", name: "Inchwick", rule: "every new thing you buy makes your house one inch smaller.",
+  hook: "So how did a dog end up with the keys to her house?",
+  meters: [{ k: "door", label: "Door height (inches)" }, { k: "room", label: "Room to breathe", life: true }],
+  init: () => ({ door: 72, room: 3, lost: false, gave: false }),
+  steps: [
+    { rehook: "Here's what nobody tells you: your stuff doesn't shrink, only the house does. And if you can't stand up inside, the town gives it to whoever can. You're five foot six. Your door is six feet." },
+    { when: "Monday", text: "A lamp shaped like a duck. It's perfect, and it's only one inch.",
+      choices: [
+        { t: "Buy the duck lamp", fx: s => { s.door -= 1; s.room -= 1; }, say: "The roof gives a little squash. The duck glows happily." },
+        { t: "Leave the duck", fx: s => { s.room += 1; }, say: "You walk home with empty hands and a tall door." }] },
+    { when: "Friday", text: "Three pairs of shoes, all on sale. That's three more inches.",
+      choices: [
+        { t: "Buy all three", fx: s => { s.door -= 3; s.room -= 1; }, say: "Now you duck through your own door. Biscuit trots in just fine." },
+        { t: "Your old shoes are fine", fx: s => { s.room += 1; }, say: "Your old shoes are, in fact, fine." }] },
+    { when: "Midnight", text: "A sale ends in one minute. Two inches, and your finger is over the button.",
+      choices: [
+        { t: "Tap the button", fx: s => { s.door -= 2; s.lost = s.door <= 66; }, say: "The ceiling drops, and the boxes tumble." },
+        { t: "Put the phone down", fx: s => { s.room += 1; }, say: "The minute ends. Nothing happens, and that's the good news." }] },
+    { when: "Morning", text: s => s.lost ? "A man from town hall ties the keys to Biscuit's collar. Your things are piled on the lawn." : "You can still stand up in your own kitchen. Your neighbor stops by and admires your stuff.",
+      choices: [
+        { t: "Give it all away", fx: s => { s.gave = true; s.door = 72; s.room += 3; }, say: "Every gift, the house grows an inch." },
+        { t: "Keep everything", say: "You pack it all back in. It takes a while." }] },
+  ],
+  rate: s => s.gave && !s.lost ? 3 : s.gave || !s.lost ? 2 : 1,
+  ending: s => s.lost && s.gave ? "Biscuit lets you back in, and your door is six feet again." : s.lost ? "Biscuit sleeps inside tonight. You sleep on the lawn with your stuff." : s.gave ? "Your door is six feet tall, and there's room to dance." : "You still own your house. For now.",
+  lesson: "Your stuff doesn't shrink. Your house does.",
+  cta: "What's the one thing you bought that you'd give away first?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
