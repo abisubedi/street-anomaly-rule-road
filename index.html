@@ -810,6 +810,31 @@ const TOWNS = [
   lesson: "Your stuff doesn't shrink. Your house does.",
   cta: "What's the one thing you bought that you'd give away first?"
 },
+{
+  id: "M-birds", track: "money", name: "Featherton", rule: "every subscription is a tiny bird that eats from your pocket every month.",
+  hook: "So how did a bird eat a whole paycheck?",
+  meters: [{ k: "coins", label: "Coins you have" }, { k: "birds", label: "Birds in your coat" }],
+  init: () => ({ coins: 1000, birds: 0, ignored: false, paid: false }),
+  steps: [
+    { rehook: "Here's what nobody tells you: the birds you forget don't leave. They get fat. And you can only send one away if you remember its name. Rent is 800 coins, due Friday." },
+    { when: "March", text: "A free trial. No coins today, it says. Just one tiny bird.",
+      choices: [
+        { t: "Sign up for everything", fx: s => { s.birds = 6; s.coins -= 300; }, say: "Six tiny birds hop into your coat. You forget them by lunch." },
+        { t: "Keep just the one you use", fx: s => { s.birds = 1; s.coins -= 50; }, say: "One tiny blue bird settles on your shoulder." }] },
+    { when: "Payday", text: "Your coat starts chirping.",
+      choices: [
+        { t: "Open it and look", say: "You count your birds. Some of them look familiar." },
+        { t: "Turn the music up", fx: s => { s.birds += 5; s.coins -= 560; s.ignored = true; }, say: "The chirping stops. Your coat feels heavier." }] },
+    { when: "Friday", text: s => `The landlord knocks. You have ${s.coins} coins, and rent is 800.`,
+      choices: [
+        { t: "Read every old bill out loud", fx: s => { s.coins += Math.max(0, s.birds - 1) * 130; s.birds = Math.min(s.birds, 1); s.paid = s.coins >= 800; }, say: "Every name, a bird flies off and drops your coins." },
+        { t: "Hide behind the door", fx: s => { s.paid = s.coins >= 800; }, say: "The knocking gets louder." }] },
+  ],
+  rate: s => s.paid ? (s.ignored ? 2 : 3) : 1,
+  ending: s => s.paid ? "Rent paid. One tiny bird sings on your shoulder, and you actually use that one." : "You come up short on rent, and your coat keeps chirping.",
+  lesson: "The birds you forget get fat.",
+  cta: "How many subscriptions are you paying for right now?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
