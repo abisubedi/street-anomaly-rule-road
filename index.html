@@ -835,6 +835,31 @@ const TOWNS = [
   lesson: "The birds you forget get fat.",
   cta: "How many subscriptions are you paying for right now?"
 },
+{
+  id: "M-monster", track: "money", name: "Duesbury", rule: "every bill you forget turns into a monster.",
+  hook: "So what ate her front door?",
+  meters: [{ k: "bill", label: "What you owe" }, { k: "coins", label: "Coins you have" }],
+  init: () => ({ bill: 12, coins: 50, paidEarly: false, plan: false, hid: false }),
+  steps: [
+    { rehook: "Here's what nobody tells you: it grows every single day. And on Friday the thirteenth, every monster in town comes to collect." },
+    { when: "Monday", text: "You find a water bill under your couch. Twelve coins.",
+      choices: [
+        { t: "Open it and pay it now", fx: s => { s.coins -= 12; s.bill = 0; s.paidEarly = true; }, say: "Twelve coins, gone. The envelope stays an envelope." },
+        { t: "Tomorrow", fx: s => { s.bill = 60; }, say: "You slide it back under with your foot." }] },
+    { when: "A week later", text: s => s.paidEarly ? "Your neighbor's couch is purring. Yours is quiet." : "Something under your couch is purring. It's the size of a cat. Cute.",
+      choices: [
+        { t: "Check your mail", fx: s => { if (s.bill) { s.plan = true; } }, say: "You sit down and open everything." },
+        { t: "Leave it", fx: s => { if (s.bill) { s.bill = 240; } }, say: "By Monday, something is wearing the couch." }] },
+    { when: "Friday the 13th", text: s => s.bill ? `A monster is at your door. The bill is ${s.bill} coins, and you have ${s.coins}.` : "A parade of monsters hops down your street, each one holding an envelope.",
+      choices: [
+        { t: "Call the number and ask", fx: s => { if (s.bill) { s.plan = true; s.coins = 0; s.bill = Math.max(0, s.bill - 50); } }, say: "Can you pay a little at a time? Yes." },
+        { t: "Hide in the attic", fx: s => { s.hid = true; }, say: "You hear chewing." }] },
+  ],
+  rate: s => s.paidEarly ? 3 : s.plan && !s.hid ? 2 : 1,
+  ending: s => s.paidEarly ? "The monsters walk right past your door. You still have one." : s.plan && !s.hid ? "Every coin, it shrinks. You lost the door, but you got your house back." : "It takes your door. Then the couch. Then it gets comfortable.",
+  lesson: "Open it the day it comes.",
+  cta: "How many unopened envelopes do you have right now?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
