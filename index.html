@@ -860,6 +860,31 @@ const TOWNS = [
   lesson: "Open it the day it comes.",
   cta: "How many unopened envelopes do you have right now?"
 },
+{
+  id: "M-shadow", track: "money", name: "Laterton", rule: "every pay later makes your shadow heavier.",
+  hook: "So why can't she ride the bus?",
+  meters: [{ k: "plans", label: "Pay-later plans" }, { k: "lb", label: "Shadow (lb)" }],
+  init: () => ({ plans: 0, lb: 1, cash: false, hid: false, paid: false }),
+  steps: [
+    { rehook: "Here's what nobody tells you: at noon, you feel nothing. The weight shows up at sunset. And in November, the sun sets at five." },
+    { when: "Noon", text: "Red boots, 80 coins. Or four easy payments of 20.",
+      choices: [
+        { t: "Tap pay later", fx: s => { s.plans = 1; s.lb = 2; }, say: "Four easy payments. Your shadow doesn't even twitch." },
+        { t: "Save up and buy them next week", fx: s => { s.cash = true; }, say: "You walk home light. Boots next Saturday." }] },
+    { when: "Every noon after", text: s => s.plans ? "Shopping at noon feels free. A coat. A lamp. A couch." : "Everyone around you is tapping pay later. Their shadows look fine. It's noon.",
+      choices: [
+        { t: "Keep tapping, it's noon", fx: s => { s.plans += 13; s.lb = s.plans / 2 + 1; }, say: s => `${s.plans} plans. Your shadow is still tiny.` },
+        { t: "Stop and add up what you owe", fx: s => {}, say: s => s.plans ? "One plan. You can see the end of it." : "Nothing to add. Your shadow is just a shadow." }] },
+    { when: "November, 5 p.m.", text: s => { s.lb = s.plans * 100 || 1; return s.plans ? `The sun sets. Your shadow stretches down the whole street. It weighs ${s.lb} pounds. The bus driver looks at it, then at his bus.` : "The sun sets. Your shadow stretches down the street, light as ever. The bus driver waves you on."; },
+      choices: [
+        { t: "Turn on every light in the house", fx: s => { if (s.plans) { s.hid = true; } }, say: s => s.plans ? "No shadow. You win! Then every payment lands the same morning, the power gets cut, and the floor cracks." : "Cozy. Nothing to hide from." },
+        { t: "Pay them off, one at a time", fx: s => { if (s.plans) { s.paid = true; s.plans = 0; s.lb = 1; } }, say: s => s.paid ? "Every plan you end, your shadow lifts." : "Nothing to pay. You're already home." }] },
+  ],
+  rate: s => s.cash && !s.plans && !s.paid ? 3 : s.paid ? 2 : 1,
+  ending: s => s.cash && !s.plans && !s.paid ? "Your new boots are paid for, and your shadow is the lightest on the bus." : s.paid ? "One plan at a time, you got a shadow you can carry. The bus lets you on." : "The lamps are off, the floor is cracked, and your shadow isn't going anywhere. Neither are you.",
+  lesson: "If you can't pay it at noon, you can't carry it at sunset.",
+  cta: "How many pay-later plans do you have running right now?"
+},
 ];
 
 /* ---------- saved stars (per viewer, optional) ---------- */
