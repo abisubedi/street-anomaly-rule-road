@@ -456,6 +456,28 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .sketch .catch { background: linear-gradient(#0B1428, #17254A); border: 1px dashed rgba(241,232,208,.25); }
 .sketch .cjar { border-color: #F1E8D0; }
 .sketch .cjar.big::after { content: "BIG"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 12px var(--font-sign); color: #F1E8D0; }
+/* act it out: drag something on the drawing to choose */
+.act-wrap { position: relative; }
+.act-layer { position: absolute; inset: 0; }
+.act-zone { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 4px 2px; border: 2px dashed rgba(241,232,208,.35); border-radius: 12px; transition: background .15s, border-color .15s, transform .15s; pointer-events: none; }
+.act-zone.top { justify-content: flex-start; }
+.act-zone b { font-size: 28px; line-height: 1; margin: auto 0; font-weight: 400; }
+.act-zone span { font: 700 12px/1.1 var(--font-sign); font-size: calc(var(--ts) * 12px); color: #F1E8D0; background: rgba(18,26,48,.88); padding: 2px 6px; border-radius: 6px; text-align: center; }
+.act-zone.hot { border-color: var(--sign); border-style: solid; background: rgba(255,210,63,.16); transform: scale(1.05); }
+.act-zone.off { opacity: .45; border-style: dotted; }
+.act-zone.nope { animation: shake .4s; }
+.act-item { position: absolute; width: 48px; height: 48px; margin: -24px 0 0 -24px; padding: 0; border-radius: 50%; border: 2px solid var(--sign); background: rgba(255,210,63,.2); font-size: 26px; line-height: 1; display: grid; place-items: center; touch-action: none; cursor: grab; z-index: 2;
+  box-shadow: 0 0 0 7px rgba(255,210,63,.12), 0 4px 0 rgba(0,0,0,.35); animation: nudge 1.8s ease-in-out infinite; }
+.act-item:focus-visible { outline: 3px solid var(--sign); outline-offset: 3px; }
+.act-item.lifted { animation: none; cursor: grabbing; box-shadow: 0 10px 22px rgba(0,0,0,.45); }
+@keyframes nudge { 0%, 60%, 100% { translate: 0 0; } 30% { translate: 10px -5px; } }
+.choices.compact .choice { min-height: 46px; padding-top: 10px; padding-bottom: 10px; font-size: 16px; font-size: calc(var(--ts) * 16px); }
+/* Hushwick: hold a line to say it; tokens get used up while you hold */
+.choice.hold { position: relative; overflow: hidden; }
+.choice.hold .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255,210,63,.22); pointer-events: none; }
+.choice.hold .cost::after { content: " · hold"; opacity: .7; }
+.stage-words [data-tok] { transition: opacity .12s, transform .12s; transform-box: fill-box; transform-origin: center; }
+.stage-words [data-tok].spend { opacity: .15; transform: scale(.8); }
 .stage-jar .glow { transform-box: fill-box; transform-origin: center; animation: bump 1.2s ease-in-out infinite; }
 .yard-pop, .stage-yard .grow { animation: sprout .6s cubic-bezier(.3,1.6,.5,1) both; }
 .shelf { display: flex; flex-wrap: wrap; gap: 3px; padding: 4px; border-bottom: 3px solid #5B4636; min-height: 26px; }
@@ -555,16 +577,16 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=41"></script>
-<script src="/js/juice.js?v=41"></script>
-<script src="/js/mic.js?v=41"></script>
-<script src="/js/road.js?v=41"></script>
-<script src="/js/radio.js?v=41"></script>
-<script src="/js/reel.js?v=41"></script>
-<script src="/js/glovebox.js?v=41"></script>
-<script src="/js/play.js?v=41"></script>
-<script src="/js/sketch.js?v=41"></script>
-<script src="/js/share.js?v=41"></script>
+<script src="/js/compat.js?v=42"></script>
+<script src="/js/juice.js?v=42"></script>
+<script src="/js/mic.js?v=42"></script>
+<script src="/js/road.js?v=42"></script>
+<script src="/js/radio.js?v=42"></script>
+<script src="/js/reel.js?v=42"></script>
+<script src="/js/glovebox.js?v=42"></script>
+<script src="/js/play.js?v=42"></script>
+<script src="/js/sketch.js?v=42"></script>
+<script src="/js/share.js?v=42"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1829,7 +1851,8 @@ function renderTown() {
     ${showMic ? micPanel(st) : ""}
     ${showMic ? `<div class="or-tap">or tap</div>` : ""}
     ${st.drag && !r ? dragPanel(st) + `<div class="or-tap">or tap</div>` : ""}
-    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : `<div class="choices">${choices}</div>`}
+    ${typeof actOf === "function" && actOf(st, s) ? `<div class="or-tap">or tap</div>` : ""}
+    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : `<div class="choices ${typeof actOf === "function" && actOf(st, s) ? "compact" : ""}">${choices}</div>`}
     ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>👆 Tap A or B to choose</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
     ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}

@@ -43,6 +43,8 @@ const Play = {
     if (st && st.drag && S.phase === "step") dragGame(st);
     if (st && st.pay && S.phase === "step") payGame(st);
     if (T.id === "M-shadow" && S.s.lb > 50) heavyNext();
+    if (document.getElementById("actitem")) actGame();
+    if (T.id === "L1" && st && st.choices) sayGame(st); // Hushwick: the tap fallback under the mic becomes hold-to-say
   },
 };
 
@@ -161,6 +163,77 @@ function dragPanel(st) {
     <button class="chip" id="dragchip" aria-label="Drag ${esc(st.drag.label)}"><b>${st.drag.item}</b><span>${esc(st.drag.label)}</span></button>
     <div class="zone" data-zone="${st.drag.zones[1].pick}">${esc(st.drag.zones[1].label)}</div>
   </div>`;
+}
+
+/* ---------- act it out: drag the item on the drawing onto a zone to choose ---------- */
+function actGame() {
+  const item = document.getElementById("actitem"), zones = [...document.querySelectorAll(".act-zone")];
+  if (item.dataset.bound) return; item.dataset.bound = "1";
+  let sx = 0, sy = 0, on = false, hot = null;
+  const at = (x, y) => zones.find(z => { const r = z.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
+  const pt = e => e.touches ? e.touches[0] || e.changedTouches[0] : e;
+  const back = () => { item.style.transition = "transform .3s cubic-bezier(.3,1.5,.5,1)"; item.style.transform = ""; setTimeout(() => { item.style.transition = ""; }, 320); };
+  const down = e => {
+    const p = pt(e); if (!p) return; on = true; sx = p.clientX; sy = p.clientY;
+    item.classList.add("lifted"); Sound.tone(520, .06, "triangle", .05);
+    if (e.pointerId !== undefined && item.setPointerCapture) item.setPointerCapture(e.pointerId);
+    if (e.cancelable) e.preventDefault();
+  };
+  const move = e => {
+    if (!on) return; const p = pt(e); if (!p) return;
+    item.style.transform = `translate(${p.clientX - sx}px, ${p.clientY - sy}px) scale(1.15)`;
+    const z = at(p.clientX, p.clientY);
+    if (z !== hot) { zones.forEach(q => q.classList.toggle("hot", q === z && z.dataset.zone !== "off")); hot = z; if (z) { Juice.buzz([8]); Sound.tone(z.dataset.zone === "off" ? 200 : 700, .05, "triangle", .04); } }
+    if (e.cancelable) e.preventDefault();
+  };
+  const up = () => {
+    if (!on) return; on = false; item.classList.remove("lifted"); zones.forEach(q => q.classList.remove("hot"));
+    const z = hot; hot = null;
+    if (!z) return back();
+    if (z.dataset.zone === "off") { Juice.penalty(); z.classList.add("nope"); setTimeout(() => z.classList.remove("nope"), 400); return back(); }
+    item.style.transition = "opacity .2s"; item.style.opacity = "0";
+    pick(+z.dataset.zone);
+  };
+  if (window.PointerEvent) {
+    item.addEventListener("pointerdown", down); item.addEventListener("pointermove", move);
+    item.addEventListener("pointerup", up); item.addEventListener("pointercancel", () => { on = false; hot = null; item.classList.remove("lifted"); zones.forEach(q => q.classList.remove("hot")); back(); });
+  } else {
+    item.addEventListener("touchstart", down, { passive: false }); item.addEventListener("touchmove", move, { passive: false }); item.addEventListener("touchend", up);
+    item.addEventListener("mousedown", down); document.addEventListener("mousemove", move); document.addEventListener("mouseup", up);
+  }
+  // a click without a drag (keyboard, or a tap) points the player at the buttons instead of choosing for them
+  item.addEventListener("click", e => { if (e.detail === 0) { const c = document.querySelector(".choices .choice:not([disabled])"); if (c) c.focus(); } });
+}
+
+/* ---------- Hushwick: hold a line to say it; one word token goes per beat ---------- */
+function sayGame(st) {
+  const per = Juice.reduced ? 120 : 200; // ms per word
+  document.querySelectorAll('.choice[data-act="pick"]').forEach(b => {
+    const i = +b.dataset.c, c = st.choices[i];
+    if (!c || !c.w || b.disabled) return;
+    b.dataset.act = "hold-say"; b.classList.add("hold");
+    b.insertAdjacentHTML("afterbegin", '<i class="fill"></i>');
+    const fill = b.querySelector(".fill");
+    let t = 0, spent = 0, holding = false;
+    const toks = () => { const left = S.s.words; return Array.from({ length: c.w }, (_, k) => document.querySelector(`[data-tok="${left - 1 - k}"]`)); };
+    const reset = () => { clearInterval(t); holding = false; spent = 0; fill.style.width = "0"; toks().forEach(x => x && x.classList.remove("spend")); };
+    const go = e => {
+      if (holding) return; holding = true; if (e && e.cancelable) e.preventDefault();
+      const tk = toks();
+      const beat = () => {
+        if (tk[spent]) tk[spent].classList.add("spend");
+        Sound.tone(660 * Math.pow(1.08, spent), .08, "triangle", .06); Juice.buzz([6]);
+        spent += 1; fill.style.width = (spent / c.w * 100) + "%";
+        if (spent >= c.w) { clearInterval(t); holding = false; setTimeout(() => pick(i), 120); }
+      };
+      beat(); if (spent < c.w) t = setInterval(beat, per);
+    };
+    const stop = () => { if (holding && spent < c.w) reset(); };
+    if (window.PointerEvent) { b.addEventListener("pointerdown", go); ["pointerup", "pointerleave", "pointercancel"].forEach(v => b.addEventListener(v, stop)); }
+    else { b.addEventListener("touchstart", go, { passive: false }); b.addEventListener("mousedown", go); ["touchend", "touchcancel", "mouseup", "mouseleave"].forEach(v => b.addEventListener(v, stop)); }
+    b.addEventListener("contextmenu", e => e.preventDefault()); // a long press shouldn't open the phone's menu
+    b.addEventListener("click", e => { if (e.detail === 0) pick(i); }); // keyboard: Enter or Space says it straight away
+  });
 }
 
 /* ---------- Leashville: pay the dogs back, smallest first ---------- */

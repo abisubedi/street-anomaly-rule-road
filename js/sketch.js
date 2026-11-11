@@ -49,17 +49,24 @@ const Sk = {
     </g>`;
   },
 
+  // act it out: a draggable item and drop zones laid over the drawing, in the drawing's own units (300 wide)
+  actLayer(a, h) {
+    const pc = (v, t) => (v / t * 100).toFixed(2) + "%";
+    const zones = a.zones.map(z => `<div class="act-zone ${z.top ? "top" : ""} ${z.off ? "off" : ""}" data-zone="${z.off ? "off" : z.c}" style="left:${pc(z.x, 300)};top:${pc(z.y, h)};width:${pc(z.w, 300)};height:${pc(z.h, h)}">${z.icon ? `<b>${z.icon}</b>` : ""}<span>${esc(z.label)}</span></div>`).join("");
+    return `<div class="act-layer">${zones}<button class="act-item" id="actitem" style="left:${pc(a.item.x, 300)};top:${pc(a.item.y, h)}" aria-label="${esc(a.item.label)}. Or use the buttons below.">${a.item.icon}</button></div>`;
+  },
+
   // the journal page: ruled paper, tape, the drawing, and a one-line caption
   frame(id, val, label, svg, cap, o = {}) {
     return `<figure class="stage stage-${id} sketch ${o.cls || ""}" data-scene="${id}" data-val="${val}" aria-label="${label}">
-      ${svg ? `<svg viewBox="0 0 300 ${o.h || 140}" width="100%" aria-hidden="true">${o.under || ""}<g class="ink">${svg}</g></svg>` : ""}${o.html || ""}
+      ${svg ? `${o.act ? '<div class="act-wrap">' : ""}<svg viewBox="0 0 300 ${o.h || 140}" width="100%" aria-hidden="true">${o.under || ""}<g class="ink">${svg}</g></svg>${o.act ? Sk.actLayer(o.act, o.h || 140) + "</div>" : ""}` : ""}${o.html || ""}
       <figcaption>${cap}</figcaption>
     </figure>`;
   },
 };
 
 /* ---------- Doubleton and Halfnight: the coin jar ---------- */
-function jarScene(s) {
+function jarScene(s, st) {
   const r = S.phase === "result" ? S.lastResult : null;
   const night = !!(r && r.night), doubled = night && /→/.test(r.night), end = S.phase === "end", opened = !!s.opened;
   const mood = opened ? "worried" : doubled ? "happy" : Sk.mood();
@@ -78,6 +85,7 @@ function jarScene(s) {
     : end ? `${plural(s.jar, "coin")} in the jar.`
     : s.jar ? `${plural(s.jar, "coin")}. Keep the lid on, and they double at midnight.`
     : "An empty jar. Zero doubled is still zero.";
+  const act = actOf(st, s);
   const under = doubled ? `<circle class="glow" cx="150" cy="84" r="58" fill="${SUN}" opacity=".14"/>` : "";
   return Sk.frame("jar", shown, `Your jar has ${fmt(s.jar)} coins${opened ? " and the lid is off" : ""}`, `
     ${night ? `<path d="M262 14 a14 14 0 1 0 12 22 a11 11 0 1 1 -12 -22 Z" fill="#FFE27A" opacity=".9" stroke="${INK}" stroke-width="1.2"/><path d="M236 22 l2 5 l5 1 l-5 1 l-2 5 l-2 -5 l-5 -1 l5 -1 Z" fill="${INK}" opacity=".7"/>` : ""}
@@ -88,7 +96,7 @@ function jarScene(s) {
     ${lid}${piggy}
     <g transform="rotate(-4 150 74)"><rect x="131" y="64" width="38" height="17" rx="2" fill="${INK}" opacity=".92"/>${Sk.text(150, 77, opened ? "oops" : "SAVE", DARK, 11)}</g>
     ${Sk.kid(58, 128, mood)}
-    ${extra > 0 ? Sk.text(150, 15, `+${fmt(extra)} more`, SUN, 12) : ""}`, cap, { under, h: 150 });
+    ${extra > 0 ? Sk.text(150, 15, `+${fmt(extra)} more`, SUN, 12) : ""}`, act ? act.hint : cap, { under, h: 150, act });
 }
 
 const SCENES = {
@@ -96,30 +104,31 @@ const SCENES = {
   "M-chain": jarScene,
 
   /* Hushwick: ten word tokens a day, and a friendship heart that grows */
-  L1(s) {
+  L1(s, st) {
     const left = clamp(s.words, 0, 10), heart = clamp(s.heart, 0, 14);
     const tokens = Array.from({ length: 10 }, (_, i) => {
       const x = 118 + (i % 5) * 34, y = 22 + Math.floor(i / 5) * 26, on = i < left;
-      return on ? `${Sk.wash("rect", `x="${x}" y="${y}" width="28" height="18" rx="7"`, INK, .9)}${Sk.line(`M${x + 6} ${y + 9} h16`, DARK, 1.6)}`
+      return on ? `<g data-tok="${i}">${Sk.wash("rect", `x="${x}" y="${y}" width="28" height="18" rx="7"`, INK, .9)}${Sk.line(`M${x + 6} ${y + 9} h16`, DARK, 1.6)}</g>`
         : `<rect x="${x}" y="${y}" width="28" height="18" rx="7" fill="none" stroke="${DIM}" stroke-dasharray="3 3"/>${Sk.line(`M${x + 8} ${y + 4} l12 10 M${x + 20} ${y + 4} l-12 10`, DIM, 1.2)}`;
     }).join("");
     return Sk.frame("words", left, `${left} words left, friendship ${s.heart}`, `${Sk.ground()}${tokens}
       ${Sk.heart(200, 82, .7 + heart / 14 * .9)}${Sk.kid(58, 128, Sk.mood(left <= 2 && S.phase !== "end" ? "worried" : ""), { arms: "M58 94 L46 108 M58 94 L74 86" })}`,
-      `${plural(left, "word")} left today.${heart ? ` Friendship: ${s.heart}.` : ""}`);
+      S.phase === "step" && st && st.choices ? `${st.mic ? "Say it out loud, or hold a line below." : "Hold a line to say it."} Each word uses a token.`
+        : `${plural(left, "word")} left today.${heart ? ` Friendship: ${s.heart}.` : ""}`);
   },
 
   /* Greenpenny: a coin tree that only grows on watered days */
-  M2(s) {
-    const n = clamp(s.coins, 0, 40), dry = S.phase === "result" && !s.streak;
+  M2(s, st) {
+    const n = clamp(s.coins, 0, 40), dry = S.phase === "result" && !s.streak, act = actOf(st, s);
     const coins = Array.from({ length: n }, (_, i) => { const a = i * 2.4, rr = 8 + (i * 7) % 30; return Sk.coin(190 + Math.cos(a) * rr * 1.3, 58 + Math.sin(a) * rr * .8, 3.6); }).join("");
     const drops = Array.from({ length: clamp(s.streak, 0, 7) }, (_, i) => `<path d="M${116 + i * 5} ${96 + (i % 2) * 8} q-3 5 0 6 q3 -1 0 -6 Z" fill="${SKY}"/>`).join("");
     return Sk.frame("tree", n, `${s.coins} coins on the tree, watered ${s.streak} days in a row`, `${Sk.ground()}
       ${Sk.wash("path", 'd="M184 128 L186 84 Q187 74 182 66 M188 92 Q198 84 204 76"', WOOD)}
       ${Sk.wash("path", 'd="M150 66 Q148 30 186 26 Q230 24 230 62 Q232 92 190 92 Q150 94 150 66 Z"', dry ? "#8A9A5B" : LEAF, .55)}${coins}
       ${dry ? [0, 1, 2, 3].map(i => Sk.coin(160 + i * 14, 125, 3.6)).join("") : ""}
-      ${s.streak ? `${Sk.wash("path", 'd="M88 92 L108 92 L106 108 L90 108 Z"', SKY, .6)}${Sk.line("M108 96 L118 90")}${drops}` : ""}
+      ${s.streak && !act ? `${Sk.wash("path", 'd="M88 92 L108 92 L106 108 L90 108 Z"', SKY, .6)}${Sk.line("M108 96 L118 90")}${drops}` : ""}
       ${Sk.kid(58, 128, Sk.mood(dry ? "worried" : ""), { arms: "M58 94 L46 108 M58 94 L88 96" })}`,
-      dry ? "No water today. The tree drops coins." : s.streak ? `Watered ${plural(s.streak, "day")} in a row. ${plural(s.coins, "coin")} on the tree.` : "A little tree. It grows only if you water it every day.");
+      act ? act.hint : dry ? "No water today. The tree drops coins." : s.streak ? `Watered ${plural(s.streak, "day")} in a row. ${plural(s.coins, "coin")} on the tree.` : "A little tree. It grows only if you water it every day.", { act });
   },
 
   /* Saidsville: what you say about the neighbours comes true; their faces show it */
@@ -396,3 +405,43 @@ const SCENES = {
       n ? `${plural(n, "promise")} echoing back. ${plural(t, "hour")} of Saturday left.` : `${plural(t, "hour")} of Saturday. Whatever you say comes back.`);
   },
 };
+
+/* ---------- act it out: choose by doing something on the drawing ---------- */
+// what each Doubleton day tempts you with; choice 0 always keeps the jar shut
+const JAR_DAYS = {
+  "Day 1": { coin: true, keep: "Into the jar", icon: "🍬", spend: "Gumball" },
+  "Day 2": { keep: "Keep saving", icon: "⭐", spend: "Sticker" },
+  "Day 3": { keep: "Keep it shut", icon: "👦", spend: "Open & count" },
+  "Day 4": { keep: "Just watch", icon: "🎡", spend: "Ride" },
+  "Day 5": { coin: true, keep: "Save it all", icon: "📕", spend: "Comic" },
+  "Day 6": { keep: "Share lunch", icon: "🧒", spend: "Give 5" },
+  "Day 7": { keep: "Walk away", icon: "🏎️", spend: "RC car" },
+};
+// what pulls you away from watering the Greenpenny tree
+const TREE_DAYS = { "Day 1": ["🛏️", "Tomorrow"], "Day 2": ["⚽", "Play"], "Day 3": ["📺", "Watch"], "Day 4": ["🌧️", "Let rain"], "Day 5": ["😴", "Skip"], "Day 6": ["🎒", "Just go"], "Day 7": ["👦", "Let him"], "Day 8": ["🎂", "Party"] };
+const CAN = `<svg viewBox="0 0 44 32" width="30" aria-hidden="true"><path d="M8 12 h20 v16 h-20 Z" fill="${SKY}" fill-opacity=".55" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M28 16 l12 -8" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/><path d="M12 12 q6 -9 12 0" fill="none" stroke="${INK}" stroke-width="2"/></svg>`;
+
+const ACTS = {
+  M1(st, s) {
+    const d = JAR_DAYS[st.when]; if (!d || st.choices.length !== 2) return null;
+    const ok = c => !c.need || c.need(s), cost = val(st.choices[1].cost, s);
+    return {
+      item: { icon: d.coin ? "🪙" : "✋", label: d.coin ? "Drag the coin" : "Drag your hand", x: 88, y: 100 },
+      zones: [{ c: 0, x: 106, y: 18, w: 88, h: 114, top: true, label: d.keep, off: !ok(st.choices[0]) },
+        { c: 1, x: 212, y: 52, w: 82, h: 80, icon: d.icon, label: ok(st.choices[1]) ? d.spend + (cost ? " " + cost : "") : "Not enough", off: !ok(st.choices[1]) }],
+      hint: d.coin ? `Drag the coin into the jar, or to the ${d.icon}.` : `Drag your hand: hold the lid shut, or reach for the ${d.icon}.`,
+    };
+  },
+  M2(st) {
+    const d = TREE_DAYS[st.when], w = st.choices.findIndex(c => c.water === 1); if (!d || w < 0) return null;
+    return {
+      item: { icon: CAN, label: "Drag the watering can", x: 96, y: 98 },
+      zones: [{ c: w, x: 144, y: 14, w: 94, h: 116, top: true, label: "Water it" }, { c: 1 - w, x: 242, y: 56, w: 54, h: 74, icon: d[0], label: d[1] }],
+      hint: `Tip the can over the tree, or drag it to the ${d[0]}.`,
+    };
+  },
+};
+function actOf(st, s) {
+  if (!st || S.phase !== "step" || st.rehook || st.mic || st.drag || st.play || st.pay || !st.choices) return null;
+  const f = ACTS[TOWNS[S.t].id]; return f ? f(st, s) : null;
+}
