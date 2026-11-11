@@ -6,7 +6,7 @@
   "start_url": "/?source=app",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#0B1428",
   "theme_color": "#14213D",
   "categories": ["games", "education", "kids"],

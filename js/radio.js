@@ -6,6 +6,8 @@
      speech    – say anything; st.mic.resolve(result, s) turns the words into a choice
    Every challenge ends in onMicResult(), which picks a choice exactly like a tap would. */
 
+// what to say when this browser can't turn speech into text (Firefox, iOS before 14.5, old Android browsers)
+const TALK_OFF = "Talking out loud needs Safari on iOS 14.5 or newer, or Chrome. Tap a choice instead.";
 const DEFAULT_CAL = { loud: -30, talk: -56 }; // dBFS, used until the player calibrates
 
 const MicRun = {
@@ -29,7 +31,7 @@ const MicRun = {
     if (!st || !st.mic || this.done || this.holding) return;
     const k = st.mic.kind;
     Voice.stop(); Juice.tap();
-    if (k === "speech" && !Mic.speechOK) { this.status("Talking needs Chrome, Edge or Safari. Tap a choice instead."); return; }
+    if (k === "speech" && !Mic.speechOK) { this.status(TALK_OFF); return; }
     if (Mic.state !== "on") {
       this.status("Allow the microphone…");
       const ok = await Mic.open();
@@ -85,7 +87,7 @@ const MicRun = {
         if (v > 1 && now - d.lastCrack > 600) {
           d.cracks += 1; d.lastCrack = now; Juice.penalty();
           const cb = document.getElementById("mp-cracks"); if (cb) cb.textContent = "✕".repeat(d.cracks) + "·".repeat(Math.max(0, st.mic.cracks - d.cracks));
-          document.getElementById("micpanel")?.classList.add("cracked");
+          const mp = document.getElementById("micpanel"); if (mp) mp.classList.add("cracked");
           if (d.cracks >= st.mic.cracks) return this.finish(st, { ok: false, cracks: d.cracks, label: "cracked the glass" });
           this.status("CRACK! Quieter…");
         } else if (v <= 1 && talking) this.status(v > 0.8 ? "Careful…" : "Good. Keep whispering.");
@@ -226,7 +228,7 @@ function micPanel(st) {
     <p class="mp-line">${esc(line)}</p>
     ${k !== "speech" ? `<canvas class="mp-scope" id="mp-scope" width="640" height="150" aria-hidden="true"></canvas>${ghost}` : `<p class="mp-words" id="mp-words" aria-live="polite"></p>`}
     <div class="mp-bar"><i id="mp-prog"></i></div>
-    <p class="mp-status" id="mp-status" aria-live="polite">${blocked ? (speechOff ? "Talking needs Chrome, Edge or Safari. Tap a choice below." : Mic.state === "denied" ? "The mic is blocked. Tap a choice below." : "No mic on this device. Tap a choice below.") : Mic.state === "on" ? "Hold the CB handset below and " + (k === "pitch" ? "hum." : "talk.") : "Hold the CB handset below. Your browser will ask to use the mic; nothing is uploaded" + (k === "speech" ? ", except the words, which your browser turns into text." : ".")}</p>
+    <p class="mp-status" id="mp-status" aria-live="polite">${blocked ? (speechOff ? TALK_OFF : Mic.state === "denied" ? "The mic is blocked. Tap a choice below." : "No mic on this device. Tap a choice below.") : Mic.state === "on" ? "Hold the CB handset below and " + (k === "pitch" ? "hum." : "talk.") : "Hold the CB handset below. Your browser will ask to use the mic; nothing is uploaded" + (k === "speech" ? ", except the words, which your browser turns into text." : ".")}</p>
   </div>`;
 }
 
@@ -248,9 +250,17 @@ function dash() {
 }
 function paintDash() { const d = document.querySelector(".dash"); if (d) d.outerHTML = dash(); }
 
-// hold-to-talk on the handset: pointer, plus Space/Enter for keyboards
-document.addEventListener("pointerdown", e => { const b = e.target.closest("[data-cb]"); if (b && !b.disabled) { e.preventDefault(); b.setPointerCapture?.(e.pointerId); MicRun.press(); } });
-["pointerup", "pointercancel"].forEach(ev => document.addEventListener(ev, () => MicRun.release()));
-document.addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && e.target.closest?.("[data-cb]") && !e.repeat) { e.preventDefault(); MicRun.press(); } });
-document.addEventListener("keyup", e => { if ((e.key === " " || e.key === "Enter") && e.target.closest?.("[data-cb]")) { e.preventDefault(); MicRun.release(); } });
-document.addEventListener("contextmenu", e => { if (e.target.closest("[data-cb]")) e.preventDefault(); }); // long-press on phones
+// hold-to-talk on the handset: pointer events where they exist, touch + mouse on iOS 12 and old Android, Space/Enter for keyboards
+const cbAt = e => (e.target && e.target.closest ? e.target.closest("[data-cb]") : null);
+function cbDown(e) { const b = cbAt(e); if (b && !b.disabled) { e.preventDefault(); if (e.pointerId !== undefined && b.setPointerCapture) b.setPointerCapture(e.pointerId); MicRun.press(); } }
+if (window.PointerEvent) {
+  document.addEventListener("pointerdown", cbDown);
+  ["pointerup", "pointercancel"].forEach(ev => document.addEventListener(ev, () => MicRun.release()));
+} else {
+  document.addEventListener("touchstart", cbDown, { passive: false });
+  document.addEventListener("mousedown", cbDown);
+  ["touchend", "touchcancel", "mouseup"].forEach(ev => document.addEventListener(ev, () => MicRun.release()));
+}
+document.addEventListener("keydown", e => { if ((e.key === " " || e.key === "Enter") && cbAt(e) && !e.repeat) { e.preventDefault(); MicRun.press(); } });
+document.addEventListener("keyup", e => { if ((e.key === " " || e.key === "Enter") && cbAt(e)) { e.preventDefault(); MicRun.release(); } });
+document.addEventListener("contextmenu", e => { if (cbAt(e)) e.preventDefault(); }); // long-press on phones

@@ -5,14 +5,14 @@ const Reel = {
 
   async buf(src) {
     try {
-      const ab = src instanceof Blob ? await src.arrayBuffer() : await (await fetch(src)).arrayBuffer();
-      return await new Promise((ok, no) => this.ctx.decodeAudioData(ab, ok, no));
+      const ab = src instanceof Blob ? await blobBuffer(src) : await (await fetch(src)).arrayBuffer();
+      return await new Promise((ok, no) => quiet(this.ctx.decodeAudioData(ab, ok, no))); // callback form for old Safari; newer ones also return a promise
     } catch { return null; }
   },
 
   stop() {
     this.timers.forEach(clearTimeout); this.timers = [];
-    if (this.ctx) this.ctx.close().catch(() => {});
+    if (this.ctx) quiet(this.ctx.close());
     this.ctx = null; this.busy = false;
     const cap = document.getElementById("reel-cap"); if (cap) cap.textContent = "";
     document.querySelectorAll("[data-act=reel]").forEach(b => (b.textContent = "▶ Play your broadcast"));
@@ -29,7 +29,7 @@ const Reel = {
     if (dest) out.connect(dest);
     if (cap) cap.textContent = "Tuning in…";
     const takes = S.reel.slice(-6);
-    const [intro, outro, ...bufs] = await Promise.all([this.buf(`/voice/${T.id}-reel.mp3`), this.buf("/voice/reel-out.mp3"), ...takes.map(c => this.buf(c.blob))]);
+    const [intro, outro, ...bufs] = await Promise.all([(T.reel ? this.buf(`/voice/${T.id}-reel.mp3`) : null), this.buf("/voice/reel-out.mp3"), ...takes.map(c => this.buf(c.blob))]);
     if (!this.ctx) return;
     let t = ctx.currentTime + 0.15;
     const cues = [];
@@ -38,7 +38,7 @@ const Reel = {
       for (let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * (0.5 + 0.5 * Math.sin(i / 900));
       const s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
       s.buffer = n; bp.type = "bandpass"; bp.frequency.value = 2200; g.gain.value = 0.05;
-      s.connect(bp).connect(g).connect(out); s.start(t); t += d;
+      chain(s, bp, g, out); s.start(t); t += d;
     };
     const say = (b, radio, label) => {
       const s = ctx.createBufferSource(); s.buffer = b;
@@ -48,7 +48,7 @@ const Reel = {
         hp.type = "highpass"; hp.frequency.value = 380; lp.type = "lowpass"; lp.frequency.value = 3100;
         const curve = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(2.2 * x); } ws.curve = curve;
         g.gain.value = 1.8;
-        node = s.connect(hp).connect(lp).connect(ws).connect(g);
+        node = chain(s, hp, lp, ws, g);
       }
       node.connect(out);
       const len = radio ? Math.min(b.duration, 4.5) : b.duration;
@@ -63,7 +63,7 @@ const Reel = {
     let rec = null, chunks = [];
     if (dest) {
       try {
-        const type = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find(x => MediaRecorder.isTypeSupported?.(x)) || "";
+        const type = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find(x => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(x)) || "";
         rec = new MediaRecorder(dest.stream, type ? { mimeType: type } : undefined);
         rec.ondataavailable = e => e.data.size && chunks.push(e.data);
         rec.start();

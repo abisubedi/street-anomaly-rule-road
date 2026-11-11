@@ -19,7 +19,7 @@ const Mic = {
       this.state = "denied"; return false;
     }
     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (this.ctx.state === "suspended") await this.ctx.resume();
+    if (this.ctx.state === "suspended" && this.ctx.resume) await quiet(this.ctx.resume());
     const src = this.ctx.createMediaStreamSource(this.stream);
     this.an = this.ctx.createAnalyser();
     this.an.fftSize = 2048;
@@ -33,7 +33,7 @@ const Mic = {
   close() {
     this.stopClip();
     if (this.stream) this.stream.getTracks().forEach(t => t.stop());
-    if (this.ctx) this.ctx.close().catch(() => {});
+    if (this.ctx) quiet(this.ctx.close());
     this.stream = this.ctx = this.an = null;
     if (this.state === "on") this.state = "off";
   },
@@ -41,7 +41,12 @@ const Mic = {
   // loudness of the last 43ms in dBFS (-100 = silence, 0 = full scale)
   db() {
     if (!this.an) return -100;
-    this.an.getFloatTimeDomainData(this.buf);
+    if (this.an.getFloatTimeDomainData) this.an.getFloatTimeDomainData(this.buf);
+    else {
+      const b8 = this.b8 || (this.b8 = new Uint8Array(this.an.fftSize));
+      this.an.getByteTimeDomainData(b8);
+      for (let i = 0; i < b8.length; i++) this.buf[i] = (b8[i] - 128) / 128;
+    }
     let s = 0;
     for (let i = 0; i < this.buf.length; i++) s += this.buf[i] * this.buf[i];
     return 20 * Math.log10(Math.sqrt(s / this.buf.length) || 1e-5);
