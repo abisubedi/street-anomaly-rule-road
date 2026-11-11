@@ -422,6 +422,42 @@ body { font-size: 19px; font-size: calc(var(--ts) * 19px); line-height: 1.5; }
 @media (max-width: 360px) { .toggles .iconbtn { padding: 6px 9px; } .brand { font-size: 13px; } }
 @media (min-width: 700px) { body { font-size: 20px; font-size: calc(var(--ts) * 20px); } .story { font-size: 23px; font-size: calc(var(--ts) * 23px); } }
 @media (prefers-reduced-motion: reduce) { .go:active, .choice:active, .mode:active, .daily:active { transform: none; } }
+/* ---------- minigame scenes ---------- */
+.stage { margin: 0; background: #0E1730; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; overflow: hidden; }
+.stage svg { display: block; width: 100%; height: auto; }
+.stage figcaption { color: var(--muted); font-size: 15px; font-size: calc(var(--ts) * 15px); text-align: center; margin-top: 6px; }
+.me.squashed { animation: shake .4s; }
+.dogrow { display: flex; align-items: flex-end; justify-content: space-between; min-height: 110px; padding: 6px 4px; border-bottom: 3px solid var(--line); overflow: hidden; }
+.pack { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 4px; flex: 1; min-width: 0; }
+.dog { display: inline-block; position: relative; line-height: 1; background: none; border: 0; padding: 0; transform: scaleX(-1); transition: transform .3s, opacity .3s; }
+button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); animation: bob 1s ease-in-out infinite alternate; }
+.dog i { position: absolute; top: -4px; left: 50%; transform: scaleX(-1) translateX(50%); font: 700 13px var(--font-num); color: var(--sign-ink); background: var(--sign); border-radius: 99px; padding: 1px 6px; font-style: normal; }
+.dog.gone { transform: scaleX(-1) translateX(200px); opacity: 0; }
+.dog.nope { animation: shake .4s; }
+.walker { font-size: 52px; line-height: 1; transition: transform .6s cubic-bezier(.3,1.4,.5,1); flex: none; }
+.free { color: var(--leaf); font-size: 15px; align-self: center; }
+.stage-shadow.dusk { background: linear-gradient(#3A1F2E, #14213D); }
+.stage-shadow.noon { background: linear-gradient(#25406F, #14213D); }
+.yard-pop, .stage-yard .grow { animation: sprout .6s cubic-bezier(.3,1.6,.5,1) both; }
+.shelf { display: flex; flex-wrap: wrap; gap: 3px; padding: 4px; border-bottom: 3px solid #5B4636; min-height: 26px; }
+.jar { width: 10px; height: 14px; border-radius: 3px 3px 4px 4px; background: radial-gradient(circle at 50% 60%, #FFE27A, #E9B949 60%, #8A6A17); box-shadow: 0 0 6px rgba(255,210,63,.5); }
+.catch { position: relative; height: 200px; margin-top: 10px; border-radius: 12px; background: linear-gradient(#0B1428, #1C2A4A); touch-action: none; cursor: pointer; overflow: hidden; }
+.catch:focus-visible { outline: 3px solid var(--sign); }
+.orb { position: absolute; top: 0; width: 34px; height: 34px; margin-left: -17px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #FFF6C9, #FFD23F 45%, #E9B949); box-shadow: 0 0 22px 6px rgba(255,210,63,.55); }
+.cjar { position: absolute; bottom: 8px; width: 62px; height: 46px; margin-left: -31px; border: 3px solid #CFE3FF; border-top-width: 6px; border-radius: 8px 8px 14px 14px; background: rgba(207,227,255,.12); transition: left .08s linear; }
+.catch-tip { position: absolute; left: 0; right: 0; top: 8px; text-align: center; font: 600 15px var(--font-sign); color: var(--sign); pointer-events: none; }
+.dragzone { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
+.zone { min-height: 96px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px; border: 2px dashed var(--line); border-radius: 14px; font: 600 16px var(--font-sign); color: var(--muted); }
+.zone.hot { border-color: var(--sign); color: var(--sign); background: rgba(255,210,63,.1); }
+.chip { display: grid; gap: 2px; justify-items: center; padding: 10px 12px; border-radius: 14px; border: 2px solid var(--sign); background: var(--card); color: var(--fg); box-shadow: 0 5px 0 var(--press); touch-action: none; cursor: grab; max-width: 140px; }
+.chip b { font-size: 32px; line-height: 1.1; font-weight: 400; }
+.chip span { font: 600 13px var(--font-sign); }
+.chip.lifted { cursor: grabbing; box-shadow: 0 16px 30px rgba(0,0,0,.5); z-index: 30; position: relative; transition: none; }
+.go.heavy { position: relative; overflow: hidden; background: #2A1F33; color: #fff; box-shadow: 0 5px 0 #000; touch-action: none; }
+.go.heavy .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--sign); opacity: .35; }
+.go.heavy span { position: relative; }
+@keyframes bob { from { translate: 0 0; } to { translate: 0 -4px; } }
+@keyframes sprout { from { transform: scale(0); } to { transform: scale(1); } }
 @keyframes swing { 0% { transform: rotate(-9deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: rotate(0); } }
 @keyframes flicker { 0%, 92%, 100% { opacity: 1; } 93% { opacity: .35; } 95% { opacity: 1; } 96% { opacity: .5; } }
 @keyframes rise { from { transform: translateY(8px); opacity: .0; } to { transform: none; opacity: 1; } }
@@ -436,13 +472,14 @@ body { font-size: 19px; font-size: calc(var(--ts) * 19px); line-height: 1.5; }
 
 <div class="app" id="app"></div>
 
-<script src="/js/compat.js?v=32"></script>
-<script src="/js/juice.js?v=32"></script>
-<script src="/js/mic.js?v=32"></script>
-<script src="/js/road.js?v=32"></script>
-<script src="/js/radio.js?v=32"></script>
-<script src="/js/reel.js?v=32"></script>
-<script src="/js/share.js?v=32"></script>
+<script src="/js/compat.js?v=34"></script>
+<script src="/js/juice.js?v=34"></script>
+<script src="/js/mic.js?v=34"></script>
+<script src="/js/road.js?v=34"></script>
+<script src="/js/radio.js?v=34"></script>
+<script src="/js/reel.js?v=34"></script>
+<script src="/js/play.js?v=34"></script>
+<script src="/js/share.js?v=34"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -717,32 +754,32 @@ const TOWNS = [
   meters: [{ k: "flowers", label: "Flowers in your yard", life: true }, { k: "thorns", label: "Thorns" }],
   init: () => ({ flowers: 0, thorns: 0 }),
   steps: [
-    { when: "8:00 a.m.", text: "You bump into the mail carrier and her letters go everywhere.",
+    { when: "8:00 a.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You bump into the mail carrier and her letters go everywhere.",
       choices: [
         { t: "Say sorry and help pick them up", fx: s => { s.flowers += 1; }, say: "Pop. A red tulip by your porch." },
         { t: "Keep walking, you're late", fx: s => { s.thorns += 1; }, say: "Something sharp pokes out of the dirt." }] },
-    { when: "Lunch", text: "You snapped at your little brother for taking the last cookie.",
+    { when: "Lunch", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You snapped at your little brother for taking the last cookie.",
       choices: [
         { t: "Tell him sorry", fx: s => { s.flowers += 1; }, say: "Pop. A pink rose. He gives you half the cookie." },
         { t: "Say it was his fault", fx: s => { s.thorns += 1; }, say: "Another thorn. He doesn't talk to you all afternoon." }] },
-    { when: "3:00 p.m.", text: "Your soccer ball smashed a flowerpot next door.",
+    { when: "3:00 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "Your soccer ball smashed a flowerpot next door.",
       choices: [
         { t: "Knock and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. Your neighbor laughs and lends you a new pot." },
         { t: "Blame the wind", fx: s => { s.thorns += 2; }, say: "The wind did not do that. Two big thorns." }] },
     { rehook: "Every sorry you DON'T say grows thorns. And Grandma is coming tonight. If thorns block the gate, she can't get in." },
-    { when: "Recess", text: "You knocked over a kid's sandcastle by accident.",
+    { when: "Recess", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You knocked over a kid's sandcastle by accident.",
       choices: [
         { t: "“Sorry! Let me help fix it.”", fx: s => { s.flowers += 1; }, say: "Pop. A yellow daisy. The new castle is even bigger." },
         { t: "Pretend you didn't see it", fx: s => { s.thorns += 1; }, say: "Ouch. A thorn pokes up by your gate." }] },
-    { when: "4:00 p.m.", text: "You borrowed your friend's bike and scratched it.",
+    { when: "4:00 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You borrowed your friend's bike and scratched it.",
       choices: [
         { t: "Tell her the truth and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. She shrugs. “It's a bike. Bikes get scratched.”" },
         { t: "Give it back and say nothing", fx: s => { s.thorns += 2; }, say: "Two thorns. And she'll notice tomorrow." }] },
-    { when: "5:30 p.m.", text: "Mom asked you to take out the trash. You forgot. Again.",
+    { when: "5:30 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "Mom asked you to take out the trash. You forgot. Again.",
       choices: [
         { t: "“Sorry, Mom. Doing it now.”", fx: s => { s.flowers += 1; }, say: "Pop. A purple flower. Mom blows you a kiss." },
         { t: "“I was busy!”", fx: s => { s.thorns += 1; }, say: "A thorn. And the trash still smells." }] },
-    { when: "6:00 p.m.", text: "Grandma's car pulls up. What's the last thing you do?",
+    { when: "6:00 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "Grandma's car pulls up. What's the last thing you do?",
       choices: [
         { t: "Go back and say every sorry you skipped", fx: s => { s.flowers += s.thorns; s.thorns = 0; }, say: "Pop, pop, pop. The thorns shrink away." },
         { t: "Hide inside and hope she doesn't notice", fx: s => { s.thorns += 1; }, say: "She notices." }] },
@@ -865,7 +902,7 @@ const TOWNS = [
       choices: [
         { t: "Pay from your savings jar", fx: s => { s.free += 1; }, say: "That's what savings are for. No dog." },
         { t: "Borrow the 15 coins", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A small dog sniffs your new tire." }] },
-    { when: "Next month", text: "Payday. What do you do first?",
+    { when: "Next month", pay: true, text: "Payday. What do you do first?",
       choices: [
         { t: "Pay back the smallest dog first, then the next", fx: s => { s.free += s.dogs; s.dogs = 0; s.size = 0; }, say: "Wag, wag… each one runs home." },
         { t: "Spend it and pay later", fx: s => { s.size = s.size * 2; s.free = Math.max(0, s.free - 1); }, say: "The dogs get bigger. And hungrier." }] },
@@ -881,11 +918,11 @@ const TOWNS = [
   meters: [{ k: "jars", label: "Hours saved in jars" }, { k: "joy", label: "Memories", life: true }],
   init: () => ({ jars: 54, joy: 2, theo: false }),
   steps: [
-    { when: "Fall-back night", text: "A glowing hour drops into your jar. Your neighbor says, \"Sleep in!\"",
+    { when: "Fall-back night", play: { kind: "catch" }, text: "A glowing hour drops into your jar. Your neighbor says, \"Sleep in!\"",
       choices: [
         { t: "Spend it baking cookies with your grandson", fx: s => { s.joy += 2; }, say: "Flour everywhere. He'll remember this." },
         { t: "Label it \"Someday\" and put it on the shelf", fx: s => { s.jars += 1; }, say: "Another jar glows in the pantry." }] },
-    { when: "The next year", text: "Another hour falls. Your old friend calls to talk.",
+    { when: "The next year", play: { kind: "catch" }, text: "Another hour falls. Your old friend calls to talk.",
       choices: [
         { t: "Spend the hour on the phone with her", fx: s => { s.joy += 2; }, say: "You laugh until midnight." },
         { t: "Save it for something important", fx: s => { s.jars += 1; }, say: "The shelf gets heavier." }] },
@@ -1038,19 +1075,19 @@ const TOWNS = [
   init: () => ({ door: 72, room: 3, lost: false, gave: false }),
   steps: [
     { rehook: "Here's what nobody tells you: your stuff doesn't shrink, only the house does. And if you can't stand up inside, the town gives it to whoever can. You're five foot six. Your door is six feet." },
-    { when: "Monday", text: "A lamp shaped like a duck. It's perfect, and it's only one inch.",
+    { when: "Monday", drag: { item: "🦆", label: "Duck lamp · 1 inch", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "🚶 Leave it", pick: 1 }] }, text: "A lamp shaped like a duck. It's perfect, and it's only one inch.",
       choices: [
         { t: "Buy the duck lamp", fx: s => { s.door -= 1; s.room -= 1; }, say: "The roof gives a little squash. The duck glows happily." },
         { t: "Leave the duck", fx: s => { s.room += 1; }, say: "You walk home with empty hands and a tall door." }] },
-    { when: "Friday", text: "Three pairs of shoes, all on sale. That's three more inches.",
+    { when: "Friday", drag: { item: "👟👟👟", label: "3 pairs · 3 inches", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "🚶 Leave them", pick: 1 }] }, text: "Three pairs of shoes, all on sale. That's three more inches.",
       choices: [
         { t: "Buy all three", fx: s => { s.door -= 3; s.room -= 1; }, say: "Now you duck through your own door. Biscuit trots in just fine." },
         { t: "Your old shoes are fine", fx: s => { s.room += 1; }, say: "Your old shoes are, in fact, fine." }] },
-    { when: "Midnight", text: "A sale ends in one minute. Two inches, and your finger is over the button.",
+    { when: "Midnight", drag: { item: "📦📦", label: "Flash sale · 2 inches", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "📵 Phone down", pick: 1 }] }, text: "A sale ends in one minute. Two inches, and your finger is over the button.",
       choices: [
         { t: "Tap the button", fx: s => { s.door -= 2; s.lost = s.door <= 66; }, say: "The ceiling drops, and the boxes tumble." },
         { t: "Put the phone down", fx: s => { s.room += 1; }, say: "The minute ends. Nothing happens, and that's the good news." }] },
-    { when: "Morning", text: s => s.lost ? "A man from town hall ties the keys to Biscuit's collar. Your things are piled on the lawn." : "You can still stand up in your own kitchen. Your neighbor stops by and admires your stuff.",
+    { when: "Morning", drag: { item: "📦", label: "All your stuff", zones: [{ label: "🎁 Give it away", pick: 0 }, { label: "🏠 Keep it all", pick: 1 }] }, text: s => s.lost ? "A man from town hall ties the keys to Biscuit's collar. Your things are piled on the lawn." : "You can still stand up in your own kitchen. Your neighbor stops by and admires your stuff.",
       choices: [
         { t: "Give it all away", fx: s => { s.gave = true; s.door = 72; s.room += 3; }, say: "Every gift, the house grows an inch." },
         { t: "Keep everything", say: "You pack it all back in. It takes a while." }] },
@@ -1608,7 +1645,7 @@ function renderTown() {
     const nxt = nextOnRoad(S.t);
     return `${topbar(true)}
     <div class="mini-sign">${T.name} · ${tagLabel}</div>
-    ${meters(T, s)}
+    ${meters(T, s)}${stage(T, s)}
     <div class="end-stars">${starRow(n, "")}</div>
     ${nm ? `<div class="nearmiss">😮 Near miss · ${esc(nm)}</div>` : ""}
     ${vs ? `<div class="challenge">${vs}</div>` : ""}
@@ -1640,7 +1677,7 @@ function renderTown() {
   if (st.rehook) {
     return `${topbar(true)}
     <div class="mini-sign">${T.name} · ${tagLabel}</div>
-    ${meters(T, s)}
+    ${meters(T, s)}${stage(T, s)}
     <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p>${listenBtn(T.id + "-catch")}</div>
     <button class="go" data-act="next">Keep going</button>`;
   }
@@ -1659,13 +1696,14 @@ function renderTown() {
   const who = Prefs.coop ? role(T, S.step) : null;
   return `${topbar(true)}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
-  ${meters(T, s)}
+  ${meters(T, s)}${stage(T, s)}
   <section class="scene" ${r ? 'style="animation:none"' : ""}>
     <div class="when">${esc(st.when)}${who ? `<span class="role role-${who.toLowerCase()}">${who}</span>` : ""}</div>
     <p class="story">${esc(val(st.text, s))}</p>
     ${showMic ? micPanel(st) : ""}
     ${showMic ? `<div class="or-tap">or tap</div>` : ""}
-    <div class="choices">${choices}</div>
+    ${st.drag && !r ? dragPanel(st) + `<div class="or-tap">or tap</div>` : ""}
+    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : `<div class="choices">${choices}</div>`}
     ${r ? `<div class="result">${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
   </section>`;
@@ -1704,6 +1742,7 @@ function render() {
   $app.innerHTML = (S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown()) + dash();
   if (S.screen === "fan") bindFan();
   if (S.screen === "home") bindDial();
+  Play.mount();
   const st = MicRun.step(); if (st && st.mic && !MicRun.done) MicRun.draw(st); // show the red line / target band before the first word
 }
 
@@ -1718,6 +1757,7 @@ function animateMeters(before) {
 
 function enterStep() {
   const st = TOWNS[S.t].steps[S.step];
+  S.played = false;
   if (st && st.enter && !st.rehook) st.enter(S.s);
   if (st && st.rehook) { Sound.drone(); Voice.say(TOWNS[S.t].id + "-catch"); }
   else if (st && st.clip) Voice.say(TOWNS[S.t].id + "-" + st.clip);
@@ -1733,6 +1773,7 @@ function pick(i, dyn, before0) {
     if (c.water) { s.streak += 1; s.coins += s.streak; } else { s.coins = Math.floor(s.coins / 2); s.streak = 0; }
   }
   if (c.fx) c.fx(s);
+  Play.after(T, before, s);
   if (s.bat !== undefined) s.bat = Math.max(0, Math.min(100, s.bat));
   if (s.glass !== undefined) s.glass = Math.max(0, Math.min(100, s.glass));
   const night = st.night ? st.night(s) : (c.water !== undefined ? (c.water ? `The tree grows <strong>+${s.streak}</strong> coins.` : (before.coins ? `Skipped. The tree drops half: <strong>${before.coins} → ${s.coins}</strong>` : "Skipped. Nothing grows.")) : "");
@@ -1769,7 +1810,7 @@ function onMicResult(res) {
 
 function next() {
   const T = TOWNS[S.t];
-  Sound.pluck(); Voice.stop(); Reel.stop();
+  Sound.pluck(); Voice.stop(); Reel.stop(); Play.stop();
   if (S.step + 1 >= T.steps.length) {
     const was = totalStars();
     S.phase = "end"; S.res = T.rate(S.s);
@@ -1788,7 +1829,7 @@ function next() {
 
 function startTown(i, opts = {}) {
   if (!districtOpen(districtOf(i)) && !opts.free) { Juice.penalty(); return; }
-  MicRun.reset(); Reel.stop();
+  MicRun.reset(); Reel.stop(); Play.stop(); Play.mem = {};
   S.screen = "town"; S.t = i; S.step = 0; S.phase = "arrive"; S.s = TOWNS[i].init(); S.lastResult = null;
   S.reel = []; S.grid = []; S.heard = []; S.ghostOut = null; S.base = 0; S.dailyJust = false; S.daily = !!opts.daily;
   render(); window.scrollTo(0, 0); Voice.say(TOWNS[i].id + "-arrive");
