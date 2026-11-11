@@ -1,5 +1,5 @@
 // Rule Road offline support. Bump VERSION whenever index.html changes so players get the new towns.
-const VERSION = "rule-road-v26";
+const VERSION = "rule-road-v27";
 const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
@@ -18,6 +18,17 @@ self.addEventListener("fetch", e => {
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put("/index.html", copy)); return res; })
       .catch(() => caches.match("/index.html")));
+    return;
+  }
+  // Narrator clips: the audio element asks for byte ranges, so cache and serve whole files by path.
+  if (url.origin === location.origin && url.pathname.startsWith("/voice/")) {
+    e.respondWith(caches.open(VERSION).then(async c => {
+      const hit = await c.match(url.pathname);
+      if (hit) return hit;
+      const res = await fetch(url.pathname);
+      if (res.status === 200) c.put(url.pathname, res.clone());
+      return res;
+    }));
     return;
   }
   // Same-origin files and Google Fonts: serve from cache, refresh in the background.

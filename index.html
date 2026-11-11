@@ -189,6 +189,13 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .install div { flex: 1; min-width: 0; font-size: 14px; color: var(--muted); line-height: 1.35; }
 .install div strong { color: var(--fg); display: block; font-size: 15px; }
 .install .go { flex: none; align-self: center; padding: 10px 14px; font-size: 14px; }
+.toggles { display: flex; gap: 8px; }
+.listen-row { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+.listen-row.center { justify-content: center; }
+.listen { flex: none; background: transparent; color: var(--sign); border: 1.5px solid var(--sign); border-radius: 999px; padding: 6px 14px; font-family: var(--font-sign); font-weight: 900; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
+.listen:hover, .listen[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); }
+.rehook .listen { align-self: flex-start; color: #fff; border-color: rgba(255,255,255,.8); }
+.rehook .listen:hover, .rehook .listen[aria-pressed="true"] { background: #fff; color: var(--red); }
 .toast { min-height: 1.4em; text-align: center; color: var(--leaf); font-size: 14px; margin: 0; }
 a { color: var(--sign); }
 .foot { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); text-align: center; }
@@ -910,6 +917,27 @@ const Sound = {
   swell() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 1.2, "sine", .07, i * .12)); },
 };
 
+/* ---------- narrator: the Street Anomaly host, pre-recorded in the channel's voice (/voice/<key>.mp3) ---------- */
+const Voice = {
+  on: true, key: null, el: null,
+  init() { try { this.on = localStorage.getItem("rule-road-voice") !== "off"; } catch {} },
+  save() { try { localStorage.setItem("rule-road-voice", this.on ? "on" : "off"); } catch {} },
+  say(key, force) {
+    if (!this.on && !force) return;
+    if (!this.el) {
+      this.el = new Audio(); this.el.preload = "auto";
+      ["play", "pause", "ended"].forEach(ev => this.el.addEventListener(ev, () => this.paint()));
+    }
+    this.key = key; this.el.src = `/voice/${key}.mp3`;
+    this.el.play().catch(() => { this.key = null; this.paint(); });
+  },
+  stop() { if (this.el && !this.el.paused) this.el.pause(); this.key = null; this.paint(); },
+  playing(key) { return !!(this.el && !this.el.paused && !this.el.ended && this.key === key); },
+  paint() { document.querySelectorAll('[data-act="say"]').forEach(b => { const on = this.playing(b.dataset.k); b.textContent = on ? "■ Stop" : "▶ Listen"; b.setAttribute("aria-pressed", on); }); },
+};
+Voice.init();
+const listenBtn = key => `<button class="listen" data-act="say" data-k="${key}" aria-pressed="false">▶ Listen</button>`;
+
 /* ---------- state ---------- */
 let S = { screen: "home", t: 0, step: 0, phase: "arrive", s: null, res: null, stars: loadStars(), fan: { rule: "", lesson: "" } };
 const $app = document.getElementById("app");
@@ -920,7 +948,10 @@ const starRow = (n, cls = "stars") => `<span class="${cls}" aria-label="${n || 0
 function topbar(back) {
   return `<div class="bar">
     ${back ? `<button class="iconbtn" data-act="home">← Rule Road</button>` : `<div class="brand"><b>Street Anomaly</b> · Rule Road</div>`}
-    <button class="iconbtn" data-act="sound" aria-pressed="${Sound.on}">${Sound.on ? "Sound on" : "Sound off"}</button>
+    <span class="toggles">
+      <button class="iconbtn" data-act="voice" aria-pressed="${Voice.on}">${Voice.on ? "Voice on" : "Voice off"}</button>
+      <button class="iconbtn" data-act="sound" aria-pressed="${Sound.on}">${Sound.on ? "Sound on" : "Sound off"}</button>
+    </span>
   </div>`;
 }
 
@@ -959,6 +990,7 @@ function renderHome() {
     </div></div>
     <div class="pole"></div>
     <p>Every town has one strange rule. Live one day by it. Make your choices, find the catch, and see what the rule teaches you.</p>
+    <div class="listen-row">${listenBtn("intro")}<span>Hear it from the Street Anomaly host</span></div>
   </section>
   ${installCard()}
   <p class="howto"><strong>How to play:</strong> pick a town, choose what you'd do, and watch the numbers change. Each town hides a twist halfway through. Earn up to 3 stars per town.</p>
@@ -1003,6 +1035,7 @@ function renderTown() {
       <div class="pole"></div>
     </section>
     <p class="story">${esc(T.hook)}</p>
+    <div class="listen-row">${listenBtn(T.id + "-arrive")}</div>
     <button class="go" data-act="begin">Enter ${T.name}</button>`;
   }
   if (S.phase === "end") {
@@ -1015,6 +1048,7 @@ function renderTown() {
     <div class="lesson-k">The lesson</div>
     <p class="lesson">${esc(T.lesson)}</p>
     <p class="cta">${esc(T.cta)}</p>
+    <div class="listen-row center">${listenBtn(T.id + "-end")}</div>
     <p class="loop">Because in this town, ${esc(T.rule)}</p>
     <div class="row">
       <button class="go ghost" data-act="again">Play ${T.name} again</button>
@@ -1026,7 +1060,7 @@ function renderTown() {
     return `${topbar(true)}
     <div class="mini-sign">${T.name} · ${tagLabel}</div>
     ${meters(T, s)}
-    <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p></div>
+    <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p>${listenBtn(T.id + "-catch")}</div>
     <button class="go" data-act="next">Keep going</button>`;
   }
   const r = S.phase === "result" ? S.lastResult : null;
@@ -1093,7 +1127,7 @@ function animateMeters(before) {
 function enterStep() {
   const st = TOWNS[S.t].steps[S.step];
   if (st && st.enter && !st.rehook) st.enter(S.s);
-  if (st && st.rehook) Sound.drone();
+  if (st && st.rehook) { Sound.drone(); Voice.say(TOWNS[S.t].id + "-catch"); }
 }
 
 function pick(i) {
@@ -1116,18 +1150,18 @@ function pick(i) {
 
 function next() {
   const T = TOWNS[S.t];
-  Sound.pluck();
+  Sound.pluck(); Voice.stop();
   if (S.step + 1 >= T.steps.length) {
     S.phase = "end"; S.res = T.rate(S.s);
     if ((S.stars[T.id] || 0) < S.res) { S.stars[T.id] = S.res; saveStars(S.stars); }
-    Sound.swell(); render(); return;
+    Sound.swell(); render(); Voice.say(T.id + "-end"); return;
   }
   S.step += 1; S.phase = "step"; enterStep(); render();
 }
 
 function startTown(i) {
   S.screen = "town"; S.t = i; S.step = 0; S.phase = "arrive"; S.s = TOWNS[i].init(); S.lastResult = null;
-  render(); window.scrollTo(0, 0);
+  render(); window.scrollTo(0, 0); Voice.say(TOWNS[i].id + "-arrive");
 }
 
 function bindFan() {
@@ -1146,15 +1180,17 @@ $app.addEventListener("click", e => {
   const act = b.dataset.act;
   if (act === "install") { if (installEvt) { installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; render(); }); } return; }
   if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
+  if (act === "say") { const k = b.dataset.k; Voice.playing(k) ? Voice.stop() : Voice.say(k, true); return; }
+  if (act === "voice") { Voice.on = !Voice.on; Voice.save(); if (!Voice.on) Voice.stop(); render(); return; }
   if (act === "sound") { Sound.on = !Sound.on; Sound.init(); if (Sound.on) Sound.pluck(); render(); return; }
   if (Sound.on) Sound.init();
-  if (act === "home") { S.screen = "home"; Sound.pluck(); render(); window.scrollTo(0, 0); }
+  if (act === "home") { S.screen = "home"; Sound.pluck(); Voice.stop(); render(); window.scrollTo(0, 0); }
   else if (act === "town") { Sound.pluck(); startTown(+b.dataset.i); }
   else if (act === "again") { Sound.pluck(); startTown(S.t); }
-  else if (act === "begin") { S.phase = "step"; S.step = 0; enterStep(); Sound.pluck(); render(); }
+  else if (act === "begin") { Voice.stop(); S.phase = "step"; S.step = 0; enterStep(); Sound.pluck(); render(); }
   else if (act === "pick") pick(+b.dataset.c);
   else if (act === "next") { next(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-  else if (act === "fan") { S.screen = "fan"; Sound.pluck(); render(); window.scrollTo(0, 0); }
+  else if (act === "fan") { S.screen = "fan"; Sound.pluck(); render(); window.scrollTo(0, 0); Voice.say("fan"); }
   else if (act === "copy") {
     const txt = document.getElementById("copyText").textContent, toast = document.getElementById("toast");
     const fallback = () => { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents(document.getElementById("copyText")); sel.removeAllRanges(); sel.addRange(rg); toast.textContent = "Selected. Press copy on your keyboard."; };
