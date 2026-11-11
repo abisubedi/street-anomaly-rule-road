@@ -508,6 +508,15 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .mp-hint { margin: 0; color: var(--sign); font: 600 16px var(--font-sign); }
 @keyframes pulse { 50% { box-shadow: 0 0 0 18px rgba(255,210,63,.06), 0 8px 0 #000, 0 0 70px rgba(255,210,63,.45); } }
 @media (prefers-reduced-motion: reduce) { .ignite { animation: none; } }
+/* ---------- device punch-list ---------- */
+.glove-news { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; background: linear-gradient(135deg, #1B3340, var(--card)); border: 2px solid var(--leaf); border-radius: 14px; padding: 12px 14px; animation: pop .5s cubic-bezier(.3,1.8,.5,1) both; }
+.gn-i { font-size: 36px; line-height: 1; }
+.gn-t { min-width: 0; font-size: 15px; font-size: calc(var(--ts) * 15px); color: var(--muted); line-height: 1.35; }
+.gn-t b { display: block; color: var(--fg); font: 700 17px var(--font-sign); font-size: calc(var(--ts) * 17px); }
+.gn-b { grid-column: 1 / -1; display: flex; gap: 10px; }
+.gn-b .go { flex: 1; min-height: 48px; padding: 10px; }
+.item .new { position: absolute; top: 8px; right: 10px; font: 700 12px var(--font-sign); font-style: normal; color: var(--sign-ink); background: var(--sign); border-radius: 99px; padding: 2px 8px; }
+@media (max-width: 600px) { .zone { min-height: 120px; } .dragzone { gap: 8px; } }
 @keyframes swing { 0% { transform: rotate(-9deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: rotate(0); } }
 @keyframes flicker { 0%, 92%, 100% { opacity: 1; } 93% { opacity: .35; } 95% { opacity: 1; } 96% { opacity: .5; } }
 @keyframes rise { from { transform: translateY(8px); opacity: .0; } to { transform: none; opacity: 1; } }
@@ -522,15 +531,15 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 
 <div class="app" id="app"></div>
 
-<script src="/js/compat.js?v=38"></script>
-<script src="/js/juice.js?v=38"></script>
-<script src="/js/mic.js?v=38"></script>
-<script src="/js/road.js?v=38"></script>
-<script src="/js/radio.js?v=38"></script>
-<script src="/js/reel.js?v=38"></script>
-<script src="/js/glovebox.js?v=38"></script>
-<script src="/js/play.js?v=38"></script>
-<script src="/js/share.js?v=38"></script>
+<script src="/js/compat.js?v=39"></script>
+<script src="/js/juice.js?v=39"></script>
+<script src="/js/mic.js?v=39"></script>
+<script src="/js/road.js?v=39"></script>
+<script src="/js/radio.js?v=39"></script>
+<script src="/js/reel.js?v=39"></script>
+<script src="/js/glovebox.js?v=39"></script>
+<script src="/js/play.js?v=39"></script>
+<script src="/js/share.js?v=39"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1522,7 +1531,7 @@ function saveStars(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } ca
 /* ---------- tiny synth: plucks, a drone for the catch, a swell for the lesson ---------- */
 const Sound = {
   ctx: null, on: store.get("sound", true),
-  init() { if (!this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch { this.ctx = null; } } if (this.ctx && this.ctx.state === "suspended" && this.ctx.resume) quiet(this.ctx.resume()); },
+  init() { iosAudio.unlock(); if (!this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch { this.ctx = null; } } if (this.ctx && this.ctx.state === "suspended" && this.ctx.resume) quiet(this.ctx.resume()); },
   tone(f, d = .25, type = "triangle", v = .14, when = 0) {
     if (!this.on || !this.ctx) return;
     const c = this.ctx, t = c.currentTime + when, o = c.createOscillator(), g = c.createGain();
@@ -1638,6 +1647,7 @@ function renderHome() {
     <p>Every town has one strange rule. Live one day by it. Choose, talk, whisper and hum your way through, then find out what the rule teaches you.</p>
     <div class="listen-row">${listenBtn("intro")}<span>Hear it from the Street Anomaly host</span></div>
   </section>
+  ${gloveNews("home")}
   <button class="daily ${done ? "done" : ""}" data-act="daily">
     <span class="daily-k">Today's Anomaly Mile${n ? ` · 🔥 ${n}-day streak` : ""}</span>
     <span class="daily-t">${esc(D.name)}</span>
@@ -1737,6 +1747,7 @@ function renderTown() {
     <div class="end-stars">${starRow(n, "")}</div>
     ${nm ? `<div class="nearmiss">😮 Near miss · ${esc(nm)}</div>` : ""}
     ${vs ? `<div class="challenge">${vs}</div>` : ""}
+    ${gloveNews("end")}
     ${S.opened && S.opened.length ? `<div class="unlock">🔓 ${esc(S.opened.join(" and "))} ${S.opened.length > 1 ? "are" : "is"} open</div>` : ""}
     ${S.dailyJust ? `<div class="challenge daily-tag">🔥 Daily mile done · ${streak()}-day streak. Come back tomorrow for a new town.</div>` : ""}
     <p class="story" style="text-align:center">${esc(T.ending(s))}</p>
@@ -1965,7 +1976,9 @@ $app.addEventListener("click", async e => {
   if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
   if (act === "say") { const k = b.dataset.k; Voice.playing(k) ? Voice.stop() : Voice.say(k, true); return; }
   if (act === "ignite") { ignite(); return; }
-  if (act === "equip") { const it = ITEMS.find(x => x.id === b.dataset.id); if (!it || !Glove.open(it)) { Juice.penalty(); return; } Glove.toggle(it.id); Juice.tap(); Sound.pluck(); render(); return; }
+  if (act === "equip-new") { const id = b.dataset.id; if (Glove.on.indexOf(id) < 0) Glove.toggle(id); Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.burst(b, 8, "money"); Sound.good(); render(); return; }
+  if (act === "glove-later") { Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.tap(); render(); return; }
+  if (act === "equip") { const it = ITEMS.find(x => x.id === b.dataset.id); if (!it || !Glove.open(it)) { Juice.penalty(); return; } Glove.toggle(it.id); Glove.markSeen([it.id]); Juice.tap(); Sound.pluck(); render(); return; }
   if (act === "howto-ok") { store.set("howto", true); Juice.tap(); render(); return; }
   if (act === "tsize") { TS.i = (TS.i + 1) % 3; store.set("ts", TS.i); TS.apply(); Juice.tap(); render(); return; }
   if (act === "voice") { Voice.on = !Voice.on; Voice.save(); if (!Voice.on) Voice.stop(); render(); return; }

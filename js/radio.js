@@ -29,7 +29,7 @@ const MicRun = {
 
   async press() {
     const st = this.step();
-    if (!st || !st.mic || this.done || this.holding) return;
+    if (!st || !st.mic || this.done || this.holding || this.tail) return;
     const k = st.mic.kind;
     Voice.stop(); Juice.tap();
     if (k === "speech" && !Mic.speechOK) { this.status(TALK_OFF); return; }
@@ -58,7 +58,11 @@ const MicRun = {
     this.holding = false;
     document.querySelectorAll("[data-cb]").forEach(b => b.classList.remove("live"));
     const st = this.step(); if (!st) return;
-    if (st.mic.kind === "speech") { if (this.sr) this.sr.stop(); this.status("Thinking…"); return; } // onText(final) finishes
+    if (st.mic.kind === "speech") { // keep listening 0.7s after release, so a Bluetooth mic's last word still lands
+      const sr = this.sr; this.tail = true; this.status("Catching your last word…");
+      setTimeout(() => { this.tail = false; if (sr) sr.stop(); }, 700);
+      return; // onText(final) finishes
+    }
     Mic.stopClip(); // only the successful take goes on the tape
     const d = this.d, k = st.mic.kind;
     if (k === "pitch" && d.held > 12) return this.finish(st, { ok: false, label: "couldn't find the note" });

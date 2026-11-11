@@ -26,3 +26,18 @@ function blobBuffer(b) {
   f.parentNode.removeChild(f);
   if (!ok) document.documentElement.className += " no-flexgap";
 })();
+
+// iPhone ring/silent switch: it mutes Web Audio (crackle, pings, buzzers) unless the page plays as media.
+// iOS 17+ lets us ask for the "playback" session; older iOS gets the same result from a silent looping <audio>.
+var iosAudio = { el: null,
+  unlock: function () {
+    if (navigator.audioSession) { try { navigator.audioSession.type = "playback"; return; } catch (e) {} }
+    if (this.el || !/iphone|ipad|ipod/i.test(navigator.userAgent) && !(navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return;
+    var n = 4410, b = new ArrayBuffer(44 + n * 2), v = new DataView(b), w = function (o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); w(8, "WAVE"); w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, 44100, true); v.setUint32(28, 88200, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data"); v.setUint32(40, n * 2, true);
+    this.el = new Audio(URL.createObjectURL(new Blob([b], { type: "audio/wav" })));
+    this.el.loop = true; this.el.setAttribute("playsinline", ""); quiet(this.el.play());
+    var el = this.el;
+    document.addEventListener("visibilitychange", function () { if (document.hidden) el.pause(); else quiet(el.play()); });
+  } };

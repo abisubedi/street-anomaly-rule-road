@@ -157,10 +157,25 @@ function catchGame(st) {
   let jx = 0.5, ox = 0.15 + Math.random() * 0.7, drift = (Math.random() - 0.5) * 0.25, t0 = 0, done = false;
   const dur = Juice.reduced ? 3600 : 2600;
   const place = () => { jar.style.left = jx * W() + "px"; };
-  const to = clientX => { const r = box.getBoundingClientRect(); jx = Math.max(0.08, Math.min(0.92, (clientX - r.left) / r.width)); place(); };
-  const onMove = e => { const p = e.touches ? e.touches[0] : e; if (p) to(p.clientX); if (e.cancelable) e.preventDefault(); };
-  if (window.PointerEvent) { box.addEventListener("pointerdown", onMove); box.addEventListener("pointermove", e => { if (e.buttons || e.pointerType === "touch") onMove(e); }); }
-  else { box.addEventListener("touchstart", onMove, { passive: false }); box.addEventListener("touchmove", onMove, { passive: false }); box.addEventListener("mousedown", onMove); box.addEventListener("mousemove", e => { if (e.buttons) onMove(e); }); }
+  // the jar moves with the thumb (only sideways movement counts), and jumps only if you touch far away from it
+  let ax = null, aj = 0, held = false;
+  const clamp = v => Math.max(0.08, Math.min(0.92, v));
+  const onDown = e => {
+    const p = e.touches ? e.touches[0] : e; if (!p) return; held = true;
+    const r = box.getBoundingClientRect(), fx = (p.clientX - r.left) / r.width;
+    if (Math.abs(fx - jx) * r.width > 60) { jx = clamp(fx); place(); }
+    ax = p.clientX; aj = jx;
+    if (e.pointerId !== undefined && box.setPointerCapture) box.setPointerCapture(e.pointerId);
+    if (e.cancelable) e.preventDefault();
+  };
+  const onMove = e => {
+    if (!held) return; const p = e.touches ? e.touches[0] : e; if (!p) return;
+    jx = clamp(aj + (p.clientX - ax) / box.getBoundingClientRect().width); place();
+    if (e.cancelable) e.preventDefault();
+  };
+  const onUp = () => { held = false; };
+  if (window.PointerEvent) { box.addEventListener("pointerdown", onDown); box.addEventListener("pointermove", onMove); ["pointerup", "pointercancel"].forEach(v => box.addEventListener(v, onUp)); }
+  else { box.addEventListener("touchstart", onDown, { passive: false }); box.addEventListener("touchmove", onMove, { passive: false }); box.addEventListener("touchend", onUp); box.addEventListener("mousedown", onDown); document.addEventListener("mousemove", onMove); document.addEventListener("mouseup", onUp); }
   box.addEventListener("keydown", e => { if (e.key === "ArrowLeft") { jx = Math.max(0.08, jx - 0.08); place(); } if (e.key === "ArrowRight") { jx = Math.min(0.92, jx + 0.08); place(); } });
   place();
   const tick = now => {
@@ -192,20 +207,23 @@ function catchGame(st) {
 function dragGame(st) {
   const chip = document.getElementById("dragchip"); if (!chip) return;
   const zones = [...document.querySelectorAll("[data-zone]")];
-  let sx = 0, sy = 0, on = false;
-  const at = (x, y) => zones.find(z => { const r = z.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
+  let sx = 0, sy = 0, on = false, moved = 0;
+  const at = (x, y) => zones.find(z => { const r = z.getBoundingClientRect(), m = 14; return x >= r.left + m && x <= r.right - m && y >= r.top + m && y <= r.bottom - m; });
+  const centre = () => { const r = chip.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
   const down = e => { const p = e.touches ? e.touches[0] : e; on = true; sx = p.clientX; sy = p.clientY; chip.classList.add("lifted"); if (e.cancelable) e.preventDefault(); };
   const move = e => {
     if (!on) return; const p = e.touches ? e.touches[0] : e;
     chip.style.transform = `translate(${p.clientX - sx}px, ${p.clientY - sy}px) rotate(-4deg)`;
-    const z = at(p.clientX, p.clientY); zones.forEach(q => q.classList.toggle("hot", q === z));
+    moved = Math.max(moved, Math.hypot(p.clientX - sx, p.clientY - sy));
+    const c = centre(), z = moved > 36 ? at(c[0], c[1]) : null; zones.forEach(q => q.classList.toggle("hot", q === z));
     if (e.cancelable) e.preventDefault();
   };
   const up = e => {
     if (!on) return; on = false;
-    const p = e.changedTouches ? e.changedTouches[0] : e, z = at(p.clientX, p.clientY);
+    const c = centre(), z = moved > 36 ? at(c[0], c[1]) : null; moved = 0;
     chip.classList.remove("lifted"); zones.forEach(q => q.classList.remove("hot"));
-    if (z) { chip.style.opacity = "0"; pick(+z.dataset.zone); } else chip.style.transform = "";
+    if (z) { chip.style.opacity = "0"; pick(+z.dataset.zone); }
+    else { chip.style.transition = "transform .25s cubic-bezier(.3,1.5,.5,1)"; chip.style.transform = ""; setTimeout(() => { chip.style.transition = ""; }, 260); }
   };
   if (window.PointerEvent) {
     chip.addEventListener("pointerdown", e => { chip.setPointerCapture(e.pointerId); down(e); });

@@ -21,6 +21,10 @@ const Glove = {
     if (i >= 0) this.on.splice(i, 1); else { this.on.push(id); if (this.on.length > 2) this.on.shift(); }
     store.set("glove", this.on);
   },
+  // items that are unlocked but you haven't looked at yet
+  seen: store.get("gloveSeen", []),
+  fresh() { return ITEMS.filter(it => this.open(it) && this.seen.indexOf(it.id) < 0); },
+  markSeen(ids) { ids.forEach(id => { if (this.seen.indexOf(id) < 0) this.seen.push(id); }); store.set("gloveSeen", this.seen); },
   forTown(T) { return ITEMS.filter(it => it.towns.indexOf(T.id) >= 0 && this.has(it.id)); },
 };
 
@@ -32,7 +36,7 @@ function gloveboxPanel() {
     <div class="items">${ITEMS.map(it => {
       const open = Glove.open(it), on = Glove.has(it.id);
       return `<button class="item ${on ? "on" : ""} ${open ? "" : "locked"}" data-act="equip" data-id="${it.id}" ${open ? "" : 'aria-disabled="true"'} aria-pressed="${on}">
-        <span class="item-i">${open ? it.icon : "🔒"}</span><b>${esc(it.name)}</b>
+        <span class="item-i">${open ? it.icon : "🔒"}</span><b>${esc(it.name)}</b>${open && Glove.seen.indexOf(it.id) < 0 ? '<i class="new">NEW</i>' : ""}
         <span>${open ? esc(it.what) : `Unlocks at ${it.need} ★`}</span>${on ? '<em>Equipped</em>' : ""}
       </button>`;
     }).join("")}</div>
@@ -61,4 +65,15 @@ function ignite() {
   const c = document.querySelector('[data-act="pick"]');
   if (story && c) window.scrollTo(0, Math.max(0, Math.min(story.getBoundingClientRect().top + pageYOffset - 12, c.getBoundingClientRect().bottom + pageYOffset - dashTop + 12)));
   else window.scrollTo(0, 0);
+}
+
+// a banner for newly unlocked items: near the top of home, and on the end screen when the run unlocks one
+function gloveNews(where) {
+  const f = Glove.fresh(); if (!f.length) return "";
+  const it = f[f.length - 1];
+  return `<div class="glove-news ${where}">
+    <span class="gn-i">${it.icon}</span>
+    <span class="gn-t"><b>New in your glovebox: ${esc(it.name)}</b>${esc(it.what)}${f.length > 1 ? ` (+${f.length - 1} more)` : ""}</span>
+    <span class="gn-b"><button class="go" data-act="equip-new" data-id="${it.id}">Equip it</button><button class="iconbtn" data-act="glove-later">Later</button></span>
+  </div>`;
 }
