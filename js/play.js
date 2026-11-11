@@ -16,7 +16,11 @@ const Play = {
     if (T.id !== "M5") return;
     s.free = Math.max(0, s.free); // freedom bottoms out at zero
     if (!s.pack) s.pack = [];
-    if (s.dogs > before.dogs) s.pack.push(s.size - before.size);
+    if (s.dogs > before.dogs) {
+      let grow = s.size - before.size;
+      if (!s.pack.length && Glove.has("biscuit") && grow > 1) { s.size -= grow - 1; grow = 1; } // the biscuit keeps the first dog a puppy
+      s.pack.push(grow);
+    }
     else if (s.dogs === 0) s.pack = [];
     else if (s.size > before.size) s.pack = s.pack.map(x => x * 2);
   },
@@ -122,7 +126,7 @@ function shelfScene(s, st) {
   return `<figure class="stage stage-shelf" data-scene="shelf" data-val="${jars}" aria-label="${s.jars} hours saved in jars">
     <div class="shelf">${Array.from({ length: jars }, () => '<i class="jar"></i>').join("")}</div>
     ${st && st.play && st.play.kind === "catch" && !S.played && S.phase === "step" ? `<div class="catch" id="catch" tabindex="0" aria-label="Move the jar with your finger, mouse or arrow keys to catch the falling hour">
-      <i class="orb" id="orb"></i><i class="cjar" id="cjar"></i><span class="catch-tip" id="catch-tip">Catch the hour! Drag or tap to move the jar.</span></div>` : ""}
+      <i class="orb" id="orb"></i><i class="cjar ${Glove.has("big-jar") ? "big" : ""}" id="cjar"></i><span class="catch-tip" id="catch-tip">Catch the hour! Drag or tap to move the jar.</span></div>` : ""}
     <figcaption>${s.jars ? `${s.jars} hours on the shelf, labeled “Someday.”` : "The shelf is empty. Every hour got spent."}</figcaption>
   </figure>`;
 }
@@ -167,7 +171,7 @@ function catchGame(st) {
     orb.style.left = x * W() + "px"; orb.style.top = y * (H() - 46) + "px";
     if (p >= 1) {
       done = true;
-      const hit = Math.abs(x - jx) * W() < 40;
+      const hit = Math.abs(x - jx) * W() < (Glove.has("big-jar") ? 62 : 40);
       S.played = true;
       if (hit) {
         Juice.burst(jar, 10, "money"); Sound.good();
@@ -236,7 +240,7 @@ function payGame(st) {
 /* ---------- Laterton: a heavy shadow has to be dragged to the next scene ---------- */
 function heavyNext() {
   const b = document.querySelector('[data-act="next"]'); if (!b) return;
-  const need = Math.min(3200, 500 + S.s.lb * 1.5); // ms of holding
+  const need = Math.min(3200, 500 + S.s.lb * 1.5) / (Glove.has("shades") ? 2 : 1); // ms of holding
   b.dataset.act = "hold-next"; b.classList.add("heavy");
   b.innerHTML = `<i class="fill"></i><span>Hold to drag your shadow (${S.s.lb.toLocaleString("en-US")} lb)</span>`;
   const fill = b.querySelector(".fill");

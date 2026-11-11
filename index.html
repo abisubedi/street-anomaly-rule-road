@@ -477,6 +477,37 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .howto-card li span { flex: none; width: 34px; height: 34px; display: grid; place-items: center; background: var(--card); border-radius: 10px; font-size: 18px; }
 .verdict { font: 700 20px var(--font-sign); font-size: calc(var(--ts) * 20px); }
 .v-g { color: var(--leaf); } .v-y { color: var(--sign); } .v-r { color: #FF9AA3; }
+/* ---------- ignition + glovebox ---------- */
+.ignition { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; padding-block: 10px 30px; }
+.ign-line { margin: 0; font: 600 21px var(--font-sign); font-size: calc(var(--ts) * 21px); color: var(--fg); line-height: 1.3; }
+.ignite { width: 210px; height: 210px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  background: radial-gradient(circle at 35% 30%, #4A5678, #1B2133 70%); color: var(--fg); border: 6px solid var(--sign);
+  box-shadow: 0 0 0 10px rgba(255,210,63,.12), 0 8px 0 #000, 0 0 50px rgba(255,210,63,.35); animation: pulse 1.6s ease-in-out infinite; }
+.ignite .key { font-size: 54px; line-height: 1; transition: transform .25s; }
+.ignite b { font: 400 22px var(--font-display); color: var(--sign); }
+.ignite span:last-child { font: 600 15px var(--font-sign); color: var(--muted); }
+.ignite:active { transform: translateY(5px); box-shadow: 0 0 0 10px rgba(255,210,63,.12), 0 3px 0 #000; }
+.ignite:active .key { transform: rotate(80deg); }
+.skipmap { background: none; border: 0; color: var(--muted); text-decoration: underline; font: 600 16px var(--font-sign); min-height: 44px; }
+.howto-card.first { border-style: solid; }
+.goal.mini { padding: 8px 12px; font-size: 16px; font-size: calc(var(--ts) * 16px); }
+.howto-card.first span { color: var(--muted); font-size: 16px; }
+.glovebox { display: flex; flex-direction: column; gap: 10px; }
+.glovebox .dname { margin-left: 0; }
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.item { position: relative; text-align: left; display: flex; flex-direction: column; gap: 4px; background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 10px 12px 12px; min-height: 120px; box-shadow: 0 4px 0 var(--press); }
+.item-i { font-size: 30px; line-height: 1; }
+.item b { font: 700 16px var(--font-sign); font-size: calc(var(--ts) * 16px); }
+.item span:not(.item-i) { color: var(--muted); font-size: 14px; font-size: calc(var(--ts) * 14px); line-height: 1.3; }
+.item.on { border-color: var(--leaf); background: #1B3340; }
+.item em { position: absolute; top: 8px; right: 10px; font: 700 12px var(--font-sign); font-style: normal; color: #0B1428; background: var(--leaf); border-radius: 99px; padding: 2px 8px; }
+.item.locked { opacity: .5; box-shadow: none; }
+.item:active:not(.locked) { transform: translateY(3px); box-shadow: 0 1px 0 var(--press); }
+.item-on { background: rgba(123,211,137,.12); border: 1px solid var(--leaf); border-radius: 12px; padding: 8px 12px; font-size: 16px; }
+.cjar.big { width: 96px; margin-left: -48px; }
+.mp-hint { margin: 0; color: var(--sign); font: 600 16px var(--font-sign); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 18px rgba(255,210,63,.06), 0 8px 0 #000, 0 0 70px rgba(255,210,63,.45); } }
+@media (prefers-reduced-motion: reduce) { .ignite { animation: none; } }
 @keyframes swing { 0% { transform: rotate(-9deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: rotate(0); } }
 @keyframes flicker { 0%, 92%, 100% { opacity: 1; } 93% { opacity: .35; } 95% { opacity: 1; } 96% { opacity: .5; } }
 @keyframes rise { from { transform: translateY(8px); opacity: .0; } to { transform: none; opacity: 1; } }
@@ -491,14 +522,15 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 
 <div class="app" id="app"></div>
 
-<script src="/js/compat.js?v=36"></script>
-<script src="/js/juice.js?v=36"></script>
-<script src="/js/mic.js?v=36"></script>
-<script src="/js/road.js?v=36"></script>
-<script src="/js/radio.js?v=36"></script>
-<script src="/js/reel.js?v=36"></script>
-<script src="/js/play.js?v=36"></script>
-<script src="/js/share.js?v=36"></script>
+<script src="/js/compat.js?v=38"></script>
+<script src="/js/juice.js?v=38"></script>
+<script src="/js/mic.js?v=38"></script>
+<script src="/js/road.js?v=38"></script>
+<script src="/js/radio.js?v=38"></script>
+<script src="/js/reel.js?v=38"></script>
+<script src="/js/glovebox.js?v=38"></script>
+<script src="/js/play.js?v=38"></script>
+<script src="/js/share.js?v=38"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -506,7 +538,7 @@ const TOWNS = [
   id: "M1", track: "money", name: "Doubleton", rule: "every coin you save doubles at midnight.",
   hook: "So why does one kid here have a heavy jar… and his best friend has nothing?",
   meters: [{ k: "jar", label: "Coins in jar" }],
-  init: () => ({ jar: 0, opened: false }),
+  init: () => ({ jar: Glove.has("piggy") ? 1 : 0, opened: false }),
   steps: [
     { when: "Day 1", text: "You find a shiny coin on the sidewalk. The candy shop is right there.",
       choices: [
@@ -1039,7 +1071,7 @@ const TOWNS = [
   id: "M-chain", track: "money", name: "Halfnight", rule: "every coin you save doubles at midnight.",
   hook: "So why does almost everyone here quit one night too early?",
   meters: [{ k: "jar", label: "Coins in jar" }],
-  init: () => ({ jar: 1, resets: 0 }),
+  init: () => ({ jar: Glove.has("piggy") ? 2 : 1, resets: 0 }),
   steps: [
     { rehook: "Here's what nobody tells you: spend just one, and the whole jar drops back to one. Your house sells in twenty nights, and the price is a million coins. You have one." },
     { when: "Night 1", text: "Your friend buys a donut with his coin and laughs at your jar. The donut costs one.",
@@ -1290,13 +1322,13 @@ const TOWNS = [
   init: () => ({ coins: 30, stuff: 0, miss: 0, bus: false }),
   steps: [
     { when: "Hat stand", text: s => `A sun hat costs ${6 + s.miss} coins. The seller winks: “Rhyme with HAT and it's yours for 3.”`,
-      mic: { kind: "speech", line: "Make your offer. End it with a word that rhymes with HAT.", resolve: (r, s) => rhymeDeal(r, s, "hat", 3, 6) },
+      mic: { kind: "speech", line: "Make your offer. End it with a word that rhymes with HAT.", rhyme: "hat", resolve: (r, s) => rhymeDeal(r, s, "hat", 3, 6) },
       choices: [
         { t: "“How about that?”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "“Deal!” He drops the hat on your head." },
         { t: "“Can I have it for less?”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "“No rhyme, no deal.” You pay full price." },
         { t: "Skip it", say: "You walk on with a sunburned nose." }] },
     { when: "Bakery", text: s => `A strawberry cake costs ${8 + s.miss} coins. “Rhyme with CAKE and pay 4.”`,
-      mic: { kind: "speech", line: "Offer for the cake. End it with a rhyme for CAKE.", resolve: (r, s) => rhymeDeal(r, s, "cake", 4, 8) },
+      mic: { kind: "speech", line: "Offer for the cake. End it with a rhyme for CAKE.", rhyme: "cake", resolve: (r, s) => rhymeDeal(r, s, "cake", 4, 8) },
       choices: [
         { t: "“For goodness sake!”", cost: "−4", need: s => s.coins >= 4, fx: s => { s.coins -= 4; s.stuff += 1; }, say: "The baker laughs and boxes it up." },
         { t: "“I'll just pay.”", cost: s => "−" + (8 + s.miss), need: s => s.coins >= 8 + s.miss, fx: s => { s.coins -= 8 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. The baker shrugs." },
@@ -1308,19 +1340,19 @@ const TOWNS = [
         { t: "Say no", say: "She frowns, but she gets it." }] },
     { rehook: "Every shop in town raises its price by one coin each time you DON'T rhyme. They've been counting all day. And the bus home costs 10." },
     { when: "Toy shop", text: s => `A toy boat for your brother's birthday: ${7 + s.miss} coins. Rhyme with BOAT for 3.`,
-      mic: { kind: "speech", line: "Offer for the boat. End it with a rhyme for BOAT.", resolve: (r, s) => rhymeDeal(r, s, "boat", 3, 7) },
+      mic: { kind: "speech", line: "Offer for the boat. End it with a rhyme for BOAT.", rhyme: "boat", resolve: (r, s) => rhymeDeal(r, s, "boat", 3, 7) },
       choices: [
         { t: "“I'll trade you my coat!”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "He keeps your coat as a joke, then gives it back. Boat's yours." },
         { t: "“Here's the money.”", cost: s => "−" + (7 + s.miss), need: s => s.coins >= 7 + s.miss, fx: s => { s.coins -= 7 + s.miss; s.stuff += 1; s.miss += 1; }, say: "No rhyme. Full price, plus the town's extra." },
         { t: "Skip it", say: "Your brother will get a hug instead." }] },
     { when: "Kite stall", text: s => `A red kite: ${6 + s.miss} coins. Rhyme with KITE for 2.`,
-      mic: { kind: "speech", line: "Offer for the kite. End it with a rhyme for KITE.", resolve: (r, s) => rhymeDeal(r, s, "kite", 2, 6) },
+      mic: { kind: "speech", line: "Offer for the kite. End it with a rhyme for KITE.", rhyme: "kite", resolve: (r, s) => rhymeDeal(r, s, "kite", 2, 6) },
       choices: [
         { t: "“Is two coins right?”", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.stuff += 1; }, say: "“Right!” The kite tugs at your hand." },
         { t: "“Just give it to me.”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. The kite sulks." },
         { t: "Skip it", say: "You keep your coins for the bus." }] },
     { when: "Ice cream truck", text: s => `Ice cream: ${4 + s.miss} coins. The driver yells: “Rhyme with CONE!”`,
-      mic: { kind: "speech", line: "Order your ice cream. End it with a rhyme for CONE.", resolve: (r, s) => rhymeDeal(r, s, "cone", 1, 4) },
+      mic: { kind: "speech", line: "Order your ice cream. End it with a rhyme for CONE.", rhyme: "cone", resolve: (r, s) => rhymeDeal(r, s, "cone", 1, 4) },
       choices: [
         { t: "“One for me, I'm on my own!”", cost: "−1", need: s => s.coins >= 1, fx: s => { s.coins -= 1; s.stuff += 1; }, say: "One coin. Two scoops." },
         { t: "“Vanilla, please.”", cost: s => "−" + (4 + s.miss), need: s => s.coins >= 4 + s.miss, fx: s => { s.coins -= 4 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. It's melting already." },
@@ -1624,6 +1656,7 @@ function renderHome() {
   ${installCard()}
   <div class="led" role="status"><span class="led-n">${total}<i>/${TOWNS.length * 3}</i></span><span class="led-l">STARS</span></div>
   <div class="led-next">${gate ? `${gate.need - total} more ★ opens ${esc(gate.name)}` : "Every district is open. Now get 3 stars everywhere."}</div>
+  ${gloveboxPanel()}
   <nav class="road" aria-label="Towns">
     ${districts}
     <button class="stop yours" data-act="fan">
@@ -1682,6 +1715,7 @@ function renderTown() {
       <div class="pole"></div>
     </section>
     <p class="story">${esc(T.hook)}</p>
+    ${Glove.forTown(T).map(it => `<div class="item-on">${it.icon} <b>${esc(it.name)}</b> is on: ${esc(it.what)}</div>`).join("")}
     ${kidOf(T) ? `<div class="goal"><span class="goal-k">⭐⭐⭐ Your goal</span>${esc(kidOf(T).goal)}</div>
     <details class="kid"><summary>🤔 What does this mean?</summary><p>${esc(kidOf(T).what)}</p>${listenBtn(T.id + "-kid")}</details>` : ""}
     ${!store.get("howto", false) ? `<div class="howto-card">
@@ -1752,6 +1786,7 @@ function renderTown() {
   return `${topbar(true)}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
   ${meters(T, s)}${stage(T, s)}
+  ${S.firstRide && !r && kidOf(T) ? `<div class="goal mini">⭐⭐⭐ ${esc(kidOf(T).goal)}</div>` : ""}
   <section class="scene" ${r ? 'style="animation:none"' : ""}>
     <div class="when">${esc(st.when)}${who ? `<span class="role role-${who.toLowerCase()}">${who}</span>` : ""}</div>
     <p class="story">${esc(val(st.text, s))}</p>
@@ -1759,6 +1794,7 @@ function renderTown() {
     ${showMic ? `<div class="or-tap">or tap</div>` : ""}
     ${st.drag && !r ? dragPanel(st) + `<div class="or-tap">or tap</div>` : ""}
     ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : `<div class="choices">${choices}</div>`}
+    ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>👆 Tap A or B to choose</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
     ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
   </section>`;
@@ -1794,7 +1830,7 @@ function renderFan() {
 function render() {
   document.body.classList.toggle("party", Prefs.party);
   document.body.classList.toggle("in-town", S.screen === "town");
-  $app.innerHTML = (S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown()) + dash();
+  $app.innerHTML = (S.screen === "ignition" ? renderIgnition() : S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown()) + dash();
   if (S.screen === "fan") bindFan();
   if (S.screen === "home") bindDial();
   Play.mount();
@@ -1890,7 +1926,7 @@ function startTown(i, opts = {}) {
   if (!districtOpen(districtOf(i)) && !opts.free) { Juice.penalty(); return; }
   MicRun.reset(); Reel.stop(); Play.stop(); Play.mem = {};
   S.screen = "town"; S.t = i; S.step = 0; S.phase = "arrive"; S.s = TOWNS[i].init(); S.lastResult = null;
-  S.reel = []; S.grid = []; S.heard = []; S.ghostOut = null; S.base = 0; S.dailyJust = false; S.daily = !!opts.daily;
+  S.firstRide = false; S.reel = []; S.grid = []; S.heard = []; S.ghostOut = null; S.base = 0; S.dailyJust = false; S.daily = !!opts.daily;
   render(); window.scrollTo(0, 0); Voice.say(TOWNS[i].id + "-arrive");
 }
 
@@ -1928,6 +1964,8 @@ $app.addEventListener("click", async e => {
   if (act === "install") { if (installEvt) { installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; render(); }); } return; }
   if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
   if (act === "say") { const k = b.dataset.k; Voice.playing(k) ? Voice.stop() : Voice.say(k, true); return; }
+  if (act === "ignite") { ignite(); return; }
+  if (act === "equip") { const it = ITEMS.find(x => x.id === b.dataset.id); if (!it || !Glove.open(it)) { Juice.penalty(); return; } Glove.toggle(it.id); Juice.tap(); Sound.pluck(); render(); return; }
   if (act === "howto-ok") { store.set("howto", true); Juice.tap(); render(); return; }
   if (act === "tsize") { TS.i = (TS.i + 1) % 3; store.set("ts", TS.i); TS.apply(); Juice.tap(); render(); return; }
   if (act === "voice") { Voice.on = !Voice.on; Voice.save(); if (!Voice.on) Voice.stop(); render(); return; }
@@ -1970,7 +2008,7 @@ $app.addEventListener("click", async e => {
 function start() {
   S.challenge = readChallenge();
   if (S.challenge) return startTown(S.challenge.t, { free: true });
-  if (!store.get("seen", false) && !Object.keys(S.stars).length) return startTown(road()[0], { free: true });
+  if (!store.get("seen", false) && !Object.keys(S.stars).length) { S.screen = "ignition"; return render(); }
   render();
 }
 start();

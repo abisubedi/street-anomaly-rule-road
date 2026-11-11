@@ -22,7 +22,8 @@ const MicRun = {
   },
 
   step() { const T = TOWNS[S.t]; return S.screen === "town" && S.phase === "step" ? T.steps[S.step] : null; },
-  cal() { return S.cal || DEFAULT_CAL; },
+  cal() { const c = S.cal || DEFAULT_CAL; return Glove.has("muffler") ? { loud: c.loud + 3, talk: c.talk } : c; },
+  cracksAllowed(st) { return st.mic.cracks + (Glove.has("muffler") ? 1 : 0); },
 
   status(msg) { const el = document.getElementById("mp-status"); if (el) el.textContent = msg; },
 
@@ -86,9 +87,9 @@ const MicRun = {
         if (talking) { d.gt += dt; if (d.gt >= 0.1 && d.mine.length < 40) { d.gt = 0; d.mine.push(Math.max(0, Math.min(1.3, v))); } }
         if (v > 1 && now - d.lastCrack > 600) {
           d.cracks += 1; d.lastCrack = now; Juice.penalty();
-          const cb = document.getElementById("mp-cracks"); if (cb) cb.textContent = "✕".repeat(d.cracks) + "·".repeat(Math.max(0, st.mic.cracks - d.cracks));
+          const cb = document.getElementById("mp-cracks"); if (cb) cb.textContent = "✕".repeat(d.cracks) + "·".repeat(Math.max(0, this.cracksAllowed(st) - d.cracks));
           const mp = document.getElementById("micpanel"); if (mp) mp.classList.add("cracked");
-          if (d.cracks >= st.mic.cracks) return this.finish(st, { ok: false, cracks: d.cracks, label: "cracked the glass" });
+          if (d.cracks >= this.cracksAllowed(st)) return this.finish(st, { ok: false, cracks: d.cracks, label: "cracked the glass" });
           this.status("CRACK! Quieter…");
         } else if (v <= 1 && talking) this.status(v > 0.8 ? "Careful…" : "Good. Keep whispering.");
         if (d.talked >= st.mic.secs) return this.finish(st, { ok: true, cracks: d.cracks, label: "whispered across" });
@@ -121,10 +122,11 @@ const MicRun = {
       return false;
     }
     const b = S.base;
-    if (mode === "higher") return f >= b * 1.18;
-    if (mode === "lower") return f <= b * 0.87;
-    if (mode === "match") return Math.abs(f / b - 1) < 0.08;
-    if (mode === "slide") { d.minF = Math.min(d.minF || f, f); return f >= d.minF * 1.35; }
+    const fork = Glove.has("fork"); // the tuning fork forgives a slightly-off note
+    if (mode === "higher") return f >= b * (fork ? 1.12 : 1.18);
+    if (mode === "lower") return f <= b * (fork ? 0.92 : 0.87);
+    if (mode === "match") return Math.abs(f / b - 1) < (fork ? 0.12 : 0.08);
+    if (mode === "slide") { d.minF = Math.min(d.minF || f, f); return f >= d.minF * (fork ? 1.25 : 1.35); }
     return false;
   },
 
@@ -224,8 +226,9 @@ function micPanel(st) {
   const line = k === "speech" ? m.line : k === "pitch" ? m.line : `Say: “${m.line}”`;
   const ghost = k === "whisper" && S.challenge && S.challenge.g ? `<span class="mp-ghost">— ${esc(S.challenge.c || "Friend")}'s ghost</span>` : "";
   return `<div class="micpanel kind-${k}" id="micpanel">
-    <div class="mp-head"><span class="mp-tag">CB radio · ${esc(hint)}</span>${k === "whisper" ? `<span class="mp-cracks" id="mp-cracks" aria-label="cracks">${"·".repeat(m.cracks)}</span>` : ""}${m.words ? `<span class="mp-count" id="mp-count">${S.s.words} words left</span>` : ""}</div>
+    <div class="mp-head"><span class="mp-tag">CB radio · ${esc(hint)}</span>${k === "whisper" ? `<span class="mp-cracks" id="mp-cracks" aria-label="cracks">${"·".repeat(MicRun.cracksAllowed(st))}</span>` : ""}${m.words ? `<span class="mp-count" id="mp-count">${S.s.words} words left</span>` : ""}</div>
     <p class="mp-line">${esc(line)}</p>
+    ${m.rhyme && Glove.has("rhyme-book") ? `<p class="mp-hint">📕 Rhymes with ${m.rhyme.toUpperCase()}: ${RHYMES[m.rhyme]}</p>` : ""}
     ${k !== "speech" ? `<canvas class="mp-scope" id="mp-scope" width="640" height="150" aria-hidden="true"></canvas>${ghost}` : `<p class="mp-words" id="mp-words" aria-live="polite"></p>`}
     <div class="mp-bar"><i id="mp-prog"></i></div>
     <p class="mp-status" id="mp-status" aria-live="polite">${blocked ? (speechOff ? TALK_OFF : Mic.state === "denied" ? "The mic is blocked. Tap a choice below." : "No mic on this device. Tap a choice below.") : Mic.state === "on" ? "Hold the CB handset below and " + (k === "pitch" ? "hum." : "talk.") : "Hold the CB handset below. Your browser will ask to use the mic; nothing is uploaded" + (k === "speech" ? ", except the words, which your browser turns into text." : ".")}</p>
