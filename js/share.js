@@ -16,10 +16,10 @@ function wrap(g, text, maxW) {
 }
 
 async function drawCard(T, stars) {
-  try { await Promise.all(["900 80px Overpass", "700 40px Overpass", "400 40px 'Atkinson Hyperlegible'"].map(f => document.fonts.load(f))); } catch {}
+  try { await Promise.all(["400 80px Bungee", "700 40px Fredoka", "400 40px 'Atkinson Hyperlegible Next'", "italic 400 40px 'Atkinson Hyperlegible Next'"].map(f => document.fonts.load(f))); } catch {}
   const W = 1080, H = 1440, c = document.createElement("canvas"); c.width = W; c.height = H;
   const g = c.getContext("2d");
-  const SIGN = "Overpass, 'Arial Narrow', sans-serif", BODY = "'Atkinson Hyperlegible', Verdana, sans-serif";
+  const SIGN = "Fredoka, 'Trebuchet MS', sans-serif", DISP = "Bungee, 'Arial Black', sans-serif", BODY = "'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Verdana, sans-serif";
   // night street
   const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#14213D"); bg.addColorStop(1, "#0B1428");
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
@@ -30,14 +30,14 @@ async function drawCard(T, stars) {
   g.fillStyle = "#9AA7C4"; g.font = `700 34px ${SIGN}`;
   g.fillText(`RULE ROAD  ·  MILE ${roadPos(S.t) + 1}  ·  ${freq(roadPos(S.t))} FM`, W / 2, 110);
   // the sign
-  g.font = `900 66px ${SIGN}`;
+  g.font = `700 64px ${SIGN}`;
   const lines = wrap(g, ("In this town, " + T.rule).toUpperCase(), 820).slice(0, 6);
   const sh = 120 + lines.length * 72, sx = 80, sy = 160;
   g.fillStyle = "#FFD23F"; roundRect(g, sx, sy, W - 160, sh, 28); g.fill();
   g.strokeStyle = "#14130C"; g.lineWidth = 8; roundRect(g, sx + 18, sy + 18, W - 196, sh - 36, 18); g.stroke();
-  g.fillStyle = "#14130C"; g.textAlign = "left"; g.font = `900 30px ${SIGN}`;
+  g.fillStyle = "#14130C"; g.textAlign = "left"; g.font = `400 30px ${DISP}`;
   g.fillText(T.name.toUpperCase(), sx + 56, sy + 78);
-  g.font = `900 66px ${SIGN}`;
+  g.font = `700 64px ${SIGN}`;
   lines.forEach((l, i) => g.fillText(l, sx + 52, sy + 152 + i * 72));
   g.fillStyle = "#8C97B0"; g.fillRect(W / 2 - 11, sy + sh, 22, 60);
   // stars
@@ -58,7 +58,7 @@ async function drawCard(T, stars) {
     wrap(g, `“${heard.join(" … ").slice(0, 120)}”`, 860).slice(0, 3).forEach(l => { g.fillText(l, W / 2, y); y += 50; });
   }
   // the dare
-  g.fillStyle = "#E63946"; g.font = `900 52px ${SIGN}`;
+  g.fillStyle = "#E63946"; g.font = `400 46px ${DISP}`;
   g.fillText(S.challenge && stars > S.challenge.s ? `I BEAT ${(S.challenge.c || "MY FRIEND").toUpperCase()}. YOUR TURN.` : "CAN YOU BEAT ME?", W / 2, H - 150);
   g.fillStyle = "#9AA7C4"; g.font = `700 36px ${SIGN}`;
   g.fillText("streetanomaly.pages.dev", W / 2, H - 90);
