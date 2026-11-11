@@ -458,6 +458,25 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .go.heavy span { position: relative; }
 @keyframes bob { from { translate: 0 0; } to { translate: 0 -4px; } }
 @keyframes sprout { from { transform: scale(0); } to { transform: scale(1); } }
+/* ---------- for kids ---------- */
+.dir { display: block; margin-top: 2px; font: 600 13px var(--font-sign); font-size: calc(var(--ts) * 13px); letter-spacing: 0; text-transform: none; }
+.dir-up { color: var(--leaf); } .dir-down { color: #FF9AA3; }
+.goal { background: rgba(255,210,63,.1); border: 2px solid var(--sign); border-radius: 14px; padding: 10px 14px; font: 600 18px var(--font-sign); font-size: calc(var(--ts) * 18px); line-height: 1.3; }
+.goal-k { display: block; font: 400 13px var(--font-display); font-size: calc(var(--ts) * 13px); color: var(--sign); letter-spacing: .06em; margin-bottom: 2px; }
+.kid { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 14px; }
+.kid summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font: 700 18px var(--font-sign); font-size: calc(var(--ts) * 18px); color: var(--leaf); list-style: none; }
+.kid summary::-webkit-details-marker { display: none; }
+.kid summary::after { content: "＋"; margin-left: auto; color: var(--muted); }
+.kid[open] summary::after { content: "－"; }
+.kid p { margin: 0 0 10px; font-size: 19px; font-size: calc(var(--ts) * 19px); }
+.kid .listen { margin-bottom: 12px; }
+.howto-card { background: #0E1730; border: 2px dashed var(--sign); border-radius: 14px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.howto-card b { font: 400 18px var(--font-display); color: var(--sign); }
+.howto-card ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.howto-card li { display: flex; gap: 10px; align-items: center; font: 600 17px var(--font-sign); font-size: calc(var(--ts) * 17px); }
+.howto-card li span { flex: none; width: 34px; height: 34px; display: grid; place-items: center; background: var(--card); border-radius: 10px; font-size: 18px; }
+.verdict { font: 700 20px var(--font-sign); font-size: calc(var(--ts) * 20px); }
+.v-g { color: var(--leaf); } .v-y { color: var(--sign); } .v-r { color: #FF9AA3; }
 @keyframes swing { 0% { transform: rotate(-9deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: rotate(0); } }
 @keyframes flicker { 0%, 92%, 100% { opacity: 1; } 93% { opacity: .35; } 95% { opacity: 1; } 96% { opacity: .5; } }
 @keyframes rise { from { transform: translateY(8px); opacity: .0; } to { transform: none; opacity: 1; } }
@@ -472,14 +491,14 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 
 <div class="app" id="app"></div>
 
-<script src="/js/compat.js?v=34"></script>
-<script src="/js/juice.js?v=34"></script>
-<script src="/js/mic.js?v=34"></script>
-<script src="/js/road.js?v=34"></script>
-<script src="/js/radio.js?v=34"></script>
-<script src="/js/reel.js?v=34"></script>
-<script src="/js/play.js?v=34"></script>
-<script src="/js/share.js?v=34"></script>
+<script src="/js/compat.js?v=36"></script>
+<script src="/js/juice.js?v=36"></script>
+<script src="/js/mic.js?v=36"></script>
+<script src="/js/road.js?v=36"></script>
+<script src="/js/radio.js?v=36"></script>
+<script src="/js/reel.js?v=36"></script>
+<script src="/js/play.js?v=36"></script>
+<script src="/js/share.js?v=36"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -792,7 +811,7 @@ const TOWNS = [
 {
   id: "M4", track: "money", name: "Futureville", rule: "your bank account shows you your future self.",
   hook: "So why did the girl at the bank machine just scream?",
-  meters: [{ k: "saved", label: "Saved", unit: "$" }, { k: "future", label: "Future you", life: true }],
+  meters: [{ k: "saved", label: "Coins saved" }, { k: "future", label: "Future you", life: true }],
   init: () => ({ saved: 0, future: 1 }),
   steps: [
     { when: "Payday", text: "You just got paid. The screen shows future-you at 75… still working.",
@@ -1366,6 +1385,35 @@ const TOWNS = [
 }
 ];
 
+/* ---------- for kids: what each rule really means, the 3-star goal, and which way each number should go ---------- */
+const KID = {
+  "M1": { what: "Saving means keeping money instead of spending it. Saved money can grow over time, a bit like this magic jar.", goal: "Get 100 coins in the jar. Tip: keep the jar closed.", up: ["jar"] },
+  "L1": { what: "Words are powerful. When you only have a few, you think hard about which ones matter most.", goal: "Fill the friendship meter to 11 with only 10 words.", up: ["heart"] },
+  "M2": { what: "A habit is something you do every day. Small things done every day add up to big things.", goal: "Grow 36 coins. Water every single day, even when it's hard.", up: ["coins", "streak"] },
+  "L2": { what: "What we say about people changes how they feel and act. Kind words help people be their best.", goal: "Make 12 town smiles.", up: ["smiles"] },
+  "M3": { what: "A need is something you must have, like shoes. A want is just nice to have. Too many wants can cost more than money.", goal: "Sleep all 9 hours, and still buy the shoes and the book you need.", up: ["sleep"] },
+  "L3": { what: "Screens can wear you out. Playing outside, reading and sleeping recharge you.", goal: "End the day with 75% battery or more.", up: ["bat"] },
+  "L4": { what: "Saying sorry fixes hurt feelings. Skipping it makes things prickly.", goal: "Zero thorns and at least 7 flowers.", up: ["flowers"], down: ["thorns"] },
+  "M4": { what: "Money you save now helps the grown-up you later. Even small amounts grow a lot over many years.", goal: "Make future-you happy 8 times.", up: ["saved", "future"] },
+  "L5": { what: "Throwing things away doesn't make them disappear. Using things up, fixing them and sharing them makes less waste.", goal: "No junk coming back, and 7 happy faces.", up: ["happy"], down: ["pile"] },
+  "M5": { what: "Borrowing means using someone else's money and paying it back later, usually with extra. The more you borrow, the bigger it grows.", goal: "End with no dogs and freedom of 8 or more.", up: ["free"], down: ["dogs", "size"] },
+  "L-fallback": { what: "Time is something you spend, like money. Saving fun for “someday” can mean it never happens.", goal: "Wake Theo, open every jar, and make lots of memories.", up: ["joy"], down: ["jars"] },
+  "M8": { what: "A budget is a plan for your money. It helps you stop before you buy things you don't need.", goal: "Buy mom's present and earn 7 wallet trust.", up: ["trust"] },
+  "M-jobs": { what: "Giving every coin a job, like saving or snacks, is called a budget. Money with no plan slips away.", goal: "Pay for the heater and build your plan to 6.", up: ["plan"] },
+  "M-chain": { what: "When saved money grows, the growth grows too. It starts slow, then gets big fast, so patience pays.", goal: "Reach 1,000,000 coins. Don't spend a single one.", up: ["jar"] },
+  "M-hours": { what: "Grown-ups work hours to earn money, so everything you buy really costs time.", goal: "Make it to Dad's birthday, on time.", up: ["hours", "family"] },
+  "M-shrink": { what: "Owning lots of stuff takes up space. Having less can feel like more room to live.", goal: "Give your stuff away and keep your house.", up: ["door", "room"] },
+  "M-birds": { what: "A subscription is something you pay for every month, like a game or a show. Small monthly costs add up if you forget them.", goal: "Pay the rent without ignoring any birds.", up: ["coins"], down: ["birds"] },
+  "M-monster": { what: "A bill is a note that says you owe money. Ignore it, and extra fees make it bigger.", goal: "Open the bill and pay it early.", up: ["coins"], down: ["bill"] },
+  "M-shadow": { what: "“Pay later” lets you take something now and pay in small parts later. It feels free, but you still owe all of it.", goal: "Save up and buy the boots. No pay-later plans.", down: ["plans", "lb"] },
+  "L-whisper": { what: "A calm, gentle voice can fix more problems than shouting.", goal: "Keep the bridge 60% whole and earn 6 trust.", up: ["glass", "trust"] },
+  "L-hum": { what: "Speaking up takes courage. The more you use your voice, the easier it gets.", goal: "Open 4 doors and build 6 courage.", up: ["doors", "courage"] },
+  "M-rhyme": { what: "Before you pay, it's okay to ask for a better deal. Prices aren't always fixed.", goal: "Get 4 things, and keep 10 coins for the bus home.", up: ["stuff"] },
+  "L-echo": { what: "A promise is something you have to keep. Only promise what you can really do.", goal: "Keep your promises and earn 5 trust.", up: ["trust"] },
+};
+const kidOf = T => KID[T.id] || null;
+const dirOf = (T, k) => { const K = kidOf(T); return K && K.up && K.up.indexOf(k) >= 0 ? "up" : K && K.down && K.down.indexOf(k) >= 0 ? "down" : ""; };
+
 /* ---------- voice-town helpers (Rhymeburg deals, Echo Valley promises, talk-back Hushwick) ---------- */
 function rhymeDeal(r, s, target, cheap, full) {
   const text = r.text, T = target.toUpperCase();
@@ -1597,7 +1645,7 @@ function meters(T, s) {
     const low = m.battery ? v < 40 : (m.k === "words" ? v <= 3 : m.k === "sleep" ? v < 7 : m.k === "glass" ? v < 40 : false);
     const pct = max ? Math.max(0, Math.min(100, v / max * 100)) : null;
     return `<div class="meter ${m.life ? "life" : ""} ${low ? "low" : ""}">
-      <div class="ml">${m.label}</div>
+      <div class="ml">${m.label}${dirOf(T, m.k) ? `<span class="dir dir-${dirOf(T, m.k)}" title="${dirOf(T, m.k) === "up" ? "More is good" : "Less is good"}">${dirOf(T, m.k) === "up" ? "⬆ more is good" : "⬇ less is good"}</span>` : ""}</div>
       <div class="mv" data-k="${m.k}">${v}${m.unit || ""}</div>
       ${pct !== null ? `<div class="track"><i style="width:${pct}%"></i></div>` : ""}
     </div>`;
@@ -1634,6 +1682,12 @@ function renderTown() {
       <div class="pole"></div>
     </section>
     <p class="story">${esc(T.hook)}</p>
+    ${kidOf(T) ? `<div class="goal"><span class="goal-k">⭐⭐⭐ Your goal</span>${esc(kidOf(T).goal)}</div>
+    <details class="kid"><summary>🤔 What does this mean?</summary><p>${esc(kidOf(T).what)}</p>${listenBtn(T.id + "-kid")}</details>` : ""}
+    ${!store.get("howto", false) ? `<div class="howto-card">
+      <b>How to play</b>
+      <ol><li><span>🪧</span>Read the town's strange rule.</li><li><span>👆</span>Tap A, B or C to choose what to do.</li><li><span>⬆</span>Watch your numbers. Green arrows show which way is good.</li><li><span>⚠️</span>Halfway through, a red card shows the catch.</li></ol>
+      <button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
     ${T.voice ? `<p class="voice-note">🎙 This town listens. You'll ${T.voice === "whisper" ? "whisper" : T.voice === "pitch" ? "hum" : "talk"} into your mic using the CB handset. No mic? You can tap instead.</p>` : ""}
     ${Prefs.coop ? `<p class="voice-note coop-note">🚗 Road trip: the <b>Driver</b> picks, the <b>Navigator</b> does all the talking. Swap seats when the game says so.</p>` : ""}
     <div class="listen-row">${listenBtn(T.id + "-arrive")}</div>
@@ -1652,6 +1706,7 @@ function renderTown() {
     ${S.opened && S.opened.length ? `<div class="unlock">🔓 ${esc(S.opened.join(" and "))} ${S.opened.length > 1 ? "are" : "is"} open</div>` : ""}
     ${S.dailyJust ? `<div class="challenge daily-tag">🔥 Daily mile done · ${streak()}-day streak. Come back tomorrow for a new town.</div>` : ""}
     <p class="story" style="text-align:center">${esc(T.ending(s))}</p>
+    ${n < 3 && kidOf(T) ? `<div class="goal"><span class="goal-k">For 3 stars next time</span>${esc(kidOf(T).goal)}</div>` : ""}
     <div class="lesson-k">The lesson</div>
     <p class="lesson">${esc(T.lesson)}</p>
     <p class="cta">${esc(T.cta)}</p>
@@ -1704,7 +1759,7 @@ function renderTown() {
     ${showMic ? `<div class="or-tap">or tap</div>` : ""}
     ${st.drag && !r ? dragPanel(st) + `<div class="or-tap">or tap</div>` : ""}
     ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : `<div class="choices">${choices}</div>`}
-    ${r ? `<div class="result">${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
+    ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
   </section>`;
 }
@@ -1781,10 +1836,14 @@ function pick(i, dyn, before0) {
   if (c.heard) S.heard.push(c.heard);
   if (c.clip) Voice.say(T.id + "-" + c.clip);
   S.phase = "result";
-  const keys = T.meters.map(m => m.k);
-  const up = keys.some(k => s[k] > before[k]), down = keys.some(k => s[k] < before[k]);
-  S.grid.push(down && !up ? "r" : up ? "g" : "y");
-  down && !up ? Sound.bad() : up ? Sound.good() : Sound.pluck();
+  // was that choice good? each number counts in its good direction (KID up/down); towns without one count "up" as good
+  const score = T.meters.reduce((sum, m) => {
+    const diff = s[m.k] - before[m.k]; if (!diff || typeof diff !== "number") return sum;
+    const d = dirOf(T, m.k), w = d === "down" ? -1 : d === "up" || !kidOf(T) ? 1 : 0;
+    return sum + Math.sign(diff) * w;
+  }, 0);
+  S.grid.push(score < 0 ? "r" : score > 0 ? "g" : "y");
+  score < 0 ? Sound.bad() : score > 0 ? Sound.good() : Sound.pluck();
   render(); animateMeters(before); Juice.meters(T, before, s);
 }
 
@@ -1869,6 +1928,7 @@ $app.addEventListener("click", async e => {
   if (act === "install") { if (installEvt) { installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; render(); }); } return; }
   if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
   if (act === "say") { const k = b.dataset.k; Voice.playing(k) ? Voice.stop() : Voice.say(k, true); return; }
+  if (act === "howto-ok") { store.set("howto", true); Juice.tap(); render(); return; }
   if (act === "tsize") { TS.i = (TS.i + 1) % 3; store.set("ts", TS.i); TS.apply(); Juice.tap(); render(); return; }
   if (act === "voice") { Voice.on = !Voice.on; Voice.save(); if (!Voice.on) Voice.stop(); render(); return; }
   if (act === "sound") { Sound.on = !Sound.on; store.set("sound", Sound.on); Sound.init(); if (Sound.on) Sound.pluck(); render(); return; }

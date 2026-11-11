@@ -52,6 +52,8 @@ const Juice = {
       const a = before[m.k], b = after[m.k];
       if (typeof a !== "number" || typeof b !== "number" || a === b) continue;
       const el = document.querySelector(`.mv[data-k="${m.k}"]`);
+      const bad = typeof dirOf === "function" && dirOf(T, m.k) === "down"; // more thorns, dogs or debt is not a win
+      if (bad) { if (b > a) down = true; else this.burst(el, 4, "life"); continue; }
       if (b > a) {
         const steps = m.max ? Math.round((b - a) / m.max * 20) : Math.round(Math.log2(1 + b - a) * 2.5);
         this.burst(el, Math.max(2, steps), m.life ? "life" : "money");
