@@ -466,6 +466,7 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .act-zone.hot { border-color: var(--sign); border-style: solid; background: rgba(255,210,63,.16); transform: scale(1.05); }
 .act-zone.off { opacity: .45; border-style: dotted; }
 .act-zone.nope { animation: shake .4s; }
+.act-wrap .free { visibility: hidden; }
 .act-item { position: absolute; width: 48px; height: 48px; margin: -24px 0 0 -24px; padding: 0; border-radius: 50%; border: 2px solid var(--sign); background: rgba(255,210,63,.2); font-size: 26px; line-height: 1; display: grid; place-items: center; touch-action: none; cursor: grab; z-index: 2;
   box-shadow: 0 0 0 7px rgba(255,210,63,.12), 0 4px 0 rgba(0,0,0,.35); animation: nudge 1.8s ease-in-out infinite; }
 .act-item:focus-visible { outline: 3px solid var(--sign); outline-offset: 3px; }
@@ -577,16 +578,16 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=42"></script>
-<script src="/js/juice.js?v=42"></script>
-<script src="/js/mic.js?v=42"></script>
-<script src="/js/road.js?v=42"></script>
-<script src="/js/radio.js?v=42"></script>
-<script src="/js/reel.js?v=42"></script>
-<script src="/js/glovebox.js?v=42"></script>
-<script src="/js/play.js?v=42"></script>
-<script src="/js/sketch.js?v=42"></script>
-<script src="/js/share.js?v=42"></script>
+<script src="/js/compat.js?v=43"></script>
+<script src="/js/juice.js?v=43"></script>
+<script src="/js/mic.js?v=43"></script>
+<script src="/js/road.js?v=43"></script>
+<script src="/js/radio.js?v=43"></script>
+<script src="/js/reel.js?v=43"></script>
+<script src="/js/glovebox.js?v=43"></script>
+<script src="/js/play.js?v=43"></script>
+<script src="/js/sketch.js?v=43"></script>
+<script src="/js/share.js?v=43"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [

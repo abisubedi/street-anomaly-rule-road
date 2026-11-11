@@ -58,9 +58,11 @@ const Sk = {
 
   // the journal page: ruled paper, tape, the drawing, and a one-line caption
   frame(id, val, label, svg, cap, o = {}) {
+    const act = o.act !== undefined ? o.act : actOf(S.phase === "step" ? TOWNS[S.t].steps[S.step] : null, S.s), h = svg ? o.h || 140 : o.actH || 110;
+    const draw = svg ? `<svg viewBox="0 0 300 ${h}" width="100%" aria-hidden="true">${o.under || ""}<g class="ink">${svg}</g></svg>` : "";
     return `<figure class="stage stage-${id} sketch ${o.cls || ""}" data-scene="${id}" data-val="${val}" aria-label="${label}">
-      ${svg ? `${o.act ? '<div class="act-wrap">' : ""}<svg viewBox="0 0 300 ${o.h || 140}" width="100%" aria-hidden="true">${o.under || ""}<g class="ink">${svg}</g></svg>${o.act ? Sk.actLayer(o.act, o.h || 140) + "</div>" : ""}` : ""}${o.html || ""}
-      <figcaption>${cap}</figcaption>
+      ${act ? `<div class="act-wrap">${draw}${svg ? "" : o.html || ""}${Sk.actLayer(act, h)}</div>${svg ? o.html || "" : ""}` : draw + (o.html || "")}
+      <figcaption>${act ? act.hint : cap}</figcaption>
     </figure>`;
   },
 };
@@ -421,9 +423,9 @@ const JAR_DAYS = {
 const TREE_DAYS = { "Day 1": ["🛏️", "Tomorrow"], "Day 2": ["⚽", "Play"], "Day 3": ["📺", "Watch"], "Day 4": ["🌧️", "Let rain"], "Day 5": ["😴", "Skip"], "Day 6": ["🎒", "Just go"], "Day 7": ["👦", "Let him"], "Day 8": ["🎂", "Party"] };
 const CAN = `<svg viewBox="0 0 44 32" width="30" aria-hidden="true"><path d="M8 12 h20 v16 h-20 Z" fill="${SKY}" fill-opacity=".55" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M28 16 l12 -8" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/><path d="M12 12 q6 -9 12 0" fill="none" stroke="${INK}" stroke-width="2"/></svg>`;
 
-const ACTS = {
-  M1(st, s) {
-    const d = JAR_DAYS[st.when]; if (!d || st.choices.length !== 2) return null;
+// the jar layout: the jar itself is choice 0 (keep it shut), the temptation sits to its right
+function jarAct(d, st, s) {
+    if (!d || st.choices.length !== 2) return null;
     const ok = c => !c.need || c.need(s), cost = val(st.choices[1].cost, s);
     return {
       item: { icon: d.coin ? "🪙" : "✋", label: d.coin ? "Drag the coin" : "Drag your hand", x: 88, y: 100 },
@@ -431,7 +433,74 @@ const ACTS = {
         { c: 1, x: 212, y: 52, w: 82, h: 80, icon: d.icon, label: ok(st.choices[1]) ? d.spend + (cost ? " " + cost : "") : "Not enough", off: !ok(st.choices[1]) }],
       hint: d.coin ? `Drag the coin into the jar, or to the ${d.icon}.` : `Drag your hand: hold the lid shut, or reach for the ${d.icon}.`,
     };
-  },
+}
+const HALF_NIGHTS = { 1: { coin: true, keep: "Into the jar", icon: "🍩", spend: "Donut too" }, 2: { keep: "Keep going", icon: "🥪", spend: "Quit, lunch" }, 3: { keep: "Let it go", icon: "🍩", spend: "Donut" } };
+
+// every other town: drag the town's item onto one of the choices, laid out as stickers across the drawing.
+// days maps a step number to one [icon, short label] per choice; costs and "not enough" are added automatically
+function rowAct(st, s, A) {
+  const p = A.days[S.step], n = st.choices.length;
+  if (!p || p.length !== n) return null;
+  const b = { x0: 120, x1: 296, y: 30, h: 98, ...A.box }, gap = 6, w = (b.x1 - b.x0 - gap * (n - 1)) / n;
+  return {
+    item: A.item,
+    zones: st.choices.map((c, i) => {
+      const ok = !c.need || c.need(s), cost = val(c.cost, s);
+      return { c: i, x: b.x0 + i * (w + gap), y: b.y, w, h: b.h, icon: p[i][0], off: !ok,
+        label: ok ? p[i][1] + (cost && String(cost).length <= 9 ? " " + cost : "") : "Not enough" };
+    }),
+    hint: A.hint,
+  };
+}
+const HAND = (x, y) => ({ icon: "✋", label: "Drag your hand", x, y });
+const COIN = (x, y) => ({ icon: "🪙", label: "Drag the coin", x, y });
+const WORDS = (x, y) => ({ icon: "💬", label: "Drag your words", x, y });
+const ROWS = {
+  L2: { item: WORDS(90, 100), box: { x0: 118, y: 58, h: 70 }, hint: "Drag your words to what you'll say. It comes true.",
+    days: { 0: [["🌸", "Really kind"], ["🌩️", "Grumpy troll"], ["🤐", "Say nothing"]], 1: [["🌸", "She'll score"], ["🌩️", "Worst player"]], 2: [["🌸", "Really funny"], ["🌩️", "Kind of weird"]],
+      4: [["🌸", "I studied"], ["🌩️", "I'll fail"], ["💪", "I can do it"]], 5: [["🌸", "Mom finds a way"], ["🌩️", "Loses everything"]], 6: [["🌸", "Bravest kid"], ["🌩️", "Total baby"], ["🤝", "Hold his hand"]], 7: [["🌸", "Strong fish"], ["🌩️", "Boring fish"]] } },
+  M3: { item: HAND(112, 70), box: { x0: 150, y: 34, h: 92 }, hint: "Reach for it, or keep your hands (and your sleep).",
+    days: { 0: [["🌀", "Buy it"], ["🔄", "Put it back"]], 1: [["👟", "Buy shoes"], ["👛", "Keep coins"]], 2: [["🍭", "Candy cane"], ["🚰", "Fountain"]], 4: [["🕹️", "Claw"], ["👀", "Just watch"]],
+      5: [["📘", "School book"], ["🚶", "Skip it"]], 6: [["🪀", "Yo-yo #4"], ["✋", "Have three"]], 7: [["🔑", "Keychains"], ["🚪", "Walk out"]] } },
+  L3: { item: HAND(100, 100), box: { x0: 126 }, hint: "Drag your hand to what you'll do. Screens drain you.",
+    days: { 0: [["📱", "Scroll in bed"], ["🍳", "Breakfast"]], 1: [["🏃", "Play tag"], ["🎮", "New level"]], 2: [["📞", "Answer"], ["📺", "Keep watching"]], 4: [["🚪", "Other room"], ["📱", "Quick check"]],
+      5: [["🐕", "Play fetch"], ["📱", "Toss once"]], 6: [["🔕", "Mute it"], ["💬", "Read them all"]], 7: [["😴", "Nap"], ["📖", "Comic"], ["📺", "One more"]] } },
+  M4: { item: COIN(90, 94), box: { x0: 126 }, hint: "Drag the coin. Future you is watching.",
+    days: { 0: [["🐷", "Save 20 first"], ["👟", "New shoes"]], 1: [["☕", "Home coffee"], ["✨", "Fancy coffee"]], 2: [["🤝", "Split a small"], ["🍕", "Giant one"]], 4: [["🐷", "Save 15"], ["🎮", "All on games"]],
+      5: [["📱", "Skip it"], ["🏷️", "Buy on sale"]], 6: [["🧺", "Picnic"], ["🛍️", "Mall"]], 7: [["🐷", "Keep saving"], ["⏳", "Wait"]] } },
+  L5: { item: HAND(90, 100), box: { x0: 120, y: 24, h: 82 }, hint: "Keep it, or toss it. Whatever you toss comes back.",
+    days: { 0: [["🥪", "Wrap it up"], ["🗑️", "Trash it"]], 1: [["🧒", "Give it away"], ["🗑️", "Throw it out"]], 2: [["🚰", "Refill it"], ["🗑️", "Toss, buy new"]], 4: [["✏️", "Draw on back"], ["🗑️", "Crumple it"]],
+      5: [["🧒", "Give to cousin"], ["🗑️", "Bin them"]], 6: [["🍱", "Lunch tomorrow"], ["🗑️", "Toss it"]], 7: [["🔧", "Fix & share"], ["🗑️", "Throw it all"]] } },
+  M5: { item: COIN(234, 68), box: { x0: 8, x1: 200, y: 6, h: 96 }, hint: "Drag the coin. Every loan comes home as a dog.",
+    days: { 0: [["🎟️", "Save up"], ["🐕", "Borrow 50"]], 1: [["📺", "Old TV is fine"], ["🐕", "Borrow for TV"]], 2: [["🚲", "Keep the bike"], ["🐕", "Borrow for car"]], 4: [["📱", "Keep my phone"], ["🐕", "Borrow for it"]],
+      5: [["🍕", "Pizza at home"], ["🐕", "Borrow"]], 6: [["🐷", "Pay from jar"], ["🐕", "Borrow 15"]] } },
+  "L-fallback": { item: HAND(36, 96), box: { x0: 76, x1: 296, y: 14, h: 104 }, hint: "Drag your hand: use your saved hours, or keep them.",
+    days: { 2: [["🫙", "Show a jar"], ["🤐", "Keep it vague"]], 4: [["⏰", "Wake Theo"], ["😴", "Let him sleep"]], 5: [["🫙", "Open ALL"], ["1️⃣", "Just the oldest"]], 6: [["🥞", "Fort & pancakes"], ["🧹", "Tidy pantry"]] } },
+  M8: { item: COIN(100, 100), box: { x0: 128, y: 44, h: 84 }, hint: "Drag the coin. Your wallet is listening.",
+    days: { 3: [["🎁", "Save for Mom"], ["🥿", "Light-up slippers"]], 4: [["🎁", "Buy her present"], ["💌", "Make a card"]] } },
+  "M-jobs": { item: COIN(90, 100), hint: "Drag the coin. Coins with a job stay.",
+    days: { 1: [["🏷️", "Tag: HEATER"], ["👖", "Pocket them"]], 2: [["🏷️", "Tag: FOOD"], ["👋", "Let them go"]], 3: [["🔧", "Pay the repair"], ["👧", "Ask sister"]] } },
+  "M-hours": { item: HAND(90, 100), hint: "Drag your hand. Every price is hours of your life.",
+    days: { 1: [["🏷️", "Tap the tag"], ["🧥", "Leave it"]], 2: [["🏷️", "Tap the tag"], ["❓", "Which hours?"]], 3: [["🏠", "Dad's house"], ["🪑", "Stay home"]] } },
+  "M-birds": { item: HAND(100, 100), box: { x0: 128, y: 40, h: 88 }, hint: "Drag your hand. Every bird eats every month.",
+    days: { 1: [["🐦", "Sign up for all"], ["✅", "Keep just one"]], 2: [["✉️", "Open and look"], ["🎵", "Music up"]], 3: [["📢", "Read the bills"], ["🚪", "Hide"]] } },
+  "M-monster": { item: HAND(90, 100), hint: "Drag your hand. Bills you dodge grow teeth.",
+    days: { 1: [["💳", "Pay it now"], ["📅", "Tomorrow"]], 2: [["📬", "Check mail"], ["🙈", "Leave it"]], 3: [["📞", "Call and ask"], ["🏚️", "Hide in attic"]] } },
+  "M-shadow": { item: HAND(94, 88), box: { x0: 124, y: 32, h: 74 }, hint: "Drag your hand. Every pay-later weighs on your shadow.",
+    days: { 1: [["📲", "Pay later"], ["🐷", "Save up"]], 2: [["📲", "Keep tapping"], ["🧮", "Add it up"]], 3: [["💡", "Every light on"], ["💸", "Pay them off"]] } },
+  "L-whisper": { item: WORDS(94, 86), box: { x0: 122, y: 14, h: 88 }, hint: "Drag your words. Loud ones crack the glass.",
+    days: { 2: [["🤫", "Wait quietly"], ["📢", "Yell louder"], ["🙏", "Whisper please"]], 5: [["🤭", "Into sleeve"], ["😂", "Laugh out loud"], ["😊", "Save it"]] } },
+  "L-hum": { item: WORDS(92, 100), box: { x0: 116 }, hint: "Drag your voice to what you'll do.",
+    days: { 2: [["🙋", "“Me!”"], ["🎵", "Hum along"], ["🎹", "Hide"]], 6: [["🎵", "Hum for her"], ["👏", "Clap"], ["🙈", "Cover eyes"]] } },
+  "M-rhyme": { item: COIN(100, 86), box: { x0: 134 }, hint: "Drag the coin to your choice.",
+    days: { 2: [["🤝", "Lend her"], ["🎈", "Maybe soon!"], ["✋", "Say no"]], 7: [["🚌", "Ride the bus"], ["🚶", "Walk home"]] } },
+  "L-echo": { item: HAND(100, 100), box: { x0: 126 }, hint: "Drag your hand. Promises cost Saturday hours.",
+    days: { 4: [["🤝", "Keep my word"], ["🤒", "Pretend sick"]], 5: [["🤝", "Keep my word"], ["🙈", "Ignore it"]], 6: [["🤝", "Keep my word"], ["📵", "Let it ring"]], 7: [["🎡", "Go to the fair"], ["🛋️", "Stay home"]] } },
+};
+
+const ACTS = {
+  M1: (st, s) => jarAct(JAR_DAYS[st.when], st, s),
+  "M-chain": (st, s) => jarAct(HALF_NIGHTS[S.step], st, s),
   M2(st) {
     const d = TREE_DAYS[st.when], w = st.choices.findIndex(c => c.water === 1); if (!d || w < 0) return null;
     return {
@@ -443,5 +512,6 @@ const ACTS = {
 };
 function actOf(st, s) {
   if (!st || S.phase !== "step" || st.rehook || st.mic || st.drag || st.play || st.pay || !st.choices) return null;
-  const f = ACTS[TOWNS[S.t].id]; return f ? f(st, s) : null;
+  const id = TOWNS[S.t].id, f = ACTS[id];
+  return f ? f(st, s) : ROWS[id] ? rowAct(st, s, ROWS[id]) : null;
 }
