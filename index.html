@@ -456,6 +456,58 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .sketch .catch { background: linear-gradient(#0B1428, #17254A); border: 1px dashed rgba(241,232,208,.25); }
 .sketch .cjar { border-color: #F1E8D0; }
 .sketch .cjar.big::after { content: "BIG"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 12px var(--font-sign); color: #F1E8D0; }
+/* playing a day: everything on one phone screen */
+body.playing .mini-sign { display: none; } /* the town name rides on the drawing's tape instead */
+body.playing .stage.sketch::before { content: attr(data-town); width: auto; min-width: 84px; height: auto; padding: 2px 12px; font: 700 11px/16px var(--font-sign); letter-spacing: .12em; text-transform: uppercase; color: #F1E8D0; white-space: nowrap; text-align: center; }
+body.playing .meter .ml { display: flex; align-items: center; gap: 2px; }
+body.playing .meter .dir { display: inline; margin: 0 0 0 4px; font-size: inherit; }
+body.playing .catch { height: 150px; }
+body.tight .stage > svg, body.tight .stage > .act-wrap { max-width: 210px; margin-inline: auto; }
+body.tight .stage figcaption { display: none; }
+body.playing .dash { padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+body.playing .cb { padding: 8px 12px; font-size: 14px; font-size: calc(var(--ts) * 14px); white-space: nowrap; }
+body.playing .dash-radio { padding: 6px 10px; }
+body.playing .dash-radio .fm { font-size: 17px; font-size: calc(var(--ts) * 17px); }
+body.playing.in-town .app { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+body.playing .mp-status { font-size: 12px; font-size: calc(var(--ts) * 12px); line-height: 1.3; }
+@media (max-height: 720px) {
+  body.playing .stage > svg, body.playing .stage > .act-wrap { max-width: 270px; margin-inline: auto; }
+  body.playing .story { font-size: 16px; font-size: calc(var(--ts) * 16px); }
+  body.tight .stage > svg, body.tight .stage > .act-wrap { max-width: 150px; }
+  body.tight .mp-scope { max-height: 44px; }
+  body.tight .mp-line { font-size: 15px; font-size: calc(var(--ts) * 15px); }
+  body.playing .app, body.playing .scene { gap: 8px; }
+}
+body.playing .app { gap: 10px; }
+body.playing .scene { gap: 10px; }
+body.playing .mini-sign { font-size: 12px; font-size: calc(var(--ts) * 12px); padding: 3px 8px; }
+body.playing .meters { flex-wrap: nowrap; gap: 6px; }
+body.playing .meter { flex: 1 1 0; min-width: 0; padding: 6px 10px; gap: 2px; border-radius: 10px; }
+body.playing .meter .ml { font-size: 11px; font-size: calc(var(--ts) * 11px); letter-spacing: .05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.playing .meter .dir-t { display: none; }
+body.playing .meter .mv { font-size: 22px; font-size: calc(var(--ts) * 22px); }
+body.playing .stage { padding: 6px 8px; }
+body.playing .stage figcaption { font-size: 14px; font-size: calc(var(--ts) * 14px); margin-top: 2px; }
+body.playing .when { font-size: 12px; font-size: calc(var(--ts) * 12px); }
+body.playing .story { font-size: 17px; font-size: calc(var(--ts) * 17px); line-height: 1.35; }
+body.playing .micpanel { padding: 8px 12px; gap: 4px; }
+body.playing .mp-line { font-size: 16px; font-size: calc(var(--ts) * 16px); }
+body.playing .mp-scope { max-height: 64px; }
+body.playing .result { gap: 4px; }
+body.playing .result p { margin: 0; font-size: 16px; font-size: calc(var(--ts) * 16px); }
+body.playing .choices.done { display: none; } /* once you've chosen, the result says what you did */
+body.playing .result { padding-top: 8px; padding-bottom: 8px; font-size: 16px; font-size: calc(var(--ts) * 16px); line-height: 1.35; }
+body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16px); }
+.tapfall > summary { list-style: none; cursor: pointer; text-align: center; font-family: var(--font-sign); font-weight: 700; font-size: 14px; font-size: calc(var(--ts) * 14px); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 8px; border-radius: 10px; }
+.tapfall > summary::-webkit-details-marker { display: none; }
+.tapfall > summary::after { content: " ▾"; }
+.tapfall[open] > summary::after { content: " ▴"; }
+.tapfall > summary:focus-visible { outline: 3px solid var(--sign); }
+.tapfall .choices { margin-top: 6px; }
+/* after a drag, the game moves on by itself: the Next button fills up as a countdown */
+.go.auto { position: relative; overflow: hidden; }
+.go.auto::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(0,0,0,.18); animation: autofill var(--auto-ms, 3s) linear forwards; pointer-events: none; }
+@keyframes autofill { to { width: 100%; } }
 /* act it out: drag something on the drawing to choose */
 .act-wrap { position: relative; }
 .act-layer { position: absolute; inset: 0; }
@@ -578,16 +630,16 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=43"></script>
-<script src="/js/juice.js?v=43"></script>
-<script src="/js/mic.js?v=43"></script>
-<script src="/js/road.js?v=43"></script>
-<script src="/js/radio.js?v=43"></script>
-<script src="/js/reel.js?v=43"></script>
-<script src="/js/glovebox.js?v=43"></script>
-<script src="/js/play.js?v=43"></script>
-<script src="/js/sketch.js?v=43"></script>
-<script src="/js/share.js?v=43"></script>
+<script src="/js/compat.js?v=45"></script>
+<script src="/js/juice.js?v=45"></script>
+<script src="/js/mic.js?v=45"></script>
+<script src="/js/road.js?v=45"></script>
+<script src="/js/radio.js?v=45"></script>
+<script src="/js/reel.js?v=45"></script>
+<script src="/js/glovebox.js?v=45"></script>
+<script src="/js/play.js?v=45"></script>
+<script src="/js/sketch.js?v=45"></script>
+<script src="/js/share.js?v=45"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1736,7 +1788,7 @@ function meters(T, s) {
     const low = m.battery ? v < 40 : (m.k === "words" ? v <= 3 : m.k === "sleep" ? v < 7 : m.k === "glass" ? v < 40 : false);
     const pct = max ? Math.max(0, Math.min(100, v / max * 100)) : null;
     return `<div class="meter ${m.life ? "life" : ""} ${low ? "low" : ""}">
-      <div class="ml">${m.label}${dirOf(T, m.k) ? `<span class="dir dir-${dirOf(T, m.k)}" title="${dirOf(T, m.k) === "up" ? "More is good" : "Less is good"}">${dirOf(T, m.k) === "up" ? "⬆ more is good" : "⬇ less is good"}</span>` : ""}</div>
+      <div class="ml">${m.label}${dirOf(T, m.k) ? `<span class="dir dir-${dirOf(T, m.k)}" title="${dirOf(T, m.k) === "up" ? "More is good" : "Less is good"}">${dirOf(T, m.k) === "up" ? "⬆<span class=\"dir-t\"> more is good</span>" : "⬇<span class=\"dir-t\"> less is good</span>"}</span>` : ""}</div>
       <div class="mv" data-k="${m.k}">${v}${m.unit || ""}</div>
       ${pct !== null ? `<div class="track"><i style="width:${pct}%"></i></div>` : ""}
     </div>`;
@@ -1837,11 +1889,14 @@ function renderTown() {
     const ok = !lockedToMic && (c.need ? c.need(s) : (words ? s.words >= c.w : true));
     const cl = val(c.cost, s);
     const cost = lockedToMic ? "use the mic" : words ? (c.w ? `${c.w} word${c.w > 1 ? "s" : ""}` : "0 words") : (cl ? (/[a-z]$/i.test(cl) ? cl : `${cl} coins`) : "");
-    return `<button class="choice" data-act="pick" data-c="${i}" ${ok && !r ? "" : "disabled"} ${r && r.i === i ? 'style="border-color:var(--sign);opacity:1"' : ""}>
+    return `<button class="choice ${r && r.i === i ? "picked" : ""}" data-act="pick" data-c="${i}" ${ok && !r ? "" : "disabled"} ${r && r.i === i ? 'style="border-color:var(--sign);opacity:1"' : ""}>
       <span>${esc(c.t)}</span>${cost ? `<span class="cost">${ok || lockedToMic ? cost : "not enough"}</span>` : ""}
     </button>`;
   }).join("");
   const who = Prefs.coop ? role(T, S.step) : null;
+  const act = !r && typeof actOf === "function" ? actOf(st, s) : null;
+  const micBlocked = st.mic && (Mic.state === "denied" || Mic.state === "unsupported" || (st.mic.kind === "speech" && !Mic.speechOK));
+  const fold = !r && (act || st.drag || (showMic && !micBlocked));
   return `${topbar(true)}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
   ${meters(T, s)}${stage(T, s)}
@@ -1850,11 +1905,10 @@ function renderTown() {
     <div class="when">${esc(st.when)}${who ? `<span class="role role-${who.toLowerCase()}">${who}</span>` : ""}</div>
     <p class="story">${esc(val(st.text, s))}</p>
     ${showMic ? micPanel(st) : ""}
-    ${showMic ? `<div class="or-tap">or tap</div>` : ""}
-    ${st.drag && !r ? dragPanel(st) + `<div class="or-tap">or tap</div>` : ""}
-    ${typeof actOf === "function" && actOf(st, s) ? `<div class="or-tap">or tap</div>` : ""}
-    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : `<div class="choices ${typeof actOf === "function" && actOf(st, s) ? "compact" : ""}">${choices}</div>`}
-    ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>👆 Tap A or B to choose</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
+    ${showMic && !fold ? `<div class="or-tap">or tap</div>` : ""}
+    ${st.drag && !r ? dragPanel(st) : ""}
+    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : fold ? `<details class="tapfall"><summary>or tap a button</summary><div class="choices compact">${choices}</div></details>` : `<div class="choices ${r ? "done" : ""}">${choices}</div>`}
+    ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>${act ? "👆 Drag it onto your choice" : "👆 Tap A or B to choose"}</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
     ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
   </section>`;
@@ -1890,6 +1944,9 @@ function renderFan() {
 function render() {
   document.body.classList.toggle("party", Prefs.party);
   document.body.classList.toggle("in-town", S.screen === "town");
+  document.body.classList.toggle("playing", S.screen === "town" && (S.phase === "step" || S.phase === "result")); // compact layout so a whole day fits on one phone screen
+  const cur = S.screen === "town" && S.phase === "step" ? TOWNS[S.t].steps[S.step] : null;
+  document.body.classList.toggle("tight", !!(cur && (cur.mic || cur.drag))); // mic and drag days carry an extra panel, so the drawing gives up some room
   $app.innerHTML = (S.screen === "ignition" ? renderIgnition() : S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown()) + dash();
   if (S.screen === "fan") bindFan();
   if (S.screen === "home") bindDial();
@@ -1979,7 +2036,7 @@ function next() {
     else if (nearMiss(T, S.s)) Juice.buzz([20, 40, 20, 40, 60]);
     return;
   }
-  S.step += 1; S.phase = "step"; enterStep(); render();
+  S.step += 1; S.phase = "step"; enterStep(); render(); window.scrollTo(0, 0);
 }
 
 function startTown(i, opts = {}) {

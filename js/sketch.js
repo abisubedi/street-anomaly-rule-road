@@ -60,7 +60,7 @@ const Sk = {
   frame(id, val, label, svg, cap, o = {}) {
     const act = o.act !== undefined ? o.act : actOf(S.phase === "step" ? TOWNS[S.t].steps[S.step] : null, S.s), h = svg ? o.h || 140 : o.actH || 110;
     const draw = svg ? `<svg viewBox="0 0 300 ${h}" width="100%" aria-hidden="true">${o.under || ""}<g class="ink">${svg}</g></svg>` : "";
-    return `<figure class="stage stage-${id} sketch ${o.cls || ""}" data-scene="${id}" data-val="${val}" aria-label="${label}">
+    return `<figure class="stage stage-${id} sketch ${o.cls || ""}" data-scene="${id}" data-val="${val}" data-town="${esc(TOWNS[S.t].name)}" aria-label="${label}">
       ${act ? `<div class="act-wrap">${draw}${svg ? "" : o.html || ""}${Sk.actLayer(act, h)}</div>${svg ? o.html || "" : ""}` : draw + (o.html || "")}
       <figcaption>${act ? act.hint : cap}</figcaption>
     </figure>`;

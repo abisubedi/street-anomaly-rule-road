@@ -7,9 +7,26 @@
 
 const Play = {
   mem: {},        // last drawn values per town, so scenes animate from the old value to the new one
-  timer: 0, raf: 0, boilT: 0,
+  timer: 0, raf: 0, boilT: 0, autoT: 0,
 
-  stop() { cancelAnimationFrame(this.raf); clearTimeout(this.timer); clearInterval(this.boilT); this.raf = this.boilT = 0; },
+  stop() { cancelAnimationFrame(this.raf); clearTimeout(this.timer); clearInterval(this.boilT); clearTimeout(this.autoT); this.raf = this.boilT = this.autoT = 0; },
+
+  // after a finger gesture lands on a choice: show the result long enough to read, then go to the next day.
+  // The Next button fills up as a countdown and still works for anyone who wants to skip ahead.
+  // Not when the next step needs its own action (Laterton's heavy shadow, passing the phone in road-trip mode).
+  autoNext() {
+    const b = document.querySelector('.go[data-act="next"]');
+    if (!b || /Pass the phone/.test(b.textContent)) return;
+    const r = S.lastResult || {}, chars = ((r.say || "") + (r.night || "").replace(/<[^>]+>/g, "")).length;
+    const ms = Math.max(2400, Math.min(5200, 1600 + chars * 32));
+    b.style.setProperty("--auto-ms", ms + "ms"); b.classList.add("auto");
+    const go = () => {
+      if (!document.body.contains(b) || S.phase !== "result") return;
+      if (Voice.el && !Voice.el.paused && !Voice.el.ended) { this.autoT = setTimeout(go, 400); return; } // let the narrator finish
+      next();
+    };
+    this.autoT = setTimeout(go, ms);
+  },
 
   // field-journal scenes: re-seed the shared ink filter so the pen lines shimmer like a flipbook (off for reduced motion)
   boil() {
@@ -146,7 +163,7 @@ function dragGame(st) {
     if (!on) return; on = false;
     const c = centre(), z = moved > 36 ? at(c[0], c[1]) : null; moved = 0;
     chip.classList.remove("lifted"); zones.forEach(q => q.classList.remove("hot"));
-    if (z) { chip.style.opacity = "0"; pick(+z.dataset.zone); }
+    if (z) { chip.style.opacity = "0"; pick(+z.dataset.zone); Play.autoNext(); }
     else { chip.style.transition = "transform .25s cubic-bezier(.3,1.5,.5,1)"; chip.style.transform = ""; setTimeout(() => { chip.style.transition = ""; }, 260); }
   };
   if (window.PointerEvent) {
@@ -192,7 +209,7 @@ function actGame() {
     if (!z) return back();
     if (z.dataset.zone === "off") { Juice.penalty(); z.classList.add("nope"); setTimeout(() => z.classList.remove("nope"), 400); return back(); }
     item.style.transition = "opacity .2s"; item.style.opacity = "0";
-    pick(+z.dataset.zone);
+    pick(+z.dataset.zone); Play.autoNext();
   };
   if (window.PointerEvent) {
     item.addEventListener("pointerdown", down); item.addEventListener("pointermove", move);
@@ -246,7 +263,7 @@ function payGame(st) {
     Juice.burst(b, 6, "money");
     b.classList.add("gone");
     s.pack[i] = Infinity;
-    if (s.pack.every(v => v === Infinity)) { s.pack = []; setTimeout(() => pick(0), 450); }
+    if (s.pack.every(v => v === Infinity)) { s.pack = []; setTimeout(() => { pick(0); Play.autoNext(); }, 450); }
   }));
 }
 
