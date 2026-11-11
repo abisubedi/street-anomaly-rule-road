@@ -456,6 +456,62 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .sketch .catch { background: linear-gradient(#0B1428, #17254A); border: 1px dashed rgba(241,232,208,.25); }
 .sketch .cjar { border-color: #F1E8D0; }
 .sketch .cjar.big::after { content: "BIG"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 12px var(--font-sign); color: #F1E8D0; }
+/* home: a locked district is one line of town names under its lock */
+.locked-towns { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.locked-towns span { font: 700 13px var(--font-sign); font-size: calc(var(--ts) * 13px); color: var(--muted); border: 1px dashed var(--line); border-radius: 999px; padding: 3px 10px; }
+/* arrival: one sign moment */
+.sign-go { display: block; width: 100%; border: 0; color: var(--sign-ink); font: inherit; text-align: inherit; cursor: pointer; } /* the arrival sign is the door into town */
+.sign-go:active { translate: 0 3px; }
+.hero .sign-go .rule { font-size: 32px; font-size: calc(var(--ts) * clamp(28px, 8.4vw, 46px)); }
+.hero .sign-go .sign-inner { padding: 12px 14px 14px; }
+.hero .sign-go .rule.long { font-size: 26px; font-size: calc(var(--ts) * clamp(23px, 6.6vw, 38px)); }
+.hero:has(.sign-go) { padding-top: 0; }
+.hook { font-size: 18px; font-size: calc(var(--ts) * 18px); margin: 0; }
+.sign-go .kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.badges { display: inline-flex; gap: 2px; margin-left: auto; letter-spacing: 0; font-size: 18px; }
+.hero:has(.sign-go) .pole { height: 18px; }
+body.in-town .goal.mini { padding: 6px 10px; }
+@media (max-height: 720px) {
+  .hero .sign-go .rule { font-size: 28px; font-size: calc(var(--ts) * clamp(24px, 7.4vw, 40px)); }
+  .hero .sign-go .rule.long { font-size: 22px; font-size: calc(var(--ts) * clamp(20px, 5.9vw, 32px)); }
+  .hook { font-size: 16px; font-size: calc(var(--ts) * 16px); }
+}
+.arrive-row { align-items: center; flex-wrap: nowrap; }
+.arrive-row .enter { flex: 1; min-width: 0; }
+.arrive-row:has(.help[open]) { flex-wrap: wrap; }
+.help[open] { order: 3; }
+.sign-go .sign-inner, .sign-go .kicker, .sign-go .rule { display: block; }
+.sign-go:focus-visible { outline: 3px solid var(--sign); outline-offset: 4px; border-radius: 12px; }
+.hook { text-align: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.chip { font: 700 13px var(--font-sign); font-size: calc(var(--ts) * 13px); background: #18264A; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--fg); }
+.arrive-row { display: flex; align-items: flex-start; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.help { flex: 0 1 auto; }
+.help > summary { list-style: none; cursor: pointer; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--line); font-size: 20px; }
+.help > summary::-webkit-details-marker { display: none; }
+.help > summary:focus-visible { outline: 3px solid var(--sign); }
+.help[open] { flex-basis: 100%; }
+.help[open] > summary { margin: 0 auto 8px; border-color: var(--sign); }
+.help-body { background: #0E1730; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.help-body p { margin: 0; }
+.howto { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.howto li { display: flex; gap: 8px; align-items: baseline; }
+/* ending: a taped polaroid of your final scene */
+.polaroid { margin: 6px auto 0; width: 100%; max-width: 440px; background: #F1E8D0; padding: 10px 10px 12px; border-radius: 4px; rotate: -1.2deg; box-shadow: 0 10px 24px rgba(0,0,0,.45); position: relative; }
+.polaroid .stage { rotate: 0deg; box-shadow: none; border-radius: 2px; }
+.polaroid .stage figcaption { display: none; }
+.polaroid > figcaption { margin-top: 10px; color: #14130C; text-align: center; font: 600 17px/1.35 var(--font-sign); font-size: calc(var(--ts) * 17px); }
+.pol-stars { position: absolute; right: -6px; top: -14px; rotate: 8deg; background: var(--sign); color: var(--sign-ink); border: 2px solid #14130C; border-radius: 10px; padding: 2px 10px; font-size: 26px; box-shadow: 0 4px 0 rgba(0,0,0,.35); z-index: 2; }
+.pol-stars .off { opacity: .3; }
+.stamps { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.stamp { font: 700 14px var(--font-sign); font-size: calc(var(--ts) * 14px); border: 2px dashed currentColor; border-radius: 8px; padding: 4px 10px; rotate: -2deg; }
+.stamp:nth-child(2n) { rotate: 2deg; }
+.s-open { color: var(--leaf); } .s-daily { color: #FF9F43; } .s-vs { color: var(--sign); } .s-near { color: #FF9AA3; }
+.end-row { display: grid; grid-template-columns: auto auto 1fr; gap: 8px; }
+.end-row .go { padding-left: 12px; padding-right: 12px; white-space: nowrap; font-size: 15px; font-size: calc(var(--ts) * 15px); }
+.more > summary { list-style: none; cursor: pointer; text-align: center; font: 700 14px var(--font-sign); font-size: calc(var(--ts) * 14px); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 8px; }
+.more > summary::-webkit-details-marker { display: none; }
+.more-body { display: flex; flex-direction: column; gap: 12px; }
 /* playing a day: everything on one phone screen */
 body.playing .mini-sign { display: none; } /* the town name rides on the drawing's tape instead */
 body.playing .stage.sketch::before { content: attr(data-town); width: auto; min-width: 84px; height: auto; padding: 2px 12px; font: 700 11px/16px var(--font-sign); letter-spacing: .12em; text-transform: uppercase; color: #F1E8D0; white-space: nowrap; text-align: center; }
@@ -464,11 +520,11 @@ body.playing .meter .dir { display: inline; margin: 0 0 0 4px; font-size: inheri
 body.playing .catch { height: 150px; }
 body.tight .stage > svg, body.tight .stage > .act-wrap { max-width: 210px; margin-inline: auto; }
 body.tight .stage figcaption { display: none; }
-body.playing .dash { padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
-body.playing .cb { padding: 8px 12px; font-size: 14px; font-size: calc(var(--ts) * 14px); white-space: nowrap; }
-body.playing .dash-radio { padding: 6px 10px; }
-body.playing .dash-radio .fm { font-size: 17px; font-size: calc(var(--ts) * 17px); }
-body.playing.in-town .app { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+body.in-town .dash { padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+body.in-town .cb { padding: 8px 12px; font-size: 14px; font-size: calc(var(--ts) * 14px); white-space: nowrap; }
+body.in-town .dash-radio { padding: 6px 10px; }
+body.in-town .dash-radio .fm { font-size: 17px; font-size: calc(var(--ts) * 17px); }
+body.in-town .app { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
 body.playing .mp-status { font-size: 12px; font-size: calc(var(--ts) * 12px); line-height: 1.3; }
 @media (max-height: 720px) {
   body.playing .stage > svg, body.playing .stage > .act-wrap { max-width: 270px; margin-inline: auto; }
@@ -630,16 +686,16 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=45"></script>
-<script src="/js/juice.js?v=45"></script>
-<script src="/js/mic.js?v=45"></script>
-<script src="/js/road.js?v=45"></script>
-<script src="/js/radio.js?v=45"></script>
-<script src="/js/reel.js?v=45"></script>
-<script src="/js/glovebox.js?v=45"></script>
-<script src="/js/play.js?v=45"></script>
-<script src="/js/sketch.js?v=45"></script>
-<script src="/js/share.js?v=45"></script>
+<script src="/js/compat.js?v=46"></script>
+<script src="/js/juice.js?v=46"></script>
+<script src="/js/mic.js?v=46"></script>
+<script src="/js/road.js?v=46"></script>
+<script src="/js/radio.js?v=46"></script>
+<script src="/js/reel.js?v=46"></script>
+<script src="/js/glovebox.js?v=46"></script>
+<script src="/js/play.js?v=46"></script>
+<script src="/js/sketch.js?v=46"></script>
+<script src="/js/share.js?v=46"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1724,7 +1780,7 @@ function stopCard(i) {
     <span class="stop-card">
       <span class="tags"><span class="${T.track === "money" ? "tag-money" : "tag-life"}">${T.track === "money" ? "Money town" : "Life town"}</span>${T.voice ? `<span class="tag-voice">${VOICE_TAG[T.voice]}</span>` : ""}${starRow(st)}</span>
       <span class="tname">${T.name}</span>
-      <span class="trule">In this town, ${esc(T.rule)}</span>
+      ${open && !st ? `<span class="trule">In this town, ${esc(T.rule)}</span>` : ""}
     </span>
   </button>`;
 }
@@ -1736,7 +1792,7 @@ function renderHome() {
     const towns = d.ids.map(id => TOWNS.findIndex(t => t.id === id)).filter(i => i >= 0);
     return `<section class="district ${open ? "" : "shut"}">
       <h2 class="dname"><span>${d.name}</span>${open ? "" : `<span class="lock">🔒 ${d.need - total} more ★ to open</span>`}</h2>
-      ${towns.map(stopCard).join("")}
+      ${open ? towns.map(stopCard).join("") : `<p class="locked-towns">${towns.map(i => `<span>${esc(TOWNS[i].name)}</span>`).join("")}</p>`}
     </section>`;
   }).join("");
   const stations = road().map(i => `<button class="station" data-act="tune" data-i="${i}" aria-label="${freq(roadPos(i))} FM, ${esc(TOWNS[i].name)}"><b>${freq(roadPos(i))}</b><span>${esc(TOWNS[i].name)}</span></button>`).join("");
@@ -1744,8 +1800,8 @@ function renderHome() {
   return `${topbar(false)}
   <section class="hero">
     <img class="hero-art" src="/img/hero-sign.jpg" width="1100" height="603" alt="Rule Road, on a lit overhead highway sign">
-    <p>Every town has one strange rule. Live one day by it. Choose, talk, whisper and hum your way through, then find out what the rule teaches you.</p>
-    <div class="listen-row">${listenBtn("intro")}<span>Hear it from the Street Anomaly host</span></div>
+    <p>Every town has one strange rule. Live by it for a day.</p>
+    <div class="listen-row">${listenBtn("intro")}</div>
   </section>
   ${gloveNews("home")}
   <button class="daily ${done ? "done" : ""}" data-act="daily">
@@ -1760,8 +1816,8 @@ function renderHome() {
     <div class="needle" aria-hidden="true"></div>
   </div>
   <div class="modes">
-    <button class="mode ${Prefs.coop ? "on" : ""}" data-act="coop" aria-pressed="${Prefs.coop}"><b>Road trip · 2 players</b><span>One drives the choices, one does the talking</span></button>
-    <button class="mode ${Prefs.party ? "on" : ""}" data-act="party" aria-pressed="${Prefs.party}"><b>Party mode</b><span>Giant meters, made for a crowd or a stream</span></button>
+    <button class="mode ${Prefs.coop ? "on" : ""}" data-act="coop" aria-pressed="${Prefs.coop}"><b>Road trip · 2 players</b><span>One picks, one talks</span></button>
+    <button class="mode ${Prefs.party ? "on" : ""}" data-act="party" aria-pressed="${Prefs.party}"><b>Party mode</b><span>Giant meters for a crowd</span></button>
   </div>
   ${installCard()}
   <div class="led" role="status"><span class="led-n">${total}<i>/${TOWNS.length * 3}</i></span><span class="led-l">STARS</span></div>
@@ -1774,7 +1830,7 @@ function renderHome() {
       <span class="stop-card">
         <span class="tags"><span class="tag-money">Your town</span></span>
         <span class="tname">Make your own rule</span>
-        <span class="trule">Invent a town and dare a friend to live by it.</span>
+        <span class="trule">Invent a town, dare a friend.</span>
       </span>
     </button>
   </nav>
@@ -1813,65 +1869,85 @@ function renderTown() {
   const tagLabel = T.track === "money" ? "Money town" : "Life town";
   const mile = roadPos(S.t) + 1;
   if (S.phase === "arrive") {
-    const ch = S.challenge && S.challenge.t === S.t ? S.challenge : null;
+    // one moment: the sign swings in, the narrator reads the hook, you drive in. Help lives behind ❓
+    const ch = S.challenge && S.challenge.t === S.t ? S.challenge : null, K = kidOf(T), fresh = !store.get("howto", false);
+    // little badges on the sign itself: equipped Glovebox items, a mic town, road-trip mode (spelled out under ❓)
+    const badges = [
+      ...Glove.forTown(T).map(it => `<span class="badge" role="img" aria-label="${esc(it.name)} equipped" title="${esc(it.name)}: ${esc(it.what)}">${it.icon}</span>`),
+      T.voice ? `<span class="badge" role="img" aria-label="Mic town" title="This town listens">🎙</span>` : "",
+      Prefs.coop ? `<span class="badge" role="img" aria-label="Road trip mode" title="Road trip">🚗</span>` : "",
+    ].join("");
     return `${topbar(true)}
-    ${ch ? `<div class="challenge">${esc(ch.c || "A friend")} got ${starRow(ch.s, "")} here${ch.g ? " and left a ghost of their whisper" : ""}. Beat them.</div>` : ""}
+    ${ch ? `<div class="challenge">${esc(ch.c || "A friend")} got ${starRow(ch.s, "")} here${ch.g ? " and left a whisper ghost" : ""}. Beat them.</div>` : ""}
     ${S.daily ? `<div class="challenge daily-tag">Today's Anomaly Mile</div>` : ""}
     <section class="hero">
-      <div class="sign"><div class="sign-inner">
-        <div class="kicker">${T.name} · Mile ${mile} · ${freq(roadPos(S.t))} FM</div>
-        <div class="rule">In this town, ${esc(T.rule)}</div>
-      </div></div>
+      <button class="sign sign-go" data-act="begin" aria-label="Enter ${esc(T.name)}"><span class="sign-inner">
+        <span class="kicker">${T.name} · Mile ${mile} · ${freq(roadPos(S.t))} FM${badges ? `<span class="badges">${badges}</span>` : ""}</span>
+        <span class="rule ${T.rule.length > 58 ? "long" : ""}">In this town, ${esc(T.rule)}</span>
+      </span></button>
       <div class="pole"></div>
     </section>
-    <p class="story">${esc(T.hook)}</p>
-    ${Glove.forTown(T).map(it => `<div class="item-on">${it.icon} <b>${esc(it.name)}</b> is on: ${esc(it.what)}</div>`).join("")}
-    ${kidOf(T) ? `<div class="goal"><span class="goal-k">⭐⭐⭐ Your goal</span>${esc(kidOf(T).goal)}</div>
-    <details class="kid"><summary>🤔 What does this mean?</summary><p>${esc(kidOf(T).what)}</p>${listenBtn(T.id + "-kid")}</details>` : ""}
-    ${!store.get("howto", false) ? `<div class="howto-card">
-      <b>How to play</b>
-      <ol><li><span>🪧</span>Read the town's strange rule.</li><li><span>👆</span>Tap A, B or C to choose what to do.</li><li><span>⬆</span>Watch your numbers. Green arrows show which way is good.</li><li><span>⚠️</span>Halfway through, a red card shows the catch.</li></ol>
-      <button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
-    ${T.voice ? `<p class="voice-note">🎙 This town listens. You'll ${T.voice === "whisper" ? "whisper" : T.voice === "pitch" ? "hum" : "talk"} into your mic using the CB handset. No mic? You can tap instead.</p>` : ""}
-    ${Prefs.coop ? `<p class="voice-note coop-note">🚗 Road trip: the <b>Driver</b> picks, the <b>Navigator</b> does all the talking. Swap seats when the game says so.</p>` : ""}
-    <div class="listen-row">${listenBtn(T.id + "-arrive")}</div>
-    <button class="go" data-act="begin">Enter ${T.name}</button>`;
+    <p class="story hook">${esc(T.hook)}</p>
+    ${K ? `<div class="goal mini">⭐⭐⭐ ${esc(K.goal)}</div>` : ""}
+    <div class="arrive-row">
+      ${listenBtn(T.id + "-arrive")}
+      <details class="help" ${fresh ? "open" : ""}><summary aria-label="Help">❓</summary>
+        <div class="help-body">
+          ${K ? `<p><b>🤔 What does this mean?</b> ${esc(K.what)}</p>${listenBtn(T.id + "-kid")}` : ""}
+          <ol class="howto"><li><span>🪧</span>Read the town's strange rule.</li><li><span>👆</span>Drag onto your choice, or tap a button.</li><li><span>⬆</span>Watch your numbers. Green arrows show which way is good.</li><li><span>⚠️</span>Halfway through, a red card shows the catch.</li></ol>
+          ${Glove.forTown(T).map(it => `<p>${it.icon} <b>${esc(it.name)}</b> is on: ${esc(it.what)}</p>`).join("")}
+          ${T.voice ? `<p>🎙 This town listens: hold the CB handset and ${T.voice === "whisper" ? "whisper" : T.voice === "pitch" ? "hum" : "talk"}. No mic? Tap instead.</p>` : ""}
+          ${Prefs.coop ? `<p>🚗 Road trip: the <b>Driver</b> picks, the <b>Navigator</b> does the talking. Swap when the game says so.</p>` : ""}
+          ${fresh ? `<button class="go ghost" data-act="howto-ok">Got it</button>` : ""}
+        </div>
+      </details>
+      <button class="go enter" data-act="begin" aria-label="Drive into ${esc(T.name)}">Drive in →</button>
+    </div>`;
   }
   if (S.phase === "end") {
+    // a polaroid of how it went for you, one lesson, and the road onward. The rest is under ⋯ More
     const n = S.res, nm = nearMiss(T, s), ch = S.challenge && S.challenge.t === S.t ? S.challenge : null;
-    const vs = ch ? (n > ch.s ? `You beat ${esc(ch.c || "your friend")}! ${starRow(n, "")} vs ${starRow(ch.s, "")}` : n === ch.s ? `Tied with ${esc(ch.c || "your friend")}.` : `${esc(ch.c || "Your friend")} still leads. Try again?`) : "";
+    const vs = ch ? (n > ch.s ? `You beat ${esc(ch.c || "your friend")}!` : n === ch.s ? `Tied with ${esc(ch.c || "your friend")}.` : `${esc(ch.c || "Your friend")} still leads.`) : "";
     const nxt = nextOnRoad(S.t);
+    const stamps = [
+      S.opened && S.opened.length ? `<span class="stamp s-open">🔓 ${esc(S.opened.join(" and "))} open</span>` : "",
+      S.dailyJust ? `<span class="stamp s-daily">🔥 ${streak()}-day streak</span>` : "",
+      vs ? `<span class="stamp s-vs">${vs}</span>` : "",
+      nm ? `<span class="stamp s-near">😮 Near miss · ${esc(nm)}</span>` : "",
+    ].join("");
     return `${topbar(true)}
-    <div class="mini-sign">${T.name} · ${tagLabel}</div>
-    ${meters(T, s)}${stage(T, s)}
-    <div class="end-stars">${starRow(n, "")}</div>
-    ${nm ? `<div class="nearmiss">😮 Near miss · ${esc(nm)}</div>` : ""}
-    ${vs ? `<div class="challenge">${vs}</div>` : ""}
+    <figure class="polaroid">
+      ${stage(T, s)}
+      <div class="pol-stars">${starRow(n, "")}</div>
+      <figcaption>${esc(T.ending(s))}</figcaption>
+    </figure>
+    ${stamps ? `<div class="stamps">${stamps}</div>` : ""}
     ${gloveNews("end")}
-    ${S.opened && S.opened.length ? `<div class="unlock">🔓 ${esc(S.opened.join(" and "))} ${S.opened.length > 1 ? "are" : "is"} open</div>` : ""}
-    ${S.dailyJust ? `<div class="challenge daily-tag">🔥 Daily mile done · ${streak()}-day streak. Come back tomorrow for a new town.</div>` : ""}
-    <p class="story" style="text-align:center">${esc(T.ending(s))}</p>
-    ${n < 3 && kidOf(T) ? `<div class="goal"><span class="goal-k">For 3 stars next time</span>${esc(kidOf(T).goal)}</div>` : ""}
-    <div class="lesson-k">The lesson</div>
-    <p class="lesson">${esc(T.lesson)}</p>
-    <p class="cta">${esc(T.cta)}</p>
-    <div class="listen-row center">${listenBtn(T.id + "-end")}</div>
+    <p class="lesson">💡 ${esc(T.lesson)}</p>
+    <div class="end-row">
+      <button class="go ghost" data-act="again" aria-label="Play ${esc(T.name)} again">↺ Again</button>
+      <button class="go ghost" data-act="share">Share</button>
+      ${nxt !== undefined ? `<button class="go" data-act="town" data-i="${nxt}">Next town →</button>` : `<button class="go" data-act="fan">Your own town →</button>`}
+    </div>
+    <p class="toast" id="share-toast" aria-live="polite"></p>
     ${S.reel.length ? `<div class="reel">
-      <div class="reel-k">📻 Your town broadcast · ${S.reel.length} take${S.reel.length > 1 ? "s" : ""} of your voice</div>
+      <div class="reel-k">📻 Your broadcast · ${S.reel.length} take${S.reel.length > 1 ? "s" : ""} of your voice</div>
       <p class="reel-cap" id="reel-cap" aria-live="polite"></p>
-      <div class="row"><button class="go" data-act="reel">▶ Play your broadcast</button><button class="go ghost" data-act="reelsave">Save it</button></div>
+      <div class="row"><button class="go" data-act="reel">▶ Play it</button><button class="go ghost" data-act="reelsave">Save it</button></div>
     </div>` : ""}
-    <div class="sharebox">
-      <label for="alias">Your name on the challenge link</label>
-      <div class="row"><input id="alias" maxlength="20" placeholder="Optional" value="${esc(Prefs.name)}"><button class="go" data-act="share">Share result</button></div>
-      <p class="toast" id="share-toast" aria-live="polite"></p>
-    </div>
-    <p class="loop">Because in this town, ${esc(T.rule)}</p>
-    <div class="row">
-      <button class="go ghost" data-act="again">Play ${T.name} again</button>
-      ${nxt !== undefined ? `<button class="go" data-act="town" data-i="${nxt}">Next town →</button>` : `<button class="go" data-act="fan">Make your own town →</button>`}
-    </div>
-    ${installCard()}`;
+    <details class="more"><summary>⋯ More</summary>
+      <div class="more-body">
+        ${n < 3 && kidOf(T) ? `<div class="goal"><span class="goal-k">For 3 stars next time</span>${esc(kidOf(T).goal)}</div>` : ""}
+        <p class="cta">${esc(T.cta)}</p>
+        <div class="listen-row">${listenBtn(T.id + "-end")}<span>Hear the ending</span></div>
+        <div class="sharebox">
+          <label for="alias">Your name on the challenge link</label>
+          <div class="row"><input id="alias" maxlength="20" placeholder="Optional" value="${esc(Prefs.name)}"><button class="go" data-act="share">Share result</button></div>
+        </div>
+        <p class="loop">Because in this town, ${esc(T.rule)}</p>
+        ${installCard()}
+      </div>
+    </details>`;
   }
   const st = T.steps[S.step];
   if (st.rehook) {
