@@ -448,6 +448,14 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .stage.sketch figcaption { font-family: var(--font-sign); color: #E9DFC4; }
 .ink { filter: url(#ink); }
 .stage-jar .grow { transform-box: fill-box; transform-origin: 50% 100%; animation: sprout .45s cubic-bezier(.3,1.6,.5,1) both; }
+.stage-shadow.sketch.dusk { background-color: #24182C; }
+.stage-shadow.sketch.noon { background-color: #17254A; }
+.sketch .dogrow { position: relative; border-bottom: 2px solid #9AA7C4; }
+.sketch .dogrow.leashed::before { content: ""; position: absolute; left: 12%; right: 44px; top: 52%; border-top: 2px dashed rgba(241,232,208,.55); pointer-events: none; }
+.sketch .dog svg, .sketch .walker svg { display: block; height: auto; }
+.sketch .catch { background: linear-gradient(#0B1428, #17254A); border: 1px dashed rgba(241,232,208,.25); }
+.sketch .cjar { border-color: #F1E8D0; }
+.sketch .cjar.big::after { content: "BIG"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 12px var(--font-sign); color: #F1E8D0; }
 .stage-jar .glow { transform-box: fill-box; transform-origin: center; animation: bump 1.2s ease-in-out infinite; }
 .yard-pop, .stage-yard .grow { animation: sprout .6s cubic-bezier(.3,1.6,.5,1) both; }
 .shelf { display: flex; flex-wrap: wrap; gap: 3px; padding: 4px; border-bottom: 3px solid #5B4636; min-height: 26px; }
@@ -547,15 +555,16 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=40"></script>
-<script src="/js/juice.js?v=40"></script>
-<script src="/js/mic.js?v=40"></script>
-<script src="/js/road.js?v=40"></script>
-<script src="/js/radio.js?v=40"></script>
-<script src="/js/reel.js?v=40"></script>
-<script src="/js/glovebox.js?v=40"></script>
-<script src="/js/play.js?v=40"></script>
-<script src="/js/share.js?v=40"></script>
+<script src="/js/compat.js?v=41"></script>
+<script src="/js/juice.js?v=41"></script>
+<script src="/js/mic.js?v=41"></script>
+<script src="/js/road.js?v=41"></script>
+<script src="/js/radio.js?v=41"></script>
+<script src="/js/reel.js?v=41"></script>
+<script src="/js/glovebox.js?v=41"></script>
+<script src="/js/play.js?v=41"></script>
+<script src="/js/sketch.js?v=41"></script>
+<script src="/js/share.js?v=41"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
