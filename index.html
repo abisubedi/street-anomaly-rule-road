@@ -438,6 +438,17 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 .free { color: var(--leaf); font-size: 15px; align-self: center; }
 .stage-shadow.dusk { background: linear-gradient(#3A1F2E, #14213D); }
 .stage-shadow.noon { background: linear-gradient(#25406F, #14213D); }
+/* Field-journal scenes: ink on dark ruled paper, a strip of tape, and lines that wobble like a pen drew them */
+.stage.sketch { position: relative; overflow: visible; border-color: #2A3A5E; border-radius: 6px 14px 8px 12px; rotate: -.4deg;
+  background-color: #121A30;
+  background-image: linear-gradient(90deg, transparent 22px, rgba(230,57,70,.28) 22px 23px, transparent 23px), repeating-linear-gradient(transparent 0 21px, rgba(154,167,196,.11) 21px 22px);
+  box-shadow: 0 6px 0 rgba(0,0,0,.25); }
+.stage.sketch::before { content: ""; position: absolute; top: -9px; left: 50%; width: 84px; height: 20px; translate: -50% 0; rotate: 2.5deg;
+  background: rgba(255,226,122,.3); border-inline: 1px dashed rgba(255,255,255,.22); pointer-events: none; }
+.stage.sketch figcaption { font-family: var(--font-sign); color: #E9DFC4; }
+.ink { filter: url(#ink); }
+.stage-jar .grow { transform-box: fill-box; transform-origin: 50% 100%; animation: sprout .45s cubic-bezier(.3,1.6,.5,1) both; }
+.stage-jar .glow { transform-box: fill-box; transform-origin: center; animation: bump 1.2s ease-in-out infinite; }
 .yard-pop, .stage-yard .grow { animation: sprout .6s cubic-bezier(.3,1.6,.5,1) both; }
 .shelf { display: flex; flex-wrap: wrap; gap: 3px; padding: 4px; border-bottom: 3px solid #5B4636; min-height: 26px; }
 .jar { width: 10px; height: 14px; border-radius: 3px 3px 4px 4px; background: radial-gradient(circle at 50% 60%, #FFE27A, #E9B949 60%, #8A6A17); box-shadow: 0 0 6px rgba(255,210,63,.5); }
@@ -531,15 +542,20 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 
 <div class="app" id="app"></div>
 
-<script src="/js/compat.js?v=39"></script>
-<script src="/js/juice.js?v=39"></script>
-<script src="/js/mic.js?v=39"></script>
-<script src="/js/road.js?v=39"></script>
-<script src="/js/radio.js?v=39"></script>
-<script src="/js/reel.js?v=39"></script>
-<script src="/js/glovebox.js?v=39"></script>
-<script src="/js/play.js?v=39"></script>
-<script src="/js/share.js?v=39"></script>
+<!-- shared ink: one wobble filter for every field-journal scene; play.js re-seeds it a few times a second so the lines "boil" -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+
+<script src="/js/compat.js?v=40"></script>
+<script src="/js/juice.js?v=40"></script>
+<script src="/js/mic.js?v=40"></script>
+<script src="/js/road.js?v=40"></script>
+<script src="/js/radio.js?v=40"></script>
+<script src="/js/reel.js?v=40"></script>
+<script src="/js/glovebox.js?v=40"></script>
+<script src="/js/play.js?v=40"></script>
+<script src="/js/share.js?v=40"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [

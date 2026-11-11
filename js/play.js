@@ -7,9 +7,17 @@
 
 const Play = {
   mem: {},        // last drawn values per town, so scenes animate from the old value to the new one
-  timer: 0, raf: 0,
+  timer: 0, raf: 0, boilT: 0,
 
-  stop() { cancelAnimationFrame(this.raf); clearTimeout(this.timer); this.raf = 0; },
+  stop() { cancelAnimationFrame(this.raf); clearTimeout(this.timer); clearInterval(this.boilT); this.raf = this.boilT = 0; },
+
+  // field-journal scenes: re-seed the shared ink filter so the pen lines shimmer like a flipbook (off for reduced motion)
+  boil() {
+    const n = document.getElementById("ink-noise");
+    if (!n || Juice.reduced || !document.querySelector(".sketch")) return;
+    let k = 0;
+    this.boilT = setInterval(() => { if (!document.hidden) n.setAttribute("seed", 1 + (k = (k + 1) % 3)); }, 160);
+  },
 
   // after a choice: keep the dog pack in step with the Leashville numbers
   after(T, before, s) {
@@ -30,6 +38,7 @@ const Play = {
     if (S.screen !== "town") return;
     const T = TOWNS[S.t], st = S.phase === "step" ? T.steps[S.step] : null;
     animateStage(T);
+    this.boil();
     if (st && st.play && st.play.kind === "catch" && !S.played) catchGame(st);
     if (st && st.drag && S.phase === "step") dragGame(st);
     if (st && st.pay && S.phase === "step") payGame(st);
@@ -40,12 +49,68 @@ const Play = {
 /* ---------- scenes ---------- */
 function stage(T, s) {
   const st = S.phase === "step" || S.phase === "result" ? T.steps[S.step] : null;
+  if (T.id === "M1") return jarScene(s);
   if (T.id === "M-shrink") return houseScene(s);
   if (T.id === "M5") return dogScene(s, st);
   if (T.id === "M-shadow") return shadowScene(s, st);
   if (T.id === "L4") return yardScene(s);
   if (T.id === "L-fallback") return shelfScene(s, st);
   return "";
+}
+
+// Doubleton, drawn as a page from the traveler's field journal: the coin jar, its lid, and a kid who reacts
+const INK = "#F1E8D0", INK_DIM = "#9AA7C4";
+function jarScene(s) {
+  const r = S.phase === "result" ? S.lastResult : null;
+  const night = !!(r && r.night), doubled = night && /→/.test(r.night), end = S.phase === "end";
+  const mood = s.opened ? "worried" : doubled || (end && s.jar >= 100) ? "happy" : "calm";
+  const shown = Math.min(s.jar, 84), extra = s.jar - shown, prev = Math.min(Play.mem.jar || 0, shown);
+  // coins pile up in staggered rows of 7 inside the jar; new ones pop in
+  const coins = Array.from({ length: shown }, (_, i) => {
+    const row = Math.floor(i / 7), col = i % 7, x = 122 + col * 9 + (row % 2 ? 3 : 0), y = 122 - row * 5.5;
+    return `<ellipse class="${i >= prev ? "grow" : ""}" style="animation-delay:${Math.min(i - prev, 20) * 0.04}s" cx="${x}" cy="${y}" rx="4.6" ry="2.3" fill="#E9B949" stroke="#5A4512" stroke-width=".8"/>`;
+  }).join("");
+  const lid = s.opened
+    ? `<g transform="rotate(-24 214 118)"><rect x="196" y="112" width="46" height="9" rx="3" fill="#E63946" opacity=".85" transform="translate(2 2)"/><rect x="196" y="112" width="46" height="9" rx="3" fill="none" stroke="${INK}" stroke-width="1.8"/></g>`
+    : `<rect x="120" y="26" width="60" height="10" rx="3" fill="#E63946" opacity=".85" transform="translate(2 2)"/><rect x="120" y="26" width="60" height="10" rx="3" fill="none" stroke="${INK}" stroke-width="1.8"/>`;
+  // faces are drawn bold enough to read at phone size: happy = closed ^^ eyes and an open grin, worried = raised brows, "o" mouth and a sweat drop
+  const face = {
+    happy: `<path d="M50 73 q3 -4 6 0 M60 73 q3 -4 6 0" fill="none" stroke="#14130C" stroke-width="2" stroke-linecap="round"/><path d="M50 78 Q58 78 66 78 Q64 87 58 87 Q52 87 50 78 Z" fill="#14130C"/>`,
+    calm: `<circle cx="54" cy="72" r="1.8" fill="#14130C"/><circle cx="62" cy="72" r="1.8" fill="#14130C"/><path d="M53 79 Q58 82 63 79" fill="none" stroke="#14130C" stroke-width="2" stroke-linecap="round"/>`,
+    worried: `<circle cx="54" cy="73" r="2" fill="#14130C"/><circle cx="62" cy="73" r="2" fill="#14130C"/><path d="M49 68 L56 65 M67 68 L60 65" stroke="#14130C" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="58" cy="81" rx="3" ry="3.6" fill="#14130C"/><path d="M75 62 q-4 6 0 8 q4 -2 0 -8 Z" fill="#7FC8F8" stroke="${INK}" stroke-width="1"/>`,
+  }[mood];
+  const arms = mood === "happy" ? "M58 92 L44 76 M58 92 L72 76" : mood === "worried" ? "M58 92 L46 70 M58 92 L70 70" : "M58 94 L46 108 M58 94 L80 100";
+  const cap = s.opened ? "The lid is off. No magic tonight."
+    : doubled ? `Midnight. The jar glows. ${s.jar} coins!`
+    : end ? `${s.jar} coins in the jar.`
+    : s.jar ? `${s.jar} coin${s.jar > 1 ? "s" : ""}. Keep the lid on, and they double at midnight.`
+    : "An empty jar. Zero doubled is still zero.";
+  return `<figure class="stage stage-jar sketch" data-scene="jar" data-val="${shown}" aria-label="Your jar has ${s.jar} coins${s.opened ? " and the lid is off" : ""}">
+    <svg viewBox="0 0 300 150" width="100%" role="img" aria-hidden="true">
+      ${night ? `<path class="ink" d="M262 14 a14 14 0 1 0 12 22 a11 11 0 1 1 -12 -22 Z" fill="#FFE27A" opacity=".9" stroke="${INK}" stroke-width="1.2"/>
+      <path class="ink" d="M236 22 l2 5 l5 1 l-5 1 l-2 5 l-2 -5 l-5 -1 l5 -1 Z" fill="${INK}" opacity=".7"/>` : ""}
+      ${doubled ? `<circle class="glow" cx="150" cy="84" r="58" fill="#FFD23F" opacity=".14"/>
+      <g class="ink" stroke="#FFD23F" stroke-width="2" stroke-linecap="round">${[0, 40, 140, 180, 220, 320].map(a => { const c = Math.cos(a * Math.PI / 180), d = Math.sin(a * Math.PI / 180); return `<line x1="${150 + c * 50}" y1="${82 + d * 50}" x2="${150 + c * 62}" y2="${82 + d * 62}"/>`; }).join("")}</g>
+      <text x="204" y="42" fill="#FFD23F" font-size="20" font-weight="700" transform="rotate(-10 204 42)" style="font-family:var(--font-sign)">×2!</text>` : ""}
+      <g class="ink">
+        <path d="M8 129 Q80 126 150 129 T292 128" fill="none" stroke="${INK_DIM}" stroke-width="1.6" stroke-linecap="round"/>
+        ${coins}
+        <path d="M118 42 Q113 46 113 56 L112 118 Q112 128 124 128 L176 128 Q188 128 188 118 L187 56 Q187 46 182 42 Z" fill="rgba(154,200,230,.10)" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M122 36 L122 42 M178 36 L178 42" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>
+        <path d="M120 54 Q121 80 121 110" stroke="${INK}" stroke-width="1.2" opacity=".45" fill="none" stroke-linecap="round"/>
+        ${lid}
+        <g transform="rotate(-4 150 74)"><rect x="131" y="64" width="38" height="17" rx="2" fill="#F1E8D0" opacity=".92"/><text x="150" y="77" text-anchor="middle" fill="#14130C" font-size="11" font-weight="700" style="font-family:var(--font-sign)">${s.opened ? "oops" : "SAVE"}</text></g>
+        <g class="kid">
+          <circle cx="60" cy="76" r="12" fill="#FFD23F" opacity=".9"/>
+          <circle cx="58" cy="74" r="12" fill="none" stroke="${INK}" stroke-width="1.8"/>
+          ${face}
+          <path d="M58 86 L58 112 M58 112 L49 128 M58 112 L67 128 ${arms}" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        ${extra > 0 ? `<text x="150" y="20" text-anchor="middle" fill="#FFD23F" font-size="13" font-weight="700" style="font-family:var(--font-sign)">+${extra} more</text>` : ""}
+      </g>
+    </svg>
+    <figcaption>${cap}</figcaption>
+  </figure>`;
 }
 
 // Inchwick: the house shrinks one inch per thing; you are 66 inches tall
