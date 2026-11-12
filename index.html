@@ -693,13 +693,13 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=52"></script>
-<script src="/js/juice.js?v=52"></script>
-<script src="/js/road.js?v=52"></script>
-<script src="/js/glovebox.js?v=52"></script>
-<script src="/js/play.js?v=52"></script>
-<script src="/js/sketch.js?v=52"></script>
-<script src="/js/share.js?v=52"></script>
+<script src="/js/compat.js?v=53"></script>
+<script src="/js/juice.js?v=53"></script>
+<script src="/js/road.js?v=53"></script>
+<script src="/js/glovebox.js?v=53"></script>
+<script src="/js/play.js?v=53"></script>
+<script src="/js/sketch.js?v=53"></script>
+<script src="/js/share.js?v=53"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -709,45 +709,45 @@ const TOWNS = [
   meters: [{ k: "jar", label: "Coins in jar" }],
   init: () => ({ jar: Glove.has("piggy") ? 1 : 0, opened: false }),
   steps: [
-    { when: "Day 1", text: "You find a shiny coin on the sidewalk. The candy shop is right there.",
+    { when: "Day 1", text: "A shiny coin on the sidewalk. Candy shop's right there.",
       choices: [
-        { t: "Drop it in your jar", fx: s => { s.jar += 1; }, say: "Clink. One lonely coin." },
+        { t: "Into the jar", fx: s => { s.jar += 1; }, say: "Clink. One lonely coin." },
         { t: "Buy a gumball", say: "Sweet! Gone in ten seconds." }],
       night: s => { const a = s.jar; s.jar *= 2; return a ? `Midnight. The jar glows. <strong>${a} → ${s.jar}</strong>` : "Midnight. The jar glows… but zero doubled is still zero."; } },
-    { when: "Day 2", text: s => "Grandma slips you 1 coin. Then your friend sells cool stickers. 2 coins each.",
+    { when: "Day 2", text: s => "Grandma gives you a coin. Stickers cost 2.",
       enter: s => { s.jar += 1; },
       choices: [
-        { t: "Keep saving", say: "You walk past the stickers. It stings a little." },
-        { t: "Buy a sticker", cost: "−2", need: s => s.jar >= 2, fx: s => { s.jar -= 2; }, say: "It's a cool sticker. Your jar feels lighter." }],
+        { t: "Keep saving", say: "You walk past. It stings." },
+        { t: "Buy a sticker", cost: "−2", need: s => s.jar >= 2, fx: s => { s.jar -= 2; }, say: "Cool sticker. Lighter jar." }],
       night: s => { const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
-    { rehook: "The jar only doubles if it stays CLOSED all day. Open it, and the magic skips a night." },
-    { when: "Day 3", text: "Your big brother shakes the jar. “Open it! Let's count them!”",
+    { rehook: "Open the jar, even once, and that night it won't double." },
+    { when: "Day 3", text: "Your brother shakes the jar: “Let's count them!”",
       choices: [
-        { t: "Keep it closed", fx: s => { s.opened = false; }, say: "“Later,” you say. He rolls his eyes." },
+        { t: "Keep it closed", fx: s => { s.opened = false; }, say: "“Later.” He rolls his eyes." },
         { t: "Open it and count", fx: s => { s.opened = true; }, say: s => `${s.jar} coins! It feels great… for a minute.` }],
       night: s => { if (s.opened) return "Midnight. Nothing. The jar stays quiet."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
-    { when: "Day 4", text: "The fair is in town! The Ferris wheel costs 5 coins.",
+    { when: "Day 4", text: "The fair! The Ferris wheel costs 5.",
       choices: [
-        { t: "Watch from the ground", say: "The lights are pretty from down here too." },
-        { t: "Ride the Ferris wheel", cost: "−5", need: s => s.jar >= 5, fx: s => { s.jar -= 5; s.opened = true; }, say: "Wheee! You had to open the jar to pay." }],
+        { t: "Watch from the ground", say: "Pretty lights from down here." },
+        { t: "Ride the Ferris wheel", cost: "−5", need: s => s.jar >= 5, fx: s => { s.jar -= 5; s.opened = true; }, say: "Wheee! The jar got opened." }],
       night: s => { if (s.opened) return "Midnight. The jar was opened today. No magic."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
-    { when: "Day 5", text: "Your uncle visits and gives you 3 coins. A new comic book costs 4.",
+    { when: "Day 5", text: "Your uncle gives you 3 coins. A comic costs 4.",
       enter: s => { s.jar += 3; s.opened = false; },
       choices: [
         { t: "Save all of it", say: "Three more coins. Clink, clink, clink." },
-        { t: "Buy the comic", cost: "−4", need: s => s.jar >= 4, fx: s => { s.jar -= 4; s.opened = true; }, say: "Great comic. You read it twice. The jar was opened." }],
+        { t: "Buy the comic", cost: "−4", need: s => s.jar >= 4, fx: s => { s.jar -= 4; s.opened = true; }, say: "Great comic. The jar was opened." }],
       night: s => { if (s.opened) return "Midnight. The jar was opened today. No magic."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
     { when: "Day 6", text: "Your friend forgot his lunch money. He looks really hungry.",
       enter: s => { s.opened = false; },
       choices: [
-        { t: "Share half your sandwich", say: "He grins. “Best sandwich ever.” The jar stays shut." },
-        { t: "Open the jar and give him 5 coins", cost: "−5", need: s => s.jar >= 5, fx: s => { s.jar -= 5; s.opened = true; }, say: "Kind! But opening the jar costs a night." }],
+        { t: "Share half your sandwich", say: "“Best sandwich ever.” Jar stays shut." },
+        { t: "Give him 5 coins", cost: "−5", need: s => s.jar >= 5, fx: s => { s.jar -= 5; s.opened = true; }, say: "Kind! But the jar skips tonight." }],
       night: s => { if (s.opened) return "Midnight. The jar was opened today. No magic."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
-    { when: "Day 7", text: "The toy store has a remote-control car. 15 coins. Last one on the shelf!",
+    { when: "Day 7", text: "A remote-control car. 15 coins. Last one!",
       enter: s => { s.opened = false; },
       choices: [
-        { t: "Walk away. Keep saving", say: "“Last one” is what they always say." },
-        { t: "Buy the car", cost: "−15", need: s => s.jar >= 15, fx: s => { s.jar -= 15; s.opened = true; }, say: "Vroom! It's fast. The jar feels empty." }],
+        { t: "Walk away. Keep saving", say: "They always say “last one.”" },
+        { t: "Buy the car", cost: "−15", need: s => s.jar >= 15, fx: s => { s.jar -= 15; s.opened = true; }, say: "Vroom! The jar feels empty." }],
       night: s => { if (s.opened) return "Midnight. No magic tonight."; const a = s.jar; s.jar *= 2; return `Midnight. <strong>${a} → ${s.jar}</strong>`; } },
   ],
   rate: s => s.jar >= 100 ? 3 : s.jar >= 30 ? 2 : 1,
@@ -763,44 +763,44 @@ const TOWNS = [
   steps: [
     { when: "7:00 a.m.", text: "Mom made you breakfast before work.",
       choices: [
-        { t: "“Thank you, Mom!”", w: 3, h: 1, say: "She smiles all the way to the bus." },
+        { t: "“Thank you, Mom!”", w: 3, h: 1, say: "She smiles all the way out." },
         { t: "(Just nod)", w: 0, h: 0, say: "She nods back. A quiet morning." },
         { t: "“Eggs AGAIN? I wanted pancakes.”", w: 5, h: -1, say: "Her smile drops. Five words, gone." }] },
-    { when: "8:15 a.m.", text: "On the bus, your friend Mia looks like she's been crying.",
+    { when: "8:15 a.m.", text: "On the bus, Mia's been crying.",
       choices: [
-        { t: "“Are you okay?”", w: 3, h: 2, say: "She tells you everything. You just listen." },
-        { t: "(Sit close to her)", w: 0, h: 1, say: "You sit close. It helps a little." },
-        { t: "“Cheer up, it's no big deal.”", w: 6, h: -1, say: "She turns to the window. Six words that didn't help." }] },
-    { rehook: "At 8 p.m., Grandpa calls from far away. He calls every night. You'll want words left for him." },
+        { t: "“Are you okay?”", w: 3, h: 2, say: "She tells you everything." },
+        { t: "(Sit close to her)", w: 0, h: 1, say: "It helps a little." },
+        { t: "“Cheer up, it's no big deal.”", w: 6, h: -1, say: "Six words. They didn't help." }] },
+    { rehook: "Grandpa calls at 8 p.m. Save some words for him." },
     { when: "12:30 p.m.", text: "A kid laughs at your shoes in front of everyone.",
       choices: [
-        { t: "“Your shoes are worse. And your haircut.”", w: 7, h: -2, say: "Everyone goes “Ooooh.” You feel worse, not better." },
+        { t: "“Your shoes are worse. And your haircut.”", w: 7, h: -2, say: "“Ooooh.” You feel worse." },
         { t: "“Nice try.”", w: 2, h: 0, say: "He shrugs. It's over." },
-        { t: "(Smile and keep eating)", w: 0, h: 1, say: "He gets bored. Mia gives you a thumbs up." }] },
-    { when: "2:00 p.m.", text: "Your teacher asks who can explain the answer: 3 × 4.",
+        { t: "(Smile and keep eating)", w: 0, h: 1, say: "He gets bored. Mia grins." }] },
+    { when: "2:00 p.m.", text: "Who can explain 3 × 4?",
       choices: [
-        { t: "“It's twelve. Three groups of four.”", w: 6, h: 1, say: "Gold star! But that cost six words." },
-        { t: "(Walk up and draw it on the board)", w: 0, h: 1, say: "Three circles, four dots each. Same gold star. Zero words." }] },
-    { when: "10:00 a.m.", text: "Your little sister drew you a picture. It's… a purple blob.",
+        { t: "“It's twelve. Three groups of four.”", w: 6, h: 1, say: "Gold star. Six words gone." },
+        { t: "(Draw it instead)", w: 0, h: 1, say: "Same gold star. Zero words." }] },
+    { when: "10:00 a.m.", text: "Your sister drew you… a purple blob.",
       choices: [
-        { t: "“It's beautiful!”", w: 2, h: 2, say: "She hugs your leg and won't let go." },
-        { t: "(Hug her and tape it to your locker)", w: 0, h: 2, say: "No words needed. She skips away." },
+        { t: "“It's beautiful!”", w: 2, h: 2, say: "She hugs your leg. Tight." },
+        { t: "(Hug her)", w: 0, h: 2, say: "No words needed. She skips away." },
         { t: "“What even is that?”", w: 4, h: -1, say: "Her lip wobbles. Four words, wasted." }] },
     { when: "4:00 p.m.", text: "At practice, the coach shouts: “Who wants to lead warm-ups?”",
       choices: [
-        { t: "“Me!”", w: 1, h: 1, say: "One word. The whole team follows you." },
+        { t: "“Me!”", w: 1, h: 1, say: "One word. The team follows." },
         { t: "(Raise your hand high)", w: 0, h: 1, say: "Coach points at you. Zero words." },
         { t: "“Not me, pick someone else.”", w: 5, h: 0, say: "Five words to say no. Yikes." }] },
     { when: "6:00 p.m.", text: "Dad burned dinner. He looks really sad about it.",
       choices: [
         { t: "“Still yummy, Dad.”", w: 3, h: 2, say: "He laughs. “Liar.” But he's smiling." },
-        { t: "(Eat it with a big thumbs up)", w: 0, h: 2, say: "Crunchy. He ruffles your hair." },
-        { t: "“Gross! Can we order pizza?”", w: 5, h: -2, say: "He puts his fork down. The kitchen gets quiet." }] },
+        { t: "(Eat it, thumbs up)", w: 0, h: 2, say: "Crunchy. He ruffles your hair." },
+        { t: "“Gross! Can we order pizza?”", w: 5, h: -2, say: "His fork goes down. Silence." }] },
     { when: "8:00 p.m.", text: "The phone rings. It's Grandpa. “I miss you, kiddo.”",
       choices: [
-        { t: "“I love you.”", w: 3, h: 3, say: "He goes quiet. Then: “That made my whole week.”" },
+        { t: "“I love you.”", w: 3, h: 3, say: "“That made my whole week.”" },
         { t: "“Miss you too, Grandpa.”", w: 4, h: 3, say: "You can hear him smiling." },
-        { t: "(Silence. You're out of words.)", w: 0, h: 0, say: "He waits. “Goodnight, kiddo.” Click." }] },
+        { t: "(Silence. No words left.)", w: 0, h: 0, say: "He waits. “Goodnight, kiddo.” Click." }] },
   ],
   rate: s => s.heart >= 11 ? 3 : s.heart >= 5 ? 2 : 1,
   ending: s => s.heart >= 11 ? `You used ${10 - s.words} words, and every one mattered.` : s.heart >= 5 ? "Some words helped. Some just used up the day." : "You ran out of words before you ran out of things that mattered.",
@@ -808,81 +808,81 @@ const TOWNS = [
   cta: "So… what would YOU say with only 10 words?"
 },
 {
-  id: "M2", track: "money", name: "Greenpenny", rule: "money grows on trees, but only if you water it every day.",
+  id: "M2", track: "money", name: "Greenpenny", rule: "money grows on trees. Water them daily.",
   hook: "So why does one tree here sparkle… and the one next door is bare?",
   meters: [{ k: "coins", label: "Coins on tree" }, { k: "streak", label: "Days in a row" }],
   init: () => ({ coins: 0, streak: 0 }),
   water: true,
   steps: [
-    { when: "Day 1", text: "You plant your money seed. The watering can is by the door.",
+    { when: "Day 1", text: "You plant your money seed.",
       choices: [{ t: "Water it now", water: 1, say: "A tiny sprout pops up." }, { t: "Water it tomorrow", water: 0, say: "The seed waits." }] },
     { when: "Day 2", text: "Your friends are playing ball outside. They're yelling your name.",
-      choices: [{ t: "Water first, then play", water: 1, say: "Two minutes of watering. Then you score a goal." }, { t: "Play all day", water: 0, say: "Great game. You forgot the tree." }] },
+      choices: [{ t: "Water first, then play", water: 1, say: "Two minutes. Then you score." }, { t: "Play all day", water: 0, say: "Great game. You forgot the tree." }] },
     { when: "Day 3", text: "A brand-new episode of your favorite show just came out.",
-      choices: [{ t: "Water it during the ads", water: 1, say: "You're back before the show starts again." }, { t: "Watch now, water later", water: 0, say: "“Later” never came." }] },
+      choices: [{ t: "Water at the ads", water: 1, say: "Back before the show's on." }, { t: "Watch now, water later", water: 0, say: "“Later” never came." }] },
     { rehook: "Rain doesn't count. The tree only drinks water from YOUR hands." },
     { when: "Day 4", text: "It's pouring rain. Your boots are already wet.",
-      choices: [{ t: "Water it anyway", water: 1, say: "You look silly watering in the rain. The tree glows." }, { t: "The rain will do it", water: 0, say: "The tree shivers. Rain isn't you." }] },
+      choices: [{ t: "Water it anyway", water: 1, say: "Silly in the rain. It glows." }, { t: "Let the rain", water: 0, say: "The tree shivers. Rain isn't you." }] },
     { when: "Day 5", text: "You're so tired. It's just one day, right?",
-      choices: [{ t: "Water it, half asleep", water: 1, say: "Eyes half closed. Still did it." }, { t: "Skip just this once", water: 0, say: "Just once. That's how it always starts." }] },
-    { when: "Day 6", text: "Sleepover at your best friend's house! You'll be gone until tomorrow.",
-      choices: [{ t: "Water it before you leave", water: 1, say: "Big splash. Then pillow fight." }, { t: "It'll be fine for one night", water: 0, say: "It was not fine." }] },
-    { when: "Day 7", text: "Your little brother wants to water it. He says he'll do it right.",
-      choices: [{ t: "Water it together, his hand on yours", water: 1, say: "It still counts: your hands were there." }, { t: "Let him do it alone", water: 0, say: "The tree only drinks from YOUR hands." }] },
+      choices: [{ t: "Water it, half asleep", water: 1, say: "Eyes half closed. Still did it." }, { t: "Skip just this once", water: 0, say: "“Just once.” It always starts so." }] },
+    { when: "Day 6", text: "Sleepover tonight! Gone until tomorrow.",
+      choices: [{ t: "Water it, then go", water: 1, say: "Big splash. Then pillow fight." }, { t: "Skip one night", water: 0, say: "It was not fine." }] },
+    { when: "Day 7", text: "Your little brother wants to water it.",
+      choices: [{ t: "Water it together", water: 1, say: "Your hands were there. It counts." }, { t: "Let him alone", water: 0, say: "It only drinks from YOUR hands." }] },
     { when: "Day 8", text: "It's your birthday! Cake, presents, a party in the backyard.",
-      choices: [{ t: "Water it first, then party", water: 1, say: "Best present: a tree full of gold." }, { t: "Birthdays are a day off", water: 0, say: "The tree didn't get the memo." }] },
+      choices: [{ t: "Water first, then party", water: 1, say: "Best present: a golden tree." }, { t: "Take the day off", water: 0, say: "The tree didn't get the memo." }] },
   ],
   rate: s => s.coins >= 36 ? 3 : s.coins >= 12 ? 2 : 1,
   ending: s => s.coins >= 36 ? `${s.coins} golden leaves. Eight days, no skips. The neighbors are staring.` : s.coins >= 12 ? `${s.coins} golden leaves. Every skipped day cut your tree in half.` : `${s.coins} leaves. The tree never got going.`,
-  lesson: "Tiny habits, every single day, grow the biggest trees.",
+  lesson: "Tiny daily habits grow the biggest trees.",
   cta: "So… would YOU water it in the rain?"
 },
 {
-  id: "L2", track: "life", name: "Saidsville", rule: "whatever you say about someone comes true for one hour.",
+  id: "L2", track: "life", name: "Saidsville", rule: "what you say about someone comes true.",
   hook: "So why did the grumpiest man in town just hand out free lemonade?",
   meters: [{ k: "smiles", label: "Town smiles", life: true }],
   init: () => ({ smiles: 0 }),
   steps: [
-    { when: "9:00 a.m.", text: "Mr. Bram next door is grumpy again. He's yelling at a pigeon.",
+    { when: "9:00 a.m.", text: "Grumpy Mr. Bram is yelling at a pigeon.",
       choices: [
-        { t: "“He's actually really kind.”", fx: s => { s.smiles += 2; }, say: "He stops. He blinks. Then he hands out free lemonade to the whole street." },
-        { t: "“He's a grumpy old troll.”", fx: s => { s.smiles -= 2; }, say: "POOF. He's a real troll for an hour. The little kids run." },
+        { t: "“He's actually really kind.”", fx: s => { s.smiles += 2; }, say: "Free lemonade for the whole street!" },
+        { t: "“He's a grumpy old troll.”", fx: s => { s.smiles -= 2; }, say: "POOF. A real troll. Kids run." },
         { t: "(Say nothing)", say: "The pigeon flies off. Nothing changes." }] },
-    { when: "11:00 a.m.", text: "Your teammate misses an easy goal. She looks at the ground.",
+    { when: "11:00 a.m.", text: "Your teammate misses an easy goal.",
       choices: [
-        { t: "“She'll score the next one.”", fx: s => { s.smiles += 2; }, say: "Two minutes later: GOAL. She points right at you." },
-        { t: "“She's the worst player ever.”", fx: s => { s.smiles -= 2; }, say: "She trips over the ball. Then again. Your team loses." }] },
+        { t: "“She'll score the next one.”", fx: s => { s.smiles += 2; }, say: "GOAL. She points at you." },
+        { t: "“She's the worst player ever.”", fx: s => { s.smiles -= 2; }, say: "She trips. Twice. You lose." }] },
     { when: "12:30 p.m.", text: "The new kid sits alone at lunch.",
       choices: [
-        { t: "“He seems really funny.”", fx: s => { s.smiles += 2; }, say: "He tells one joke and the whole table laughs. Milk comes out of a nose." },
-        { t: "“He's kind of weird.”", fx: s => { s.smiles -= 1; }, say: "He starts humming at his sandwich. Now everyone moves away." }] },
-    { rehook: "It works on YOU, too. Whatever you say about yourself comes true for one hour." },
-    { when: "1:55 p.m.", text: "Big spelling test in five minutes. You look in the bathroom mirror.",
+        { t: "“He seems really funny.”", fx: s => { s.smiles += 2; }, say: "One joke. Milk out a nose." },
+        { t: "“He's kind of weird.”", fx: s => { s.smiles -= 1; }, say: "He hums. Everyone moves away." }] },
+    { rehook: "It works on YOU, too. Careful what you say." },
+    { when: "1:55 p.m.", text: "Spelling test soon. You face the mirror.",
       choices: [
         { t: "“I'm ready. I studied.”", fx: s => { s.smiles += 2; }, say: "Every word comes easy. Even “necessary.”" },
-        { t: "“I'm going to fail.”", fx: s => { s.smiles -= 2; }, say: "Your mind goes blank. You can't even spell “cat.”" },
-        { t: "“I can do hard things.”", fx: s => { s.smiles += 2; }, say: "The hard words still feel hard. You get them anyway." }] },
-    { when: "3:30 p.m.", text: "Your mom is stressed. She can't find her car keys anywhere.",
+        { t: "“I'm going to fail.”", fx: s => { s.smiles -= 2; }, say: "Blank. You can't spell “cat.”" },
+        { t: "“I can do hard things.”", fx: s => { s.smiles += 2; }, say: "Still hard. You get them anyway." }] },
+    { when: "3:30 p.m.", text: "Mom can't find her car keys.",
       choices: [
-        { t: "“Mom always finds a way.”", fx: s => { s.smiles += 2; }, say: "She reaches in her pocket. Keys! She hugs you." },
-        { t: "“Mom loses EVERYTHING.”", fx: s => { s.smiles -= 2; }, say: "Now she can't find her phone OR her shoes." }] },
-    { when: "5:00 p.m.", text: "Your little brother is scared of the big slide at the park.",
+        { t: "“Mom always finds a way.”", fx: s => { s.smiles += 2; }, say: "Keys! In her pocket. Hug." },
+        { t: "“Mom loses EVERYTHING.”", fx: s => { s.smiles -= 2; }, say: "Now her phone's gone too." }] },
+    { when: "5:00 p.m.", text: "Your brother's scared of the big slide.",
       choices: [
-        { t: "“He's the bravest kid I know.”", fx: s => { s.smiles += 2; }, say: "He zooms down three times, screaming happy." },
-        { t: "“He's a total baby.”", fx: s => { s.smiles -= 2; }, say: "He cries. He wants his blanket. Ugh." },
-        { t: "(Hold his hand to the top)", fx: s => { s.smiles += 1; }, say: "He goes down once. Small win." }] },
+        { t: "“He's the bravest kid I know.”", fx: s => { s.smiles += 2; }, say: "He zooms down. Three times!" },
+        { t: "“He's a total baby.”", fx: s => { s.smiles -= 2; }, say: "He cries for his blanket." },
+        { t: "(Hold his hand)", fx: s => { s.smiles += 1; }, say: "He goes down once. Small win." }] },
     { when: "7:00 p.m.", text: "Your friend's pet goldfish isn't swimming much today.",
       choices: [
-        { t: "“Goldie is a strong little fish.”", fx: s => { s.smiles += 2; }, say: "Goldie does a backflip. Your friend screams with joy." },
-        { t: "“That fish looks boring.”", fx: s => { s.smiles -= 1; }, say: "Goldie just floats there. Your friend frowns at you." }] },
+        { t: "“Goldie is a strong little fish.”", fx: s => { s.smiles += 2; }, say: "Goldie does a backflip!" },
+        { t: "“That fish looks boring.”", fx: s => { s.smiles -= 1; }, say: "Goldie just floats. Your friend frowns." }] },
   ],
   rate: s => s.smiles >= 12 ? 3 : s.smiles >= 5 ? 2 : 1,
   ending: s => s.smiles >= 12 ? "Lemonade, a goal, a new friend and a perfect test. All from what you said." : s.smiles >= 5 ? "A good day, mostly. One or two words came true the wrong way." : "A troll, a lost game and a blank test. Words did all of that.",
-  lesson: "Kind words come true more often than you think.",
+  lesson: "Kind words come true. Say more.",
   cta: "So… what would YOU say about your best friend?"
 },
 {
-  id: "M3", track: "money", name: "Yawnmore", rule: "every time you buy something you don't need, you lose an hour of sleep.",
+  id: "M3", track: "money", name: "Yawnmore", rule: "every buy you don't need costs sleep.",
   hook: "So why is the kid with the most toys falling asleep in class?",
   meters: [{ k: "sleep", label: "Sleep tonight", max: 9, unit: "h" }, { k: "coins", label: "Coins", max: 18 }],
   init: () => ({ sleep: 9, coins: 18, shoes: false, book: false }),
@@ -890,32 +890,32 @@ const TOWNS = [
     { when: "At the mall", text: "You have 18 coins. A glowing fidget spinner costs 3.",
       choices: [
         { t: "Buy the spinner", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.sleep -= 1; }, say: "So cool. You yawn a little." },
-        { t: "Spin it once and put it back", say: "That was fun for free." }] },
-    { when: "Shoe store", text: "Your school shoes have a hole in them. New ones cost 6.",
+        { t: "Spin it, return it", say: "That was fun for free." }] },
+    { when: "Shoe store", text: "Your school shoes have a hole. New ones: 6.",
       choices: [
-        { t: "Buy the shoes", cost: "−6", need: s => s.coins >= 6, fx: s => { s.coins -= 6; s.shoes = true; }, say: "You needed these. No yawn at all." },
-        { t: "Keep the coins", say: "Your toe pokes out of the hole. Hm." }] },
+        { t: "Buy the shoes", cost: "−6", need: s => s.coins >= 6, fx: s => { s.coins -= 6; s.shoes = true; }, say: "Needed. No yawn." },
+        { t: "Keep the coins", say: "Your toe pokes out. Hm." }] },
     { when: "Snack stand", text: "A candy cane as big as your arm. 2 coins.",
       choices: [
-        { t: "Buy the giant candy cane", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.sleep -= 1; }, say: "Sticky fingers. Heavy eyes." },
+        { t: "Buy the candy cane", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.sleep -= 1; }, say: "Sticky fingers. Heavy eyes." },
         { t: "Drink from the fountain", say: "Cold water. Free." }] },
-    { rehook: "The lost hours come out of TONIGHT. And tomorrow is the big game." },
-    { when: "Arcade", text: "The claw machine has a giant plush shark. 2 coins a try.",
+    { rehook: "Lost hours come out of tonight. Big game tomorrow." },
+    { when: "Arcade", text: "A claw machine. A giant shark. 2 a try.",
       choices: [
-        { t: "Try the claw", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.sleep -= 1; }, say: "The claw drops it. Of course. You yawn." },
-        { t: "Watch someone else try", say: "They miss too. You laugh. Free fun." }] },
+        { t: "Try the claw", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.sleep -= 1; }, say: "The claw drops it. Yawn." },
+        { t: "Watch someone else try", say: "They miss. Free fun." }] },
     { when: "Bookstore", text: "The book you need for school is here. 3 coins.",
       choices: [
-        { t: "Buy the school book", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.book = true; }, say: "You need it. No yawn at all." },
-        { t: "Skip it", say: "Hmm. Your book report is due Monday." }] },
-    { when: "Toy aisle", text: "A light-up yo-yo. It's the 4th yo-yo you'd own. 2 coins.",
+        { t: "Buy the school book", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.book = true; }, say: "Needed. No yawn." },
+        { t: "Skip it", say: "Hmm. The report's due Monday." }] },
+    { when: "Toy aisle", text: "A light-up yo-yo. Your fourth. 2 coins.",
       choices: [
         { t: "Buy yo-yo number 4", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.sleep -= 1; }, say: "It glows! Your eyes droop." },
-        { t: "You already have three", say: "Three is plenty. Your eyes stay bright." }] },
+        { t: "You already have three", say: "Three's plenty. Eyes bright." }] },
     { when: "Checkout", text: "“Buy 2 keychains, get 1 FREE!” That's 3 coins.",
       choices: [
-        { t: "Grab the 3 keychains", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.sleep -= 3; }, say: "Three things you don't need. Even the free one counts. Three hours, gone." },
-        { t: "Walk out the door", say: "The sign blinks at you. You keep walking." }] },
+        { t: "Grab the 3 keychains", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.sleep -= 3; }, say: "Three things. Three hours, gone." },
+        { t: "Walk out the door", say: "The sign blinks. You walk." }] },
   ],
   rate: s => { const r = s.sleep >= 9 ? 3 : s.sleep >= 7 ? 2 : 1; return s.shoes && s.book ? r : Math.min(r, 2); },
   ending: s => {
@@ -926,35 +926,35 @@ const TOWNS = [
   cta: "So… would YOU trade an hour of sleep for a keychain?"
 },
 {
-  id: "L3", track: "life", name: "Chargeville", rule: "your phone battery is your energy. At 0%, so are you.",
+  id: "L3", track: "life", name: "Chargeville", rule: "your phone battery is your energy.",
   hook: "So why is one kid bouncing off the walls… and her brother can't get off the couch?",
   meters: [{ k: "bat", label: "Your battery", max: 100, unit: "%", battery: true }],
   init: () => ({ bat: 60 }),
   steps: [
     { when: "7:00 a.m.", text: "You wake up at 60%. Your phone is right there.",
       choices: [
-        { t: "Scroll videos in bed", fx: s => { s.bat -= 25; }, say: "Fun! Then getting up feels like lifting a car." },
-        { t: "Eat breakfast by the window", fx: s => { s.bat = Math.min(100, s.bat + 10); }, say: "Sunlight on your face. +10%." }] },
+        { t: "Scroll videos in bed", fx: s => { s.bat -= 25; }, say: "Fun. Then getting up: heavy." },
+        { t: "Breakfast by the window", fx: s => { s.bat = Math.min(100, s.bat + 10); }, say: "Sunlight on your face. +10%." }] },
     { when: "Recess", text: "Everyone's playing tag. Your phone game has a new level.",
       choices: [
-        { t: "Play tag", fx: s => { s.bat = Math.min(100, s.bat + 15); }, say: "You're out of breath and fully awake." },
-        { t: "Play the new level", fx: s => { s.bat -= 20; }, say: "You beat the level. You feel like a wet sock." }] },
+        { t: "Play tag", fx: s => { s.bat = Math.min(100, s.bat + 15); }, say: "Out of breath. Wide awake." },
+        { t: "Play the new level", fx: s => { s.bat -= 20; }, say: "Level beat. Wet-sock tired." }] },
     { when: "3:30 p.m.", text: "Grandma video-calls just to say hi.",
       choices: [
-        { t: "Answer the call", fx: s => { s.bat -= 5; }, say: "Screens cost a little. Grandma's laugh is worth it." },
-        { t: "Decline and keep watching your show", fx: s => { s.bat -= 15; }, say: "Three episodes later, you don't remember any of them." }] },
-    { rehook: "You can't plug yourself in. You only charge OFF-screen. And your best friend's party is at 6. You need 40% to go." },
+        { t: "Answer the call", fx: s => { s.bat -= 5; }, say: "Grandma's laugh is worth it." },
+        { t: "Decline, keep watching", fx: s => { s.bat -= 15; }, say: "Three episodes. You remember none." }] },
+    { rehook: "You only charge off-screen. The party at 6 needs 40%." },
     { when: "3:45 p.m.", text: "Homework time. Your phone buzzes on the desk.",
       choices: [
-        { t: "Put the phone in another room", fx: s => { s.bat = Math.min(100, s.bat + 10); }, say: "Homework done in 20 minutes. +10%." },
-        { t: "Check it real quick", fx: s => { s.bat -= 15; }, say: "45 minutes later… still on question one." }] },
+        { t: "Phone in another room", fx: s => { s.bat = Math.min(100, s.bat + 10); }, say: "Homework done in 20 minutes. +10%." },
+        { t: "Check it real quick", fx: s => { s.bat -= 15; }, say: "45 minutes. Still question one." }] },
     { when: "4:15 p.m.", text: "Your dog drops a slobbery ball at your feet.",
       choices: [
-        { t: "Play fetch in the yard", fx: s => { s.bat = Math.min(100, s.bat + 15); }, say: "Running, laughing, muddy paws. +15%." },
-        { t: "Toss it once without looking up", fx: s => { s.bat -= 5; }, say: "The dog sighs. So do you." }] },
+        { t: "Play fetch outside", fx: s => { s.bat = Math.min(100, s.bat + 15); }, say: "Running, laughing, muddy paws. +15%." },
+        { t: "Toss it, keep scrolling", fx: s => { s.bat -= 5; }, say: "The dog sighs. So do you." }] },
     { when: "4:40 p.m.", text: "The group chat has 99 new messages.",
       choices: [
-        { t: "Mute it until after the party", fx: s => { s.bat = Math.min(100, s.bat + 5); }, say: "Silence. Your brain says thank you." },
+        { t: "Mute it till later", fx: s => { s.bat = Math.min(100, s.bat + 5); }, say: "Silence. Your brain says thank you." },
         { t: "Read every single one", fx: s => { s.bat -= 15; }, say: "Mostly memes. Your energy: gone." }] },
     { when: "5:00 p.m.", text: "One hour until the party.",
       choices: [
@@ -968,44 +968,44 @@ const TOWNS = [
   cta: "So… what's YOUR battery at right now?"
 },
 {
-  id: "L4", track: "life", name: "Petalton", rule: "every time you say sorry, a flower grows in your yard.",
+  id: "L4", track: "life", name: "Petalton", rule: "every sorry grows a flower in your yard.",
   hook: "So why does one yard on Maple Street have nothing but dirt?",
   meters: [{ k: "flowers", label: "Flowers in your yard", life: true }, { k: "thorns", label: "Thorns" }],
   init: () => ({ flowers: 0, thorns: 0 }),
   steps: [
-    { when: "8:00 a.m.", loop: true, text: "You bump into the mail carrier and her letters go everywhere.",
+    { when: "8:00 a.m.", loop: true, text: "You bump the mail carrier. Letters everywhere.",
       choices: [
-        { t: "Say sorry and help pick them up", fx: s => { s.flowers += 1; }, say: "Pop. A red tulip by your porch." },
-        { t: "Keep walking, you're late", fx: s => { s.thorns += 1; }, say: "Something sharp pokes out of the dirt." }] },
-    { when: "Lunch", loop: true, text: "You snapped at your little brother for taking the last cookie.",
+        { t: "Say sorry, help out", fx: s => { s.flowers += 1; }, say: "Pop. A red tulip." },
+        { t: "Keep walking, you're late", fx: s => { s.thorns += 1; }, say: "Something sharp pokes up." }] },
+    { when: "Lunch", loop: true, text: "You snapped at your brother over a cookie.",
       choices: [
-        { t: "Tell him sorry", fx: s => { s.flowers += 1; }, say: "Pop. A pink rose. He gives you half the cookie." },
-        { t: "Say it was his fault", fx: s => { s.thorns += 1; }, say: "Another thorn. He doesn't talk to you all afternoon." }] },
+        { t: "Tell him sorry", fx: s => { s.flowers += 1; }, say: "Pop. A rose. Half a cookie." },
+        { t: "Blame him", fx: s => { s.thorns += 1; }, say: "A thorn. Silent brother." }] },
     { when: "3:00 p.m.", loop: true, text: "Your soccer ball smashed a flowerpot next door.",
       choices: [
-        { t: "Knock and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. Your neighbor laughs and lends you a new pot." },
-        { t: "Blame the wind", fx: s => { s.thorns += 2; }, say: "The wind did not do that. Two big thorns." }] },
-    { rehook: "Every sorry you DON'T say grows thorns. And Grandma is coming tonight. If thorns block the gate, she can't get in." },
+        { t: "Knock and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. A new pot." },
+        { t: "Blame the wind", fx: s => { s.thorns += 2; }, say: "It wasn't the wind. Two thorns." }] },
+    { rehook: "Skipped sorries grow thorns. Grandma comes tonight, through the gate." },
     { when: "Recess", loop: true, text: "You knocked over a kid's sandcastle by accident.",
       choices: [
-        { t: "“Sorry! Let me help fix it.”", fx: s => { s.flowers += 1; }, say: "Pop. A yellow daisy. The new castle is even bigger." },
-        { t: "Pretend you didn't see it", fx: s => { s.thorns += 1; }, say: "Ouch. A thorn pokes up by your gate." }] },
+        { t: "“Sorry! Let me help fix it.”", fx: s => { s.flowers += 1; }, say: "Pop. A daisy. A bigger castle." },
+        { t: "Pretend you didn't", fx: s => { s.thorns += 1; }, say: "Ouch. A thorn by the gate." }] },
     { when: "4:00 p.m.", loop: true, text: "You borrowed your friend's bike and scratched it.",
       choices: [
-        { t: "Tell her the truth and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. She shrugs. “It's a bike. Bikes get scratched.”" },
-        { t: "Give it back and say nothing", fx: s => { s.thorns += 2; }, say: "Two thorns. And she'll notice tomorrow." }] },
-    { when: "5:30 p.m.", loop: true, text: "Mom asked you to take out the trash. You forgot. Again.",
+        { t: "Tell her, say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. “Bikes get scratched.”" },
+        { t: "Say nothing", fx: s => { s.thorns += 2; }, say: "Two thorns. And she'll notice tomorrow." }] },
+    { when: "5:30 p.m.", loop: true, text: "You forgot the trash. Again.",
       choices: [
-        { t: "“Sorry, Mom. Doing it now.”", fx: s => { s.flowers += 1; }, say: "Pop. A purple flower. Mom blows you a kiss." },
-        { t: "“I was busy!”", fx: s => { s.thorns += 1; }, say: "A thorn. And the trash still smells." }] },
+        { t: "“Sorry, Mom. Doing it now.”", fx: s => { s.flowers += 1; }, say: "Pop. Mom blows a kiss." },
+        { t: "“I was busy!”", fx: s => { s.thorns += 1; }, say: "A thorn. Still smelly." }] },
     { when: "6:00 p.m.", loop: true, text: "Grandma's car pulls up. What's the last thing you do?",
       choices: [
-        { t: "Go back and say every sorry you skipped", fx: s => { s.flowers += s.thorns; s.thorns = 0; }, say: "Pop, pop, pop. The thorns shrink away." },
-        { t: "Hide inside and hope she doesn't notice", fx: s => { s.thorns += 1; }, say: "She notices." }] },
+        { t: "Say every skipped sorry", fx: s => { s.flowers += s.thorns; s.thorns = 0; }, say: "Pop, pop, pop. Thorns shrink." },
+        { t: "Hide inside", fx: s => { s.thorns += 1; }, say: "She notices." }] },
   ],
   rate: s => s.thorns === 0 && s.flowers >= 7 ? 3 : s.thorns <= 1 ? 2 : 1,
   ending: s => s.thorns === 0 ? `${s.flowers} flowers and zero thorns. Grandma walks right in and hugs you.` : s.thorns <= 1 ? `${s.flowers} flowers, one thorn. Grandma squeezes past… carefully.` : `${s.thorns} thorns block the gate. Grandma waves from the sidewalk.`,
-  lesson: "Sorry is a small word. It grows big things.",
+  lesson: "Sorry is small. It grows big things.",
   cta: "So… who do YOU owe a sorry?"
 },
 {
@@ -1014,117 +1014,117 @@ const TOWNS = [
   meters: [{ k: "saved", label: "Coins saved" }, { k: "future", label: "Future you", life: true }],
   init: () => ({ saved: 0, future: 1 }),
   steps: [
-    { when: "Payday", text: "You just got paid. The screen shows future-you at 75… still working.",
+    { when: "Payday", text: "Payday. The screen shows you at 75, still working.",
       choices: [
-        { t: "Move 20 coins into savings first", fx: s => { s.saved += 20; s.future += 1; }, say: "Future-you looks up and almost smiles." },
-        { t: "Spend it all on new shoes", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Cool shoes. Future-you yawns at work." }] },
+        { t: "Save 20 first", fx: s => { s.saved += 20; s.future += 1; }, say: "Future-you looks up and almost smiles." },
+        { t: "All on new shoes", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Cool shoes. Future-you yawns at work." }] },
     { when: "Morning", text: "The fancy whipped-cream coffee is calling your name.",
       choices: [
-        { t: "Make coffee at home, save 5 coins", fx: s => { s.saved += 5; s.future += 1; }, say: "Five coins. Future-you takes a lunch break in the sun." },
+        { t: "Coffee at home", fx: s => { s.saved += 5; s.future += 1; }, say: "Future-you gets a sunny lunch." },
         { t: "Buy the fancy coffee", fx: s => {}, say: "Delicious. Future-you doesn't change." }] },
     { when: "Friday night", text: "Your friends want to order the giant pizza again.",
       choices: [
-        { t: "Split a small one and save 10 coins", fx: s => { s.saved += 10; s.future += 1; }, say: "Still fun. Future-you plants a garden." },
-        { t: "Order the giant one, extra everything", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Future-you is still wiping counters." }] },
-    { rehook: "The screen changes every day… but on your 30th birthday it freezes forever. And your 30th is coming." },
+        { t: "Split a small one", fx: s => { s.saved += 10; s.future += 1; }, say: "Still fun. Future-you plants a garden." },
+        { t: "The giant one", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Future-you is still wiping counters." }] },
+    { rehook: "On your 30th birthday, the screen freezes forever. It's soon." },
     { when: "Birthday", text: "Grandpa gives you 20 coins for your birthday.",
       choices: [
-        { t: "Save 15 coins, spend 5 coins on fun", fx: s => { s.saved += 15; s.future += 1; }, say: "A little fun now. Future-you gets a garden bench." },
-        { t: "Spend it all on games", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Fun weekend. Future-you is still wiping counters." }] },
-    { when: "Sale day", text: "A phone you don't need is 30% off. “What a deal!”",
+        { t: "Save 15, spend 5", fx: s => { s.saved += 15; s.future += 1; }, say: "Future-you gets a garden bench." },
+        { t: "All on games", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Future-you still wipes counters." }] },
+    { when: "Sale day", text: "A phone you don't need, 30% off.",
       choices: [
-        { t: "Your phone works fine. Skip it", fx: s => { s.saved += 10; s.future += 1; }, say: "Skipping a deal is the best deal. Future-you smiles." },
-        { t: "Buy it, it's on sale!", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "On sale still costs money. Future-you sighs." }] },
-    { when: "Weekend", text: "A friend wants to try a free picnic in the park instead of the mall.",
+        { t: "Skip it", fx: s => { s.saved += 10; s.future += 1; }, say: "Best deal: skipping it." },
+        { t: "Buy it, on sale!", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Sale still costs. Future-you sighs." }] },
+    { when: "Weekend", text: "A friend suggests a free picnic, not the mall.",
       choices: [
-        { t: "Picnic! Sandwiches from home", fx: s => { s.saved += 5; s.future += 1; }, say: "Sunshine, laughs, 5 coins saved. Future-you is laughing too." },
+        { t: "Picnic! Sandwiches from home", fx: s => { s.saved += 5; s.future += 1; }, say: "Sunshine, laughs, 5 coins saved." },
         { t: "Mall instead", fx: s => {}, say: "Fun… but you spent again." }] },
     { when: "One year later", text: "Last check before the big birthday. What becomes your habit?",
       choices: [
-        { t: "Keep saving a little every day", fx: s => { s.saved += 30; s.future += 2; }, say: "Small money, every day. Future-you is dancing with grandkids." },
-        { t: "Wait until you earn more", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Later never came." }] },
+        { t: "Save a little daily", fx: s => { s.saved += 30; s.future += 2; }, say: "Future-you dances with grandkids." },
+        { t: "Wait to earn more", fx: s => { s.future = Math.max(0, s.future - 1); }, say: "Later never came." }] },
   ],
   rate: s => s.future >= 8 ? 3 : s.future >= 4 ? 2 : 1,
   ending: s => s.future >= 8 ? `$${s.saved} saved. On your 30th birthday the screen freezes on future-you, laughing in a garden.` : s.future >= 4 ? `$${s.saved} saved. Future-you is smiling… and still working part-time.` : `$${s.saved} saved. The screen freezes on a very tired future-you.`,
-  lesson: "Small money, saved early, grows into a big future.",
+  lesson: "Small money, saved early, grows big.",
   cta: "So… what would YOUR screen show today?"
 },
 {
-  id: "L5", track: "life", name: "Boomerang Bay", rule: "everything you throw away comes back in a week.",
+  id: "L5", track: "life", name: "Boomerang Bay", rule: "what you throw away comes back.",
   hook: "So why is one front door blocked by a mountain of junk?",
   meters: [{ k: "pile", label: "Junk coming back" }, { k: "happy", label: "Happy faces", life: true }],
   init: () => ({ pile: 0, happy: 0 }),
   steps: [
     { when: "Lunch", text: "You're full, but half your sandwich is left.",
       choices: [
-        { t: "Wrap it up for later", fx: s => { s.happy += 1; }, say: "Afternoon snack: solved." },
-        { t: "Toss it in the trash", fx: s => { s.pile += 1; }, say: "Bye, sandwich… for now." }] },
+        { t: "Wrap it up", fx: s => { s.happy += 1; }, say: "Afternoon snack: solved." },
+        { t: "Trash it", fx: s => { s.pile += 1; }, say: "Bye, sandwich… for now." }] },
     { when: "After school", text: "Your toy robot has one tiny scratch.",
       choices: [
-        { t: "Give it to the little kid next door", fx: s => { s.happy += 2; }, say: "He holds it up like a trophy." },
-        { t: "Throw it out, it's ruined", fx: s => { s.pile += 1; }, say: "Clunk. Into the bin." }] },
+        { t: "Give it away", fx: s => { s.happy += 2; }, say: "He holds it like a trophy." },
+        { t: "Throw it out", fx: s => { s.pile += 1; }, say: "Clunk. Into the bin." }] },
     { when: "Snack time", text: "Your water bottle is empty.",
       choices: [
-        { t: "Refill it at the sink", fx: s => { s.happy += 1; }, say: "Same bottle. Fresh water." },
-        { t: "Grab a new one, toss the old", fx: s => { s.pile += 2; }, say: "That's bottle number ten today." }] },
-    { rehook: "Everything you threw away comes back next week… and if you toss it AGAIN, it comes back double. Mom's birthday party is at home on Saturday." },
-    { when: "Art class", text: "You messed up your drawing. Crumple it and grab new paper?",
+        { t: "Refill it", fx: s => { s.happy += 1; }, say: "Same bottle. Fresh water." },
+        { t: "Toss it, get new", fx: s => { s.pile += 2; }, say: "That's bottle number ten today." }] },
+    { rehook: "Toss it twice and it comes back double. Mom's party is Saturday." },
+    { when: "Art class", text: "You messed up your drawing.",
       choices: [
-        { t: "Flip it over and draw on the back", fx: s => { s.happy += 1; }, say: "Same paper. Even better drawing." },
-        { t: "Crumple and toss it", fx: s => { s.pile += 1; }, say: "That's 5 sheets today. They'll all come back." }] },
+        { t: "Draw on the back", fx: s => { s.happy += 1; }, say: "Same paper. Even better drawing." },
+        { t: "Crumple and toss it", fx: s => { s.pile += 1; }, say: "Five sheets today. All coming back." }] },
     { when: "Saturday morning", text: "Your old jeans are too small now.",
       choices: [
-        { t: "Give them to your little cousin", fx: s => { s.happy += 2; }, say: "He wears them proudly. Like a hand-me-down hero." },
-        { t: "Throw them in the bin", fx: s => { s.pile += 1; }, say: "Jeans… coming back next week." }] },
+        { t: "Give to your cousin", fx: s => { s.happy += 2; }, say: "A hand-me-down hero." },
+        { t: "Bin them", fx: s => { s.pile += 1; }, say: "Jeans… coming back next week." }] },
     { when: "Dinner", text: "Leftover pasta from last night is in the fridge.",
       choices: [
-        { t: "Eat it for lunch tomorrow", fx: s => { s.happy += 1; }, say: "Tastes even better the next day." },
-        { t: "Toss it, you want something new", fx: s => { s.pile += 1; }, say: "Pasta on the doorstep next week. Cold pasta." }] },
+        { t: "Lunch tomorrow", fx: s => { s.happy += 1; }, say: "Tastes even better the next day." },
+        { t: "Toss it", fx: s => { s.pile += 1; }, say: "Cold pasta, back next week." }] },
     { when: "Friday night", text: "The junk is back, piled against your door.",
       choices: [
-        { t: "Fix, share and reuse it all", fx: s => { s.happy += s.pile; s.pile = 0; }, say: "Bottles become flower pots for Mom." },
-        { t: "Throw it all out again", fx: s => { s.pile *= 2; }, say: "Uh oh. Double." }] },
+        { t: "Fix and share it", fx: s => { s.happy += s.pile; s.pile = 0; }, say: "Bottles become flower pots for Mom." },
+        { t: "Throw it all out", fx: s => { s.pile *= 2; }, say: "Uh oh. Double." }] },
   ],
   rate: s => s.pile === 0 && s.happy >= 7 ? 3 : s.pile <= 2 ? 2 : 1,
   ending: s => s.pile === 0 ? `Saturday: an empty doorstep, ${s.happy} happy faces, and Mom loves her flower pots.` : s.pile <= 2 ? `${s.pile} things still come back… but the party goes on.` : `${s.pile} pieces of junk block the door. The party moves to the backyard.`,
-  lesson: "Use it up. Fix it. Share it. Waste less.",
+  lesson: "Use it up. Fix it. Share it.",
   cta: "So… what would come back to YOUR door this week?"
 },
 {
-  id: "M5", track: "money", name: "Leashville", rule: "borrowed money follows you like a dog. Big loans are big dogs.",
+  id: "M5", track: "money", name: "Leashville", rule: "every loan is a dog that follows you.",
   hook: "So why is one guy being chased down Main Street by three dogs?",
   meters: [{ k: "dogs", label: "Dogs following you" }, { k: "size", label: "Dog size" }, { k: "free", label: "Freedom", life: true }],
   init: () => ({ dogs: 0, size: 0, free: 3 }),
   steps: [
-    { when: "Friday", text: "Concert tickets cost 50 coins. You don't have them right now.",
+    { when: "Friday", text: "Concert tickets: 50 coins. You don't have them.",
       choices: [
-        { t: "Save up and go to the next show", fx: s => { s.free += 1; }, say: "Two weeks later, you go. No puppy." },
-        { t: "Borrow the 50 coins", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A tiny puppy starts trotting behind you." }] },
-    { when: "Big sale", text: "A giant TV is on sale… if you borrow for it.",
+        { t: "Save up first", fx: s => { s.free += 1; }, say: "Two weeks later. No puppy." },
+        { t: "Borrow the 50 coins", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A tiny puppy trots behind you." }] },
+    { when: "Big sale", text: "A giant TV, if you borrow.",
       choices: [
-        { t: "Keep your old TV", fx: s => { s.free += 1; }, say: "It still works. Your shoes are safe." },
-        { t: "Borrow for the giant TV", fx: s => { s.dogs += 1; s.size += 2; s.free -= 1; }, say: "A medium dog moves in. It eats your shoes." }] },
-    { when: "Car lot", text: "A shiny new car. Or your old bike that still works.",
+        { t: "Keep your old TV", fx: s => { s.free += 1; }, say: "Still works. Shoes safe." },
+        { t: "Borrow for the TV", fx: s => { s.dogs += 1; s.size += 2; s.free -= 1; }, say: "A shoe-eating dog moves in." }] },
+    { when: "Car lot", text: "A shiny car, or your trusty bike.",
       choices: [
-        { t: "Keep riding the bike", fx: s => { s.free += 1; }, say: "Wind in your hair. Nothing behind you." },
-        { t: "Borrow for the shiny car", fx: s => { s.dogs += 1; s.size += 4; s.free -= 1; }, say: "A dog the size of a horse sits next to it." }] },
-    { rehook: "If you don't pay them back, the dogs keep growing every month. And your big job interview is next week." },
-    { when: "New phone", text: "Your phone works fine, but the new one is out. You could borrow for it.",
+        { t: "Keep riding the bike", fx: s => { s.free += 1; }, say: "Wind in your hair. Free." },
+        { t: "Borrow for the car", fx: s => { s.dogs += 1; s.size += 4; s.free -= 1; }, say: "A horse-sized dog appears." }] },
+    { rehook: "Unpaid dogs grow every month. Your job interview is next week." },
+    { when: "New phone", text: "A new phone is out. Yours works fine.",
       choices: [
-        { t: "Keep your phone", fx: s => { s.free += 1; }, say: "It still takes great pictures. Of your free street." },
-        { t: "Borrow for the new phone", fx: s => { s.dogs += 1; s.size += 2; s.free -= 1; }, say: "A fluffy medium dog starts following you." }] },
-    { when: "Friend's party", text: "Everyone is going to a fancy dinner. You can't afford it.",
+        { t: "Keep your phone", fx: s => { s.free += 1; }, say: "Great pictures. Of a free street." },
+        { t: "Borrow for it", fx: s => { s.dogs += 1; s.size += 2; s.free -= 1; }, say: "A fluffy dog starts following." }] },
+    { when: "Friend's party", text: "A fancy dinner you can't afford.",
       choices: [
-        { t: "Suggest pizza at home instead", fx: s => { s.free += 1; }, say: "Everyone loves it. It's way cheaper." },
-        { t: "Borrow so you don't miss out", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A tiny puppy yips behind you all night." }] },
+        { t: "Pizza at home", fx: s => { s.free += 1; }, say: "Everyone loves it. It's way cheaper." },
+        { t: "Borrow and go", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A puppy yips all night." }] },
     { when: "Surprise bill", text: "Your bike tire pops. Fixing it costs 15 coins.",
       choices: [
-        { t: "Pay from your savings jar", fx: s => { s.free += 1; }, say: "That's what savings are for. No dog." },
-        { t: "Borrow the 15 coins", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A small dog sniffs your new tire." }] },
+        { t: "Pay from savings", fx: s => { s.free += 1; }, say: "That's what savings are for." },
+        { t: "Borrow the 15 coins", fx: s => { s.dogs += 1; s.size += 1; s.free -= 1; }, say: "A small dog sniffs the tire." }] },
     { when: "Next month", pay: true, text: "Payday. What do you do first?",
       choices: [
-        { t: "Pay back the smallest dog first, then the next", fx: s => { s.free += s.dogs; s.dogs = 0; s.size = 0; }, say: "Wag, wag… each one runs home." },
-        { t: "Spend it and pay later", fx: s => { s.size = s.size * 2; s.free = Math.max(0, s.free - 1); }, say: "The dogs get bigger. And hungrier." }] },
+        { t: "Pay smallest first", fx: s => { s.free += s.dogs; s.dogs = 0; s.size = 0; }, say: "Wag, wag… each one runs home." },
+        { t: "Pay later", fx: s => { s.size = s.size * 2; s.free = Math.max(0, s.free - 1); }, say: "The dogs get bigger. And hungrier." }] },
   ],
   rate: s => s.dogs === 0 && s.free >= 8 ? 3 : s.dogs === 0 ? 2 : 1,
   ending: s => s.dogs === 0 ? "You walk into your new job with nobody behind you." : `${s.dogs} dog${s.dogs > 1 ? "s" : ""} (size ${s.size}) block your door on interview day.`,
@@ -1132,44 +1132,44 @@ const TOWNS = [
   cta: "So… how many dogs are following YOU?"
 },
 {
-  id: "L-fallback", track: "life", name: "Tockfield", rule: "when the clocks fall back, the extra hour falls from the sky, and you catch it in a jar.",
+  id: "L-fallback", track: "life", name: "Tockfield", rule: "the extra fall-back hour falls into a jar.",
   hook: "So why does one grandma have 60 hours hidden in jars?",
   meters: [{ k: "jars", label: "Hours saved in jars" }, { k: "joy", label: "Memories", life: true }],
   init: () => ({ jars: 54, joy: 2, theo: false }),
   steps: [
-    { when: "Fall-back night", play: { kind: "catch" }, text: "A glowing hour drops into your jar. Your neighbor says, \"Sleep in!\"",
+    { when: "Fall-back night", play: { kind: "catch" }, text: "A glowing hour drops into your jar.",
       choices: [
-        { t: "Spend it baking cookies with your grandson", fx: s => { s.joy += 2; }, say: "Flour everywhere. He'll remember this." },
-        { t: "Label it \"Someday\" and put it on the shelf", fx: s => { s.jars += 1; }, say: "Another jar glows in the pantry." }] },
+        { t: "Bake with your grandson", fx: s => { s.joy += 2; }, say: "Flour everywhere. He'll remember this." },
+        { t: "Shelve it: “Someday”", fx: s => { s.jars += 1; }, say: "Another jar glows in the pantry." }] },
     { when: "The next year", play: { kind: "catch" }, text: "Another hour falls. Your old friend calls to talk.",
       choices: [
-        { t: "Spend the hour on the phone with her", fx: s => { s.joy += 2; }, say: "You laugh until midnight." },
-        { t: "Save it for something important", fx: s => { s.jars += 1; }, say: "The shelf gets heavier." }] },
+        { t: "Call her", fx: s => { s.joy += 2; }, say: "You laugh until midnight." },
+        { t: "Save it", fx: s => { s.jars += 1; }, say: "The shelf gets heavier." }] },
     { when: "Another year", text: "Theo asks what \"Someday\" means.",
       choices: [
-        { t: "Show him one of the jars", fx: s => { s.joy += 1; }, say: "His eyes go wide in the golden light." },
-        { t: "Say, \"Something important\"", fx: s => { s.jars += 1; }, say: "He nods. He doesn't really get it." }] },
-    { rehook: "In this town, an hour can only wait 60 years. At 2 a.m. on fall-back night, the oldest jar melts." },
+        { t: "Show him a jar", fx: s => { s.joy += 1; }, say: "His eyes go wide. Gold light." },
+        { t: "Say, \"Something important\"", fx: s => { s.jars += 1; }, say: "He nods. He doesn't get it." }] },
+    { rehook: "Hours keep 60 years. Tonight at 2 a.m., the oldest melts." },
     { when: "1:50 a.m.", text: "Your first jar, from 1966, is starting to drip.",
       choices: [
-        { t: "Wake Theo up", fx: s => { s.theo = true; s.joy += 1; }, say: "He blinks awake in his Halloween cape." },
-        { t: "Let him sleep and watch the jar alone", fx: s => { s.jars -= 1; }, say: "Drip… drip… it's gone." }] },
+        { t: "Wake Theo up", fx: s => { s.theo = true; s.joy += 1; }, say: "He wakes up in his cape." },
+        { t: "Watch it alone", fx: s => { s.jars -= 1; }, say: "Drip… drip… it's gone." }] },
     { when: "1:59 a.m.", text: "Everyone says to open the oldest jar and rest.",
       choices: [
-        { t: "Open ALL of them", fx: s => { s.joy += s.jars; s.jars = 0; }, say: "Golden light floods the kitchen. The clock stops at 2:00." },
-        { t: "Open just the oldest one", fx: s => { s.jars -= 1; s.joy += 1; }, say: "One hour. You fall asleep in it." }] },
+        { t: "Open ALL of them", fx: s => { s.joy += s.jars; s.jars = 0; }, say: "Gold floods the kitchen. Time stops." },
+        { t: "Just the oldest", fx: s => { s.jars -= 1; s.joy += 1; }, say: "One hour. You sleep through it." }] },
     { when: "Sixty hours", text: "The whole town is frozen. What do you do first?",
       choices: [
-        { t: "Blanket fort, pancakes, and your secret card trick", fx: s => { s.joy += 3; }, say: "Theo will tell this story forever." },
+        { t: "Fort, pancakes, card tricks", fx: s => { s.joy += 3; }, say: "Theo will tell this story forever." },
         { t: "Tidy the pantry", fx: s => { s.joy += 0; }, say: "The shelves are very clean." }] },
   ],
   rate: s => s.jars === 0 && s.theo && s.joy >= 65 ? 3 : s.theo && s.joy >= 10 ? 2 : 1,
   ending: s => s.jars === 0 ? "Monday morning: every jar is empty, and you've never felt so full." : `${s.jars} jars still glow on the shelf, waiting for someday.`,
-  lesson: "Someday is a day of the week you never get. Spend the hour now.",
+  lesson: "Someday never comes. Spend the hour now.",
   cta: "This weekend your clock gives you one hour back. Who are you spending it on?"
 },
 {
-  id: "M8", track: "money", name: "Tillsbury", rule: "your wallet talks, and it warns you before you spend.",
+  id: "M8", track: "money", name: "Tillsbury", rule: "your wallet talks before you spend.",
   hook: "So why did one wallet scream in the middle of the mall?",
   meters: [{ k: "cash", label: "Coins in your wallet" }, { k: "trust", label: "Wallet's trust", life: true }],
   init: () => ({ cash: 32, trust: 2, gift: false }),
@@ -1185,48 +1185,48 @@ const TOWNS = [
     "w-huh": "Huh? Speak up. I'm a wallet, not a mind reader. I'll take that as a no.",
   },
   steps: [
-    { rehook: "Here's what nobody tells you: hit zero and your wallet falls asleep for a month, right before Black Friday. And your mom's birthday IS Black Friday." },
-    { when: "Early sale", clip: "w-sale", text: "A shiny blender, 70% off. \"You HAVE a blender!\" the wallet yells.",
+    { rehook: "Hit zero and your wallet sleeps a month. Mom's birthday is coming." },
+    { when: "Early sale", clip: "w-sale", text: "A blender, 70% off. “You HAVE one!”",
       choices: [
-        { t: "Listen and walk past it", clip: "w-purr", fx: s => { s.trust += 2; }, say: "The wallet purrs. You keep your 32 coins." },
+        { t: "Walk past it", clip: "w-purr", fx: s => { s.trust += 2; }, say: "The wallet purrs. Coins kept." },
         { t: "Buy it anyway", clip: "w-ouch", fx: s => { s.cash -= 29; s.trust -= 1; }, say: "Beep. Three coins left." }] },
-    { when: "Giant sign", clip: "w-box", text: "\"Mystery box. Three coins.\" Everyone is grabbing one. \"Don't,\" the wallet whispers.",
+    { when: "Giant sign", clip: "w-box", text: "Mystery boxes, three coins. “Don't,” whispers the wallet.",
       choices: [
-        { t: "Zip it shut and walk out", clip: "w-purr", fx: s => { s.trust += 2; }, say: "Behind you, someone opens the box. One sock." },
-        { t: "Grab a box", clip: "w-ouch", fx: s => { s.cash -= 3; s.trust -= 2; }, say: "One sock. And your wallet goes quiet." }] },
+        { t: "Zip it, walk out", clip: "w-purr", fx: s => { s.trust += 2; }, say: "Someone opens one. A sock." },
+        { t: "Grab a box", clip: "w-ouch", fx: s => { s.cash -= 3; s.trust -= 2; }, say: "One sock. Your wallet goes quiet." }] },
     { when: "Payday", clip: "w-pay", text: "Your paycheck lands. Black Friday is two weeks away.",
       choices: [
-        { t: "Put some away for mom's present", clip: "w-purr", fx: s => { s.cash += 28; s.trust += 1; }, say: "The wallet hums a happy tune." },
-        { t: "Treat yourself to light-up slippers", clip: "w-ouch", fx: s => { s.cash += 5; s.trust -= 1; }, say: "They light up. Your wallet doesn't." }] },
+        { t: "Save for Mom", clip: "w-purr", fx: s => { s.cash += 28; s.trust += 1; }, say: "The wallet hums a happy tune." },
+        { t: "Light-up slippers", clip: "w-ouch", fx: s => { s.cash += 5; s.trust -= 1; }, say: "They light up. Your wallet doesn't." }] },
     { when: "Black Friday", clip: "w-friday", text: "It's mom's birthday. What's the plan?",
       choices: [
-        { t: "Buy her present with your saved money", fx: s => { if (s.cash >= 25) { s.gift = true; s.cash -= 25; s.trust += 2; } }, say: "You check your wallet and head for the door." },
-        { t: "Make her a card instead", fx: s => { s.trust += 1; }, say: "She loves it. She still wishes you'd come to dinner." }] },
+        { t: "Buy her present", fx: s => { if (s.cash >= 25) { s.gift = true; s.cash -= 25; s.trust += 2; } }, say: "Wallet checked. Off you go." },
+        { t: "Make a card", fx: s => { s.trust += 1; }, say: "She loves it. Still, no dinner." }] },
   ],
   rate: s => s.gift && s.trust >= 7 ? 3 : s.gift ? 2 : 1,
   ending: s => s.gift ? "Your mom opens her present, and your wallet is very quiet." : "No present this year. Your wallet says nothing at all.",
-  lesson: "The best deal is the one you don't need.",
+  lesson: "The best deal: not needing it.",
   cta: "What's the worst thing YOU ever bought on sale?"
 },
 {
-  id: "M-jobs", track: "money", name: "Tagwick", rule: "a coin with no job gets up and leaves.",
+  id: "M-jobs", track: "money", name: "Tagwick", rule: "a coin with no job walks away.",
   hook: "So why does your sister always have money left?",
   meters: [{ k: "cash", label: "Coins you still have" }, { k: "plan", label: "Your plan", life: true }],
   init: () => ({ cash: 100, plan: 1, paid: false, helped: false }),
   steps: [
-    { rehook: "Here's what nobody tells you: runaway coins never come back. And the first freeze hits on Friday. Your heater is dead, and fixing it costs 80 coins." },
+    { rehook: "Runaway coins never return. Friday's freeze needs an 80-coin heater fix." },
     { when: "Payday", text: "You get 100 coins. They're already wobbling in your hand.",
       choices: [
-        { t: "Tie a tag on 80 of them: HEATER", fx: s => { s.plan += 3; }, say: "The tagged coins settle down and go quiet." },
-        { t: "Stuff them all in your pocket", fx: s => { s.cash -= 60; s.plan -= 1; }, say: "By lunch, they're rolling down the street. You catch forty." }] },
-    { when: "Lunch", text: "The coins with no job start rolling toward the door. A snack cart is right outside.",
+        { t: "Tag 80: HEATER", fx: s => { s.plan += 3; }, say: "Tagged coins settle down." },
+        { t: "Pocket them all", fx: s => { s.cash -= 60; s.plan -= 1; }, say: "They roll away. You catch forty." }] },
+    { when: "Lunch", text: "Jobless coins roll toward the snack cart.",
       choices: [
-        { t: "Give the leftovers a job: FOOD", fx: s => { s.plan += 2; }, say: "They stop rolling. Lunch is packed for the week." },
-        { t: "Let them go, it's only a few", fx: s => { s.cash -= 15; s.plan -= 1; }, say: "A few turns into fifteen." }] },
-    { when: "Friday", text: "Frost on the window. The repair truck is outside, and it wants 80 coins.",
+        { t: "Tag the rest: FOOD", fx: s => { s.plan += 2; }, say: "They stop. Lunch is sorted." },
+        { t: "Let them go", fx: s => { s.cash -= 15; s.plan -= 1; }, say: "A few turns into fifteen." }] },
+    { when: "Friday", text: "Frost. The repair truck wants 80.",
       choices: [
-        { t: "Pay for the repair", fx: s => { if (s.cash >= 80) { s.paid = true; s.cash -= 80; s.plan += 1; } }, say: "You count out your coins at the door." },
-        { t: "Ask your sister for help", fx: s => { s.helped = true; s.plan += 1; }, say: "She opens a drawer and hands you a jar. The tag has your name on it." }] },
+        { t: "Pay for the repair", fx: s => { if (s.cash >= 80) { s.paid = true; s.cash -= 80; s.plan += 1; } }, say: "You count out your coins." },
+        { t: "Ask your sister", fx: s => { s.helped = true; s.plan += 1; }, say: "A jar. Your name's on it." }] },
   ],
   rate: s => s.paid && s.plan >= 6 ? 3 : s.paid || s.helped ? 2 : 1,
   ending: s => s.paid ? "Your heater hums back on, and your own coins paid for it." : s.helped ? "Your heater hums back on. Your sister makes less than you, and she paid for it." : "You come up short. The truck drives off, and the house stays cold.",
@@ -1239,46 +1239,46 @@ const TOWNS = [
   meters: [{ k: "jar", label: "Coins in jar" }],
   init: () => ({ jar: Glove.has("piggy") ? 2 : 1, resets: 0 }),
   steps: [
-    { rehook: "Here's what nobody tells you: spend just one, and the whole jar drops back to one. Your house sells in twenty nights, and the price is a million coins. You have one." },
-    { when: "Night 1", text: "Your friend buys a donut with his coin and laughs at your jar. The donut costs one.",
+    { rehook: "Spend one coin and the jar resets. A million in twenty nights." },
+    { when: "Night 1", text: "Your friend buys a donut and laughs at your jar.",
       choices: [
-        { t: "Drop your coin in the jar", say: "Clink. One lonely coin, and your friend is still laughing." },
-        { t: "Buy the donut too", fx: s => { s.resets += 1; }, say: "Delicious. You start your jar over tomorrow." }] },
-    { when: "Night 10", text: s => s.resets ? "Halfway there, and you're still way behind." : "Halfway there. A thousand coins. Not even close. Is this even working?",
+        { t: "Coin in the jar", say: "Clink. He's still laughing." },
+        { t: "Buy the donut too", fx: s => { s.resets += 1; }, say: "Delicious. Start over tomorrow." }] },
+    { when: "Night 10", text: s => s.resets ? "Halfway there, and you're still way behind." : "Halfway. A thousand coins. Is this working?",
       enter: s => { s.jar = s.resets ? 512 : 1024; },
       choices: [
-        { t: "Keep going", say: "You put the jar back on the windowsill." },
-        { t: "Quit and spend one on lunch", fx: s => { s.jar = 1; s.resets += 1; }, say: "Good lunch. The jar drops back to one." }] },
-    { when: "Night 19", text: s => s.jar > 1 ? "Half a million coins, and you haven't eaten all day. What's one coin, out of half a million?" : "Nine nights left, and you're nowhere near. The donut smells amazing.",
+        { t: "Keep going", say: "Back on the windowsill it goes." },
+        { t: "Spend one on lunch", fx: s => { s.jar = 1; s.resets += 1; }, say: "Good lunch. Back to one." }] },
+    { when: "Night 19", text: s => s.jar > 1 ? "Half a million, and you're starving. Just one?" : "Nine nights left. The donut smells amazing.",
       enter: s => { if (s.jar > 1) s.jar = s.resets ? 262144 : 524288; else s.jar = 512; },
       choices: [
-        { t: "Let the coin go", fx: s => { s.jar *= 2; }, say: "You open your fingers. Midnight. The jar glows." },
-        { t: "Buy the donut", fx: s => { s.jar = 1; s.resets += 1; }, say: "It's a great donut. The jar drops back to one." }] },
+        { t: "Let the coin go", fx: s => { s.jar *= 2; }, say: "Midnight. The jar glows." },
+        { t: "Buy the donut", fx: s => { s.jar = 1; s.resets += 1; }, say: "Great donut. Back to one." }] },
   ],
   rate: s => s.jar >= 1000000 ? 3 : s.jar > 1 ? 2 : 1,
   ending: s => s.jar >= 1000000 ? "A million coins. They jam the front door, and the house is yours." : s.jar > 1 ? "You kept going, but you started late. You come up short on the last night." : "One coin in the jar, and the house is sold.",
-  lesson: "One night made half of it. Most people quit the night before.",
+  lesson: "The last night makes half. Don't quit.",
   cta: "What would you have done on night nineteen?"
 },
 {
-  id: "M-hours", track: "money", name: "Hourmouth", rule: "nothing costs money. Price tags show hours of your life.",
+  id: "M-hours", track: "money", name: "Hourmouth", rule: "prices are paid in hours of your life.",
   hook: "So why did one big red chair cost her a whole weekend?",
   meters: [{ k: "hours", label: "Hours you still have" }, { k: "family", label: "Your family", life: true }],
   init: () => ({ hours: 48, family: 3, missed: false, went: false }),
   steps: [
-    { rehook: "Here's what nobody tells you: the tag never says which hours. And Saturday at seven is your dad's sixtieth birthday." },
-    { when: "Monday", text: "A striped scarf. The tag says two hours. What a bargain.",
+    { rehook: "Tags never say which hours. Dad turns sixty Saturday." },
+    { when: "Monday", text: "A striped scarf. Two hours. A bargain!",
       choices: [
-        { t: "Tap the tag", fx: s => { s.hours -= 2; }, say: "Nothing happens. Then Tuesday, in a boring meeting… blink. Two hours, gone. Best deal ever." },
-        { t: "Leave it on the rack", say: "You walk out with your whole evening." }] },
-    { when: "Friday", text: "You find the chair. Big. Red. So soft. The tag says forty-eight hours. It'll come out of some boring week, right?",
+        { t: "Tap the tag", fx: s => { s.hours -= 2; }, say: "Tuesday's boring meeting: blink, gone. Nice." },
+        { t: "Leave it", say: "Your evening stays yours." }] },
+    { when: "Friday", text: "A big red chair. Forty-eight hours. Some boring week?",
       choices: [
-        { t: "Tap the tag", fx: s => { s.hours = Math.max(0, s.hours - 48); s.missed = true; s.family -= 2; }, say: "Nothing happens. You smile, and you take the chair home." },
-        { t: "Ask which hours first", fx: s => { s.family += 1; }, say: "The clerk checks the tag and goes pale. You walk away." }] },
-    { when: "The weekend", text: s => s.missed ? "Saturday morning. You grab his present. Blink. Monday morning. Forty missed calls. On your doorstep, one slice of cake and a note. We saved you some." : "The candles are ready, and your dad keeps checking his watch.",
+        { t: "Tap the tag", fx: s => { s.hours = Math.max(0, s.hours - 48); s.missed = true; s.family -= 2; }, say: "Nothing happens. Chair's yours." },
+        { t: "Ask which hours first", fx: s => { s.family += 1; }, say: "The clerk goes pale. You leave." }] },
+    { when: "The weekend", text: s => s.missed ? "Blink. It's Monday. Cake on your doorstep: “We saved some.”" : "Candles ready. Dad checks his watch.",
       choices: [
-        { t: "Go to Dad's house", fx: s => { s.went = true; s.family += s.missed ? 1 : 3; }, say: "You knock on the door, and he opens it in his paper hat." },
-        { t: "Stay home in the chair", fx: s => { s.family -= 1; }, say: "It's very soft." }] },
+        { t: "Go to Dad's house", fx: s => { s.went = true; s.family += s.missed ? 1 : 3; }, say: "Dad, in a paper hat." },
+        { t: "Stay in the chair", fx: s => { s.family -= 1; }, say: "It's very soft." }] },
   ],
   rate: s => s.went && !s.missed ? 3 : s.went ? 2 : 1,
   ending: s => s.went && !s.missed ? "You're there at seven, and you blow out the candles together." : s.went ? "You missed the party, but you sit with your dad and finish the cake." : "The chair is very soft, and the house is very quiet.",
@@ -1286,28 +1286,28 @@ const TOWNS = [
   cta: "What did YOU buy that cost you more hours than it was worth?"
 },
 {
-  id: "M-shrink", track: "money", name: "Inchwick", rule: "every new thing you buy makes your house one inch smaller.",
+  id: "M-shrink", track: "money", name: "Inchwick", rule: "every new thing shrinks your house an inch.",
   hook: "So how did a dog end up with the keys to her house?",
   meters: [{ k: "door", label: "Door height (inches)" }, { k: "room", label: "Room to breathe", life: true }],
   init: () => ({ door: 72, room: 3, lost: false, gave: false }),
   steps: [
-    { rehook: "Here's what nobody tells you: your stuff doesn't shrink, only the house does. And if you can't stand up inside, the town gives it to whoever can. You're five foot six. Your door is six feet." },
-    { when: "Monday", drag: { item: "🦆", label: "Duck lamp · 1 inch", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "🚶 Leave it", pick: 1 }] }, text: "A lamp shaped like a duck. It's perfect, and it's only one inch.",
+    { rehook: "Can't stand up inside? The town takes your house. You're 66 inches." },
+    { when: "Monday", drag: { item: "🦆", label: "Duck lamp · 1 inch", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "🚶 Leave it", pick: 1 }] }, text: "A duck lamp. Perfect. Only one inch.",
       choices: [
-        { t: "Buy the duck lamp", fx: s => { s.door -= 1; s.room -= 1; }, say: "The roof gives a little squash. The duck glows happily." },
-        { t: "Leave the duck", fx: s => { s.room += 1; }, say: "You walk home with empty hands and a tall door." }] },
-    { when: "Friday", drag: { item: "👟👟👟", label: "3 pairs · 3 inches", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "🚶 Leave them", pick: 1 }] }, text: "Three pairs of shoes, all on sale. That's three more inches.",
+        { t: "Buy the duck lamp", fx: s => { s.door -= 1; s.room -= 1; }, say: "Squash. The duck glows." },
+        { t: "Leave the duck", fx: s => { s.room += 1; }, say: "Empty hands. Tall door." }] },
+    { when: "Friday", drag: { item: "👟👟👟", label: "3 pairs · 3 inches", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "🚶 Leave them", pick: 1 }] }, text: "Three pairs of shoes on sale. Three inches.",
       choices: [
-        { t: "Buy all three", fx: s => { s.door -= 3; s.room -= 1; }, say: "Now you duck through your own door. Biscuit trots in just fine." },
-        { t: "Your old shoes are fine", fx: s => { s.room += 1; }, say: "Your old shoes are, in fact, fine." }] },
-    { when: "Midnight", drag: { item: "📦📦", label: "Flash sale · 2 inches", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "📵 Phone down", pick: 1 }] }, text: "A sale ends in one minute. Two inches, and your finger is over the button.",
+        { t: "Buy all three", fx: s => { s.door -= 3; s.room -= 1; }, say: "Now you duck through your door." },
+        { t: "Old shoes are fine", fx: s => { s.room += 1; }, say: "They are, in fact, fine." }] },
+    { when: "Midnight", drag: { item: "📦📦", label: "Flash sale · 2 inches", zones: [{ label: "🏠 Into the house", pick: 0 }, { label: "📵 Phone down", pick: 1 }] }, text: "A sale ends in one minute. Two inches.",
       choices: [
-        { t: "Tap the button", fx: s => { s.door -= 2; s.lost = s.door <= 66; }, say: "The ceiling drops, and the boxes tumble." },
-        { t: "Put the phone down", fx: s => { s.room += 1; }, say: "The minute ends. Nothing happens, and that's the good news." }] },
-    { when: "Morning", drag: { item: "📦", label: "All your stuff", zones: [{ label: "🎁 Give it away", pick: 0 }, { label: "🏠 Keep it all", pick: 1 }] }, text: s => s.lost ? "A man from town hall ties the keys to Biscuit's collar. Your things are piled on the lawn." : "You can still stand up in your own kitchen. Your neighbor stops by and admires your stuff.",
+        { t: "Tap the button", fx: s => { s.door -= 2; s.lost = s.door <= 66; }, say: "The ceiling drops. Boxes tumble." },
+        { t: "Put the phone down", fx: s => { s.room += 1; }, say: "The minute ends. Good news." }] },
+    { when: "Morning", drag: { item: "📦", label: "All your stuff", zones: [{ label: "🎁 Give it away", pick: 0 }, { label: "🏠 Keep it all", pick: 1 }] }, text: s => s.lost ? "Your stuff is on the lawn. The house is gone." : "You can still stand up. A neighbor admires your stuff.",
       choices: [
-        { t: "Give it all away", fx: s => { s.gave = true; s.door = 72; s.room += 3; }, say: "Every gift, the house grows an inch." },
-        { t: "Keep everything", say: "You pack it all back in. It takes a while." }] },
+        { t: "Give it all away", fx: s => { s.gave = true; s.door = 72; s.room += 3; }, say: "Each gift: one inch back." },
+        { t: "Keep everything", say: "You pack it all back in." }] },
   ],
   rate: s => s.gave && !s.lost ? 3 : s.gave || !s.lost ? 2 : 1,
   ending: s => s.lost && s.gave ? "Biscuit lets you back in, and your door is six feet again." : s.lost ? "Biscuit sleeps inside tonight. You sleep on the lawn with your stuff." : s.gave ? "Your door is six feet tall, and there's room to dance." : "You still own your house. For now.",
@@ -1315,23 +1315,23 @@ const TOWNS = [
   cta: "What's the one thing you bought that you'd give away first?"
 },
 {
-  id: "M-birds", track: "money", name: "Featherton", rule: "every subscription is a tiny bird that eats from your pocket every month.",
+  id: "M-birds", track: "money", name: "Featherton", rule: "every subscription is a bird that eats coins.",
   hook: "So how did a bird eat a whole paycheck?",
   meters: [{ k: "coins", label: "Coins you have" }, { k: "birds", label: "Birds in your coat" }],
   init: () => ({ coins: 1000, birds: 0, ignored: false, paid: false }),
   steps: [
-    { rehook: "Here's what nobody tells you: the birds you forget don't leave. They get fat. And you can only send one away if you remember its name. Rent is 800 coins, due Friday." },
-    { when: "March", text: "A free trial. No coins today, it says. Just one tiny bird.",
+    { rehook: "Forgotten birds get fat. Rent, 800 coins, is due Friday." },
+    { when: "March", text: "A free trial. Just one tiny bird.",
       choices: [
-        { t: "Sign up for everything", fx: s => { s.birds = 6; s.coins -= 300; }, say: "Six tiny birds hop into your coat. You forget them by lunch." },
-        { t: "Keep just the one you use", fx: s => { s.birds = 1; s.coins -= 50; }, say: "One tiny blue bird settles on your shoulder." }] },
+        { t: "Sign up for everything", fx: s => { s.birds = 6; s.coins -= 300; }, say: "Six birds. Forgotten by lunch." },
+        { t: "Keep just one", fx: s => { s.birds = 1; s.coins -= 50; }, say: "One blue bird. That's all." }] },
     { when: "Payday", text: "Your coat starts chirping.",
       choices: [
-        { t: "Open it and look", say: "You count your birds. Some of them look familiar." },
-        { t: "Turn the music up", fx: s => { s.birds += 5; s.coins -= 560; s.ignored = true; }, say: "The chirping stops. Your coat feels heavier." }] },
-    { when: "Friday", text: s => `The landlord knocks. You have ${s.coins} coins, and rent is 800.`,
+        { t: "Open it and look", say: "You count them. Some look familiar." },
+        { t: "Turn the music up", fx: s => { s.birds += 5; s.coins -= 560; s.ignored = true; }, say: "Quiet. Your coat feels heavier." }] },
+    { when: "Friday", text: s => `Rent day: 800. You have ${s.coins}.`,
       choices: [
-        { t: "Read every old bill out loud", fx: s => { s.coins += Math.max(0, s.birds - 1) * 130; s.birds = Math.min(s.birds, 1); s.paid = s.coins >= 800; }, say: "Every name, a bird flies off and drops your coins." },
+        { t: "Read every bill", fx: s => { s.coins += Math.max(0, s.birds - 1) * 130; s.birds = Math.min(s.birds, 1); s.paid = s.coins >= 800; }, say: "Names said. Birds freed." },
         { t: "Hide behind the door", fx: s => { s.paid = s.coins >= 800; }, say: "The knocking gets louder." }] },
   ],
   rate: s => s.paid ? (s.ignored ? 2 : 3) : 1,
@@ -1345,18 +1345,18 @@ const TOWNS = [
   meters: [{ k: "bill", label: "What you owe" }, { k: "coins", label: "Coins you have" }],
   init: () => ({ bill: 12, coins: 50, paidEarly: false, plan: false, hid: false }),
   steps: [
-    { rehook: "Here's what nobody tells you: it grows every single day. And on Friday the thirteenth, every monster in town comes to collect." },
+    { rehook: "It grows daily. On Friday the 13th, monsters collect." },
     { when: "Monday", text: "You find a water bill under your couch. Twelve coins.",
       choices: [
-        { t: "Open it and pay it now", fx: s => { s.coins -= 12; s.bill = 0; s.paidEarly = true; }, say: "Twelve coins, gone. The envelope stays an envelope." },
-        { t: "Tomorrow", fx: s => { s.bill = 60; }, say: "You slide it back under with your foot." }] },
-    { when: "A week later", text: s => s.paidEarly ? "Your neighbor's couch is purring. Yours is quiet." : "Something under your couch is purring. It's the size of a cat. Cute.",
+        { t: "Pay it now", fx: s => { s.coins -= 12; s.bill = 0; s.paidEarly = true; }, say: "Twelve coins. Just an envelope." },
+        { t: "Tomorrow", fx: s => { s.bill = 60; }, say: "You slide it under the mat." }] },
+    { when: "A week later", text: s => s.paidEarly ? "Your neighbor's couch is purring. Yours is quiet." : "Something under your couch purrs. Cat-sized. Cute.",
       choices: [
         { t: "Check your mail", fx: s => { if (s.bill) { s.plan = true; } }, say: "You sit down and open everything." },
-        { t: "Leave it", fx: s => { if (s.bill) { s.bill = 240; } }, say: "By Monday, something is wearing the couch." }] },
-    { when: "Friday the 13th", text: s => s.bill ? `A monster is at your door. The bill is ${s.bill} coins, and you have ${s.coins}.` : "A parade of monsters hops down your street, each one holding an envelope.",
+        { t: "Leave it", fx: s => { if (s.bill) { s.bill = 240; } }, say: "By Monday, it's wearing the couch." }] },
+    { when: "Friday the 13th", text: s => s.bill ? `A monster wants ${s.bill} coins. You have ${s.coins}.` : "Monsters parade by, holding envelopes.",
       choices: [
-        { t: "Call the number and ask", fx: s => { if (s.bill) { s.plan = true; s.coins = 0; s.bill = Math.max(0, s.bill - 50); } }, say: "Can you pay a little at a time? Yes." },
+        { t: "Call and ask", fx: s => { if (s.bill) { s.plan = true; s.coins = 0; s.bill = Math.max(0, s.bill - 50); } }, say: "A little at a time? Yes." },
         { t: "Hide in the attic", fx: s => { s.hid = true; }, say: "You hear chewing." }] },
   ],
   rate: s => s.paidEarly ? 3 : s.plan && !s.hid ? 2 : 1,
@@ -1370,56 +1370,56 @@ const TOWNS = [
   meters: [{ k: "plans", label: "Pay-later plans" }, { k: "lb", label: "Shadow (lb)" }],
   init: () => ({ plans: 0, lb: 1, cash: false, hid: false, paid: false }),
   steps: [
-    { rehook: "Here's what nobody tells you: at noon, you feel nothing. The weight shows up at sunset. And in November, the sun sets at five." },
+    { rehook: "At noon you feel nothing. The weight arrives at sunset." },
     { when: "Noon", text: "Red boots, 80 coins. Or four easy payments of 20.",
       choices: [
-        { t: "Tap pay later", fx: s => { s.plans = 1; s.lb = 2; }, say: "Four easy payments. Your shadow doesn't even twitch." },
-        { t: "Save up and buy them next week", fx: s => { s.cash = true; }, say: "You walk home light. Boots next Saturday." }] },
-    { when: "Every noon after", text: s => s.plans ? "Shopping at noon feels free. A coat. A lamp. A couch." : "Everyone around you is tapping pay later. Their shadows look fine. It's noon.",
+        { t: "Tap pay later", fx: s => { s.plans = 1; s.lb = 2; }, say: "Four easy payments. Nothing twitches." },
+        { t: "Save up first", fx: s => { s.cash = true; }, say: "Light walk home. Boots Saturday." }] },
+    { when: "Every noon after", text: s => s.plans ? "Noon shopping feels free. Coat, lamp, couch." : "Everyone taps pay later. Shadows look fine.",
       choices: [
         { t: "Keep tapping, it's noon", fx: s => { s.plans += 13; s.lb = s.plans / 2 + 1; }, say: s => `${s.plans} plans. Your shadow is still tiny.` },
-        { t: "Stop and add up what you owe", fx: s => {}, say: s => s.plans ? "One plan. You can see the end of it." : "Nothing to add. Your shadow is just a shadow." }] },
-    { when: "November, 5 p.m.", text: s => { s.lb = s.plans * 100 || 1; return s.plans ? `The sun sets. Your shadow stretches down the whole street. It weighs ${s.lb} pounds. The bus driver looks at it, then at his bus.` : "The sun sets. Your shadow stretches down the street, light as ever. The bus driver waves you on."; },
+        { t: "Add it up", fx: s => {}, say: s => s.plans ? "One plan. You can see the end of it." : "Nothing to add. Your shadow is just a shadow." }] },
+    { when: "November, 5 p.m.", text: s => { s.lb = s.plans * 100 || 1; return s.plans ? `Sunset. Your shadow weighs ${s.lb} pounds.` : "Sunset. Your shadow is light as ever."; },
       choices: [
-        { t: "Turn on every light in the house", fx: s => { if (s.plans) { s.hid = true; } }, say: s => s.plans ? "No shadow. You win! Then every payment lands the same morning, the power gets cut, and the floor cracks." : "Cozy. Nothing to hide from." },
-        { t: "Pay them off, one at a time", fx: s => { if (s.plans) { s.paid = true; s.plans = 0; s.lb = 1; } }, say: s => s.paid ? "Every plan you end, your shadow lifts." : "Nothing to pay. You're already home." }] },
+        { t: "Every light on", fx: s => { if (s.plans) { s.hid = true; } }, say: s => s.plans ? "No shadow. You win! Then every payment lands the same morning, the power gets cut, and the floor cracks." : "Cozy. Nothing to hide from." },
+        { t: "Pay them off", fx: s => { if (s.plans) { s.paid = true; s.plans = 0; s.lb = 1; } }, say: s => s.paid ? "Every plan you end, your shadow lifts." : "Nothing to pay. You're already home." }] },
   ],
   rate: s => s.cash && !s.plans && !s.paid ? 3 : s.paid ? 2 : 1,
   ending: s => s.cash && !s.plans && !s.paid ? "Your new boots are paid for, and your shadow is the lightest on the bus." : s.paid ? "One plan at a time, you got a shadow you can carry. The bus lets you on." : "The lamps are off, the floor is cracked, and your shadow isn't going anywhere. Neither are you.",
-  lesson: "If you can't pay it at noon, you can't carry it at sunset.",
+  lesson: "Can't pay at noon? Can't carry at sunset.",
   cta: "How many pay-later plans do you have running right now?"
 },
 {
-  id: "L-whisper", track: "life", name: "Whisperton", rule: "sound has weight. Loud words crack the glass streets.",
+  id: "L-whisper", track: "life", name: "Whisperton", rule: "loud words crack the glass streets.",
   hook: "So why is a whole town tiptoeing… and one kid is stuck on a glass bridge with a birthday cake?",
   meters: [{ k: "glass", label: "Bridge glass", max: 100, unit: "%" }, { k: "trust", label: "Town trust", life: true }],
   init: () => ({ glass: 100, trust: 0 }),
   steps: [
-    { when: "Town gate", tiptoe: { taps: 3, intro: true }, text: "The gatekeeper holds up a brass ear trumpet. “Say hello in your normal voice, so the town knows what loud means for you.”",
-      choices: [{ t: "“Hello, Whisperton!”", say: "The trumpet rings. “Got it. Now… never talk like that again.”" }] },
-    { when: "The glass bridge", tiptoe: { cracks: 3, cost: 8 }, text: "A glass bridge over the river. The guard leans close: “Why are you crossing?”",
+    { when: "Town gate", tiptoe: { taps: 3, intro: true }, text: "The gatekeeper whispers: “Here, we walk softly.”",
+      choices: [{ t: "“Hello, Whisperton!”", say: "“Good. Soft steps from now on.”" }] },
+    { when: "The glass bridge", tiptoe: { cracks: 3, cost: 8 }, text: "A glass bridge. “Why are you crossing?”",
       choices: [
-        { t: "Whisper your answer", gesture: true, fx: s => { s.trust += 1; }, say: "Not a single crack. The guard waves you across." },
-        { t: "Answer in your normal voice", fx: s => { s.glass -= 35; s.trust -= 1; }, say: "CRACK. A spiderweb shoots across the glass under your feet." }] },
-    { when: "The bakery", text: "The baker has the candles you need. A man behind you is yelling his order.",
+        { t: "Whisper your answer", gesture: true, fx: s => { s.trust += 1; }, say: "Not one crack. Across you go." },
+        { t: "Answer out loud", fx: s => { s.glass -= 35; s.trust -= 1; }, say: "CRACK. A spiderweb underfoot." }] },
+    { when: "The bakery", text: "Candles at the bakery. A man is yelling.",
       choices: [
-        { t: "Wait your turn quietly", fx: s => { s.trust += 1; }, say: "The baker slips you an extra candle. “For the quiet one.”" },
-        { t: "Yell louder than him", fx: s => { s.glass -= 20; s.trust -= 1; }, say: "Two voices, one crack. The shop window splinters." },
-        { t: "Lean in and whisper “please”", fx: s => { s.trust += 2; }, say: "She smiles and serves you first." }] },
-    { rehook: "Sound doesn't fade here. Every loud word you said today is stacked on the bridge home. And Grandma's party is on the other side." },
-    { when: "Grandma's street", tiptoe: { cracks: 2, cost: 10 }, text: "A baby is asleep in a stroller next to you. Her dad looks terrified you'll speak.",
+        { t: "Wait your turn quietly", fx: s => { s.trust += 1; }, say: "A candle “for the quiet one.”" },
+        { t: "Yell louder than him", fx: s => { s.glass -= 20; s.trust -= 1; }, say: "The shop window splinters." },
+        { t: "Whisper “please”", fx: s => { s.trust += 2; }, say: "She smiles and serves you first." }] },
+    { rehook: "Every loud word piles on the bridge home. Grandma waits across." },
+    { when: "Grandma's street", tiptoe: { cracks: 2, cost: 10 }, text: "A baby sleeps in a stroller nearby.",
       choices: [
-        { t: "Whisper it", gesture: true, fx: s => { s.trust += 2; }, say: "The baby sighs and keeps sleeping. Her dad mouths: “thank you.”" },
-        { t: "Say it out loud", fx: s => { s.glass -= 30; s.trust -= 1; }, say: "The baby wakes up screaming. The whole street cracks." }] },
+        { t: "Whisper it", gesture: true, fx: s => { s.trust += 2; }, say: "She sleeps. Dad mouths “thanks.”" },
+        { t: "Say it out loud", fx: s => { s.glass -= 30; s.trust -= 1; }, say: "She wakes up screaming. Cracks." }] },
     { when: "On the bridge", text: "Your friend tells a joke halfway across. It's SO funny.",
       choices: [
         { t: "Laugh into your sleeve", fx: s => { s.trust += 1; }, say: "Muffled giggles. The glass holds." },
-        { t: "Laugh out loud", fx: s => { s.glass -= 25; s.trust += 1; }, say: "Best laugh of the year. Worst crack of the year." },
-        { t: "Smile and save it for later", say: "You'll laugh about it at the party." }] },
-    { when: "The last crossing", tiptoe: { cracks: 2, cost: 12 }, text: "The bridge home groans under every word you said today. Whisper your birthday wish to get across.",
+        { t: "Laugh out loud", fx: s => { s.glass -= 25; s.trust += 1; }, say: "Best laugh. Worst crack." },
+        { t: "Save it for later", say: "You'll laugh at the party." }] },
+    { when: "The last crossing", tiptoe: { cracks: 2, cost: 12 }, text: "The bridge home groans. Tiptoe to Grandma's.",
       choices: [
-        { t: "Whisper your wish", gesture: true, fx: s => { s.trust += 3; }, say: "The glass hums like a bell. Grandma opens the door before you knock." },
-        { t: "Shout it so she hears", fx: s => { s.glass -= 40; }, say: "She hears it. So does the bridge." }] },
+        { t: "Whisper your wish", gesture: true, fx: s => { s.trust += 3; }, say: "The glass rings. Grandma opens up." },
+        { t: "Shout your wish", fx: s => { s.glass -= 40; }, say: "She hears. So does the bridge." }] },
   ],
   rate: s => s.glass >= 60 && s.trust >= 6 ? 3 : s.glass >= 30 ? 2 : 1,
   ending: s => s.glass >= 60 ? `The cake made it across with ${s.glass}% of the bridge still whole. Grandma cried happy tears.` : s.glass >= 30 ? "You made it, but you can hear the glass ticking behind you." : "The bridge gave way. You swam the cake home. It's soup now.",
@@ -1427,39 +1427,39 @@ const TOWNS = [
   cta: "So… could YOU cross the glass bridge?"
 },
 {
-  id: "L-hum", track: "life", name: "Harmonia", rule: "every door opens to a note. Only your own voice can find it.",
+  id: "L-hum", track: "life", name: "Harmonia", rule: "every door opens to your own note.",
   hook: "So why is one kid humming at a locked front door?",
   meters: [{ k: "doors", label: "Doors opened", max: 5 }, { k: "courage", label: "Courage", life: true }],
   init: () => ({ doors: 0, courage: 0 }),
   steps: [
-    { when: "7:00 a.m.", tune: { mode: "any", secs: 1.2 }, text: "Your front door won't open. Doors here open to a hum. Hum any note and hold it steady.",
+    { when: "7:00 a.m.", tune: { mode: "any", secs: 1.2 }, text: "Your door won't open. Find a note and hold it.",
       choices: [
-        { t: "Hum and hold a note", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Click. That note is YOUR note now. Remember it." },
-        { t: "Climb out the window", say: "You make it out. Your sweater doesn't." }] },
-    { when: "School", tune: { mode: "higher", secs: 1 }, text: "The classroom door is shy. It only opens to a note HIGHER than yours.",
+        { t: "Hold a note", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Click. That's YOUR note now." },
+        { t: "Climb out the window", say: "You make it. Your sweater doesn't." }] },
+    { when: "School", tune: { mode: "higher", secs: 1 }, text: "The classroom door wants a HIGHER note.",
       choices: [
         { t: "Hum a higher note", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "The door giggles open." },
-        { t: "Wait for someone else to open it", fx: s => { s.courage -= 1; }, say: "You wait. And wait. You're late." }] },
-    { when: "Music class", text: "The teacher asks who wants to sing alone in front of everyone.",
+        { t: "Wait for someone", fx: s => { s.courage -= 1; }, say: "You wait. And wait. You're late." }] },
+    { when: "Music class", text: "Who wants to sing alone?",
       choices: [
         { t: "“Me!”", fx: s => { s.courage += 2; }, say: "Your voice wobbles. Then it doesn't." },
         { t: "Hum along quietly", fx: s => { s.courage += 1; }, say: "Small, but it counts." },
         { t: "Hide behind the piano", fx: s => { s.courage -= 1; }, say: "The piano knows you're there." }] },
-    { rehook: "If you don't use your note, you forget it, and every door in town forgets you. And tonight is your sister's big recital." },
-    { when: "The recital hall", tune: { mode: "lower", secs: 1 }, text: "The big hall door only opens to a note LOWER than yours. Your sister is inside, waiting.",
+    { rehook: "Unused notes are forgotten. Tonight is your sister's recital." },
+    { when: "The recital hall", tune: { mode: "lower", secs: 1 }, text: "The hall door wants a LOWER note.",
       choices: [
         { t: "Hum a lower note", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "BOOM. The hall doors swing wide." },
-        { t: "Knock really hard", fx: s => { s.courage -= 1; }, say: "Knocking doesn't count here. You sneak in late through the back." }] },
-    { when: "Backstage", tune: { mode: "slide" }, text: "Your sister's dressing room has a slide-lock. Start low and slide UP, like a siren.",
+        { t: "Knock really hard", fx: s => { s.courage -= 1; }, say: "Knocks don't count. You're late." }] },
+    { when: "Backstage", tune: { mode: "slide" }, text: "A slide-lock: start low, slide UP.",
       choices: [
-        { t: "Siren up", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Weeeeeooo. The lock spins open. Your sister laughs so hard she forgets she's nervous." },
-        { t: "Slide a note under the door", say: "She reads it. It helps a little." }] },
+        { t: "Siren up", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Weeeeooo! She laughs. Nerves gone." },
+        { t: "Slip a note under", say: "It helps a little." }] },
     { when: "On stage", text: "Your sister freezes on stage. She forgot her first note.",
       choices: [
-        { t: "Hum it for her from the front row", fx: s => { s.courage += 2; }, say: "She hears you. She finds it. She sings." },
-        { t: "Clap to cheer her on", fx: s => { s.courage += 1; }, say: "She smiles. It takes her a moment, but she starts." },
+        { t: "Hum it for her", fx: s => { s.courage += 2; }, say: "She finds it. She sings." },
+        { t: "Cheer her on", fx: s => { s.courage += 1; }, say: "A moment. Then she starts." },
         { t: "Cover your eyes", fx: s => { s.courage -= 1; }, say: "You miss the best part." }] },
-    { when: "The way home", tune: { mode: "match", secs: 1.2 }, text: "The old town gate only opens to the exact note you found this morning.",
+    { when: "The way home", tune: { mode: "match", secs: 1.2 }, text: "The gate wants this morning's note.",
       choices: [
         { t: "Hum your note", gesture: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Same note, same click. Home." },
         { t: "Wait for the gatekeeper", fx: s => { s.courage -= 1; }, say: "He shows up at midnight. Grumpy." }] },
@@ -1470,46 +1470,46 @@ const TOWNS = [
   cta: "So… what note would open YOUR door?"
 },
 {
-  id: "M-rhyme", track: "money", name: "Rhymeburg", rule: "you can buy anything, but only if your offer rhymes.",
+  id: "M-rhyme", track: "money", name: "Rhymeburg", rule: "offers that rhyme pay less.",
   hook: "So why did one kid get a sun hat for half price… just by saying “that”?",
   meters: [{ k: "coins", label: "Coins", max: 30 }, { k: "stuff", label: "Things you got" }],
   init: () => ({ coins: 30, stuff: 0, miss: 0, bus: false }),
   steps: [
-    { when: "Hat stand", text: s => `A sun hat costs ${6 + s.miss} coins. The seller winks: “Rhyme with HAT and it's yours for 3.”`,
+    { when: "Hat stand", text: s => `A sun hat: ${6 + s.miss}. Rhyme with HAT for 3.`,
       choices: [
-        { t: "“How about that?”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "“Deal!” He drops the hat on your head." },
-        { t: "“Can I have it for less?”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "“No rhyme, no deal.” You pay full price." },
-        { t: "Skip it", say: "You walk on with a sunburned nose." }] },
-    { when: "Bakery", text: s => `A strawberry cake costs ${8 + s.miss} coins. “Rhyme with CAKE and pay 4.”`,
+        { t: "“How about that?”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "“Deal!” The hat's on your head." },
+        { t: "“Can I have it for less?”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "“No rhyme.” Full price." },
+        { t: "Skip it", say: "Hello, sunburned nose." }] },
+    { when: "Bakery", text: s => `A cake: ${8 + s.miss}. Rhyme with CAKE for 4.`,
       choices: [
-        { t: "“For goodness sake!”", cost: "−4", need: s => s.coins >= 4, fx: s => { s.coins -= 4; s.stuff += 1; }, say: "The baker laughs and boxes it up." },
+        { t: "“For goodness sake!”", cost: "−4", need: s => s.coins >= 4, fx: s => { s.coins -= 4; s.stuff += 1; }, say: "The baker laughs. Boxed!" },
         { t: "“I'll just pay.”", cost: s => "−" + (8 + s.miss), need: s => s.coins >= 8 + s.miss, fx: s => { s.coins -= 8 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. The baker shrugs." },
         { t: "Skip it", say: "The cake watches you leave." }] },
-    { when: "Balloon cart", text: "Your friend asks to borrow 5 coins for a giant balloon.",
+    { when: "Balloon cart", text: "Your friend wants 5 coins for a balloon.",
       choices: [
-        { t: "Lend her 5 coins", cost: "−5", need: s => s.coins >= 5, fx: s => { s.coins -= 5; }, say: "She floats off happy. She promises to pay you back. Someday." },
-        { t: "“Balloon? Maybe soon!”", say: "She laughs. Even a no sounds nicer when it rhymes." },
+        { t: "Lend her 5 coins", cost: "−5", need: s => s.coins >= 5, fx: s => { s.coins -= 5; }, say: "She floats off. “I'll repay you!”" },
+        { t: "“Balloon? Maybe soon!”", say: "A rhyming no. She laughs." },
         { t: "Say no", say: "She frowns, but she gets it." }] },
-    { rehook: "Every shop in town raises its price by one coin each time you DON'T rhyme. They've been counting all day. And the bus home costs 10." },
-    { when: "Toy shop", text: s => `A toy boat for your brother's birthday: ${7 + s.miss} coins. Rhyme with BOAT for 3.`,
+    { rehook: "Each plain offer raises every price. The bus costs 10." },
+    { when: "Toy shop", text: s => `A toy boat: ${7 + s.miss}. Rhyme with BOAT for 3.`,
       choices: [
-        { t: "“I'll trade you my coat!”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "He keeps your coat as a joke, then gives it back. Boat's yours." },
-        { t: "“Here's the money.”", cost: s => "−" + (7 + s.miss), need: s => s.coins >= 7 + s.miss, fx: s => { s.coins -= 7 + s.miss; s.stuff += 1; s.miss += 1; }, say: "No rhyme. Full price, plus the town's extra." },
-        { t: "Skip it", say: "Your brother will get a hug instead." }] },
-    { when: "Kite stall", text: s => `A red kite: ${6 + s.miss} coins. Rhyme with KITE for 2.`,
+        { t: "“I'll trade you my coat!”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "He laughs. The boat's yours." },
+        { t: "“Here's the money.”", cost: s => "−" + (7 + s.miss), need: s => s.coins >= 7 + s.miss, fx: s => { s.coins -= 7 + s.miss; s.stuff += 1; s.miss += 1; }, say: "No rhyme. Full price, plus extra." },
+        { t: "Skip it", say: "Your brother gets a hug." }] },
+    { when: "Kite stall", text: s => `A kite: ${6 + s.miss}. Rhyme with KITE for 2.`,
       choices: [
-        { t: "“Is two coins right?”", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.stuff += 1; }, say: "“Right!” The kite tugs at your hand." },
+        { t: "“Is two coins right?”", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.stuff += 1; }, say: "“Right!” The kite tugs." },
         { t: "“Just give it to me.”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. The kite sulks." },
-        { t: "Skip it", say: "You keep your coins for the bus." }] },
-    { when: "Ice cream truck", text: s => `Ice cream: ${4 + s.miss} coins. The driver yells: “Rhyme with CONE!”`,
+        { t: "Skip it", say: "Coins saved for the bus." }] },
+    { when: "Ice cream truck", text: s => `Ice cream: ${4 + s.miss}. Rhyme with CONE!`,
       choices: [
         { t: "“One for me, I'm on my own!”", cost: "−1", need: s => s.coins >= 1, fx: s => { s.coins -= 1; s.stuff += 1; }, say: "One coin. Two scoops." },
         { t: "“Vanilla, please.”", cost: s => "−" + (4 + s.miss), need: s => s.coins >= 4 + s.miss, fx: s => { s.coins -= 4 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. It's melting already." },
-        { t: "Skip it", say: "The truck plays a sad song as it drives off." }] },
+        { t: "Skip it", say: "The truck plays a sad song." }] },
     { when: "Bus stop", text: s => `The bus home costs 10 coins. You have ${s.coins}.`,
       choices: [
-        { t: "Ride the bus", cost: "−10", need: s => s.coins >= 10, fx: s => { s.coins -= 10; s.bus = true; }, say: "You flop into a seat with all your stuff." },
-        { t: "Walk home", say: "Two hours. Your feet will tell this story for a week." }] },
+        { t: "Ride the bus", cost: "−10", need: s => s.coins >= 10, fx: s => { s.coins -= 10; s.bus = true; }, say: "You flop into a seat." },
+        { t: "Walk home", say: "Two hours. Sore feet for days." }] },
   ],
   rate: s => s.bus && s.stuff >= 4 ? 3 : s.bus || s.stuff >= 4 ? 2 : 1,
   ending: s => s.bus ? `${s.stuff} things, a bus ride home and ${s.coins} coins left. Rhymes are money here.` : `${s.stuff} things, but no bus fare. Every plain offer cost you extra.`,
@@ -1517,43 +1517,43 @@ const TOWNS = [
   cta: "So… what would YOU rhyme to get a cake for half?"
 },
 {
-  id: "L-echo", track: "life", name: "Echo Valley", rule: "whatever you say comes back three days later as a promise you have to keep.",
+  id: "L-echo", track: "life", name: "Echo Valley", rule: "what you say comes back as promises.",
   hook: "So why is one kid carrying a fish tank, calling his grandma and drawing pictures all on the same Saturday?",
   meters: [{ k: "time", label: "Saturday hours", max: 12 }, { k: "trust", label: "Trust", life: true }],
   init: () => ({ time: 12, trust: 0, echo: [] }),
   steps: [
-    { when: "Wednesday, lunch", text: "Your friend Leo asks if you'll help him move his fish tank this weekend.",
+    { when: "Wednesday, lunch", text: "Leo asks for help moving his fish tank.",
       choices: [
-        { t: "“Sure, I'll help!”", fx: s => echo(s, "Sure, I'll help!", 1), say: "Leo grins. Somewhere, the valley writes it down." },
-        { t: "“I'll help you forever, I promise!”", fx: s => echo(s, "I'll help you forever, I promise!", 3), say: "Leo blinks. That's… a lot of helping." },
+        { t: "“Sure, I'll help!”", fx: s => echo(s, "Sure, I'll help!", 1), say: "Leo grins. The valley listens." },
+        { t: "“I'll help you forever, I promise!”", fx: s => echo(s, "I'll help you forever, I promise!", 3), say: "Leo blinks. That's a lot." },
         { t: "“Maybe, if I can.”", fx: s => echo(s, "Maybe, if I can.", 0), say: "Leo nods. Honest enough." }] },
-    { when: "Wednesday, art class", text: "Mia loves your drawing and asks if you'll draw one for her too.",
+    { when: "Wednesday, art class", text: "Mia asks you to draw her one.",
       choices: [
         { t: "“I'll draw you one this week.”", fx: s => echo(s, "I'll draw you one this week.", 1), say: "She claps. The valley hums." },
-        { t: "“I'll draw you a hundred!”", fx: s => echo(s, "I'll draw you a hundred!", 3), say: "She gasps. The valley hums very loudly." },
+        { t: "“I'll draw you a hundred!”", fx: s => echo(s, "I'll draw you a hundred!", 3), say: "She gasps. The valley hums loudly." },
         { t: "“Thanks! Maybe someday.”", fx: s => echo(s, "Thanks! Maybe someday.", 0), say: "She smiles. Fair." }] },
     { when: "Thursday night", text: "Grandma calls. “Will you call me more often, sweetheart?”",
       choices: [
-        { t: "“I'll call you every single day!”", fx: s => echo(s, "I'll call you every single day!", 3), say: "Grandma cries a little. The valley writes it in pen." },
+        { t: "“I'll call you every single day!”", fx: s => echo(s, "I'll call you every single day!", 3), say: "Grandma tears up. Written in pen." },
         { t: "“I'll call on Sundays.”", fx: s => echo(s, "I'll call on Sundays.", 1), say: "“Sundays it is,” she says." },
         { t: "“I'll try, Grandma.”", fx: s => echo(s, "I'll try, Grandma.", 0), say: "“That's all I ask.”" }] },
-    { rehook: "The valley doesn't care if you meant it. Every word comes back as a promise. And they ALL come back on Saturday." },
-    { when: "Saturday, 9 a.m.", text: s => `The valley echoes: “${echoText(s, 0)}” Leo is at your door with a fish tank.`,
+    { rehook: "Every word comes back as a promise. All on Saturday." },
+    { when: "Saturday, 9 a.m.", text: s => `“${echoText(s, 0)}” Leo's at the door.`,
       choices: [
         { t: "Keep your word", cost: s => "−" + echoCost(s, 0) + "h", need: s => s.time >= echoCost(s, 0), fx: s => { s.time -= echoCost(s, 0); s.trust += 2; }, say: s => echoKept(s, 0, "You carry the tank. The fish look grateful.") },
-        { t: "Pretend you're sick", fx: s => { s.trust -= 2; }, say: "Leo carries it alone. The valley echoes your fake cough all day." }] },
-    { when: "Saturday, noon", text: s => `The valley echoes: “${echoText(s, 1)}” Your pencils start rattling.`,
+        { t: "Pretend you're sick", fx: s => { s.trust -= 2; }, say: "Leo struggles alone. Echoing cough." }] },
+    { when: "Saturday, noon", text: s => `“${echoText(s, 1)}” Your pencils rattle.`,
       choices: [
         { t: "Keep your word", cost: s => "−" + echoCost(s, 1) + "h", need: s => s.time >= echoCost(s, 1), fx: s => { s.time -= echoCost(s, 1); s.trust += 1; }, say: s => echoKept(s, 1, "You draw until your hand aches. Mia tapes it to her wall.") },
-        { t: "Ignore it", fx: s => { s.trust -= 2; }, say: "Your pencils sulk in the drawer. Mia asks about it at school." }] },
-    { when: "Saturday, 4 p.m.", text: s => `The valley echoes: “${echoText(s, 2)}” The phone starts ringing by itself.`,
+        { t: "Ignore it", fx: s => { s.trust -= 2; }, say: "Your pencils sulk. Mia asks why." }] },
+    { when: "Saturday, 4 p.m.", text: s => `“${echoText(s, 2)}” The phone rings.`,
       choices: [
         { t: "Keep your word", cost: s => "−" + echoCost(s, 2) + "h", need: s => s.time >= echoCost(s, 2), fx: s => { s.time -= echoCost(s, 2); s.trust += 2; }, say: s => echoKept(s, 2, "Grandma tells you the same story twice. You let her.") },
-        { t: "Let it ring", fx: s => { s.trust -= 2; }, say: "It rings for an hour. You feel every ring." }] },
-    { when: "Saturday, 7 p.m.", text: s => `Your friends invite you to the fair. It takes 3 hours. You have ${s.time} left.`,
+        { t: "Let it ring", fx: s => { s.trust -= 2; }, say: "An hour of ringing. Ouch." }] },
+    { when: "Saturday, 7 p.m.", text: s => `The fair takes 3 hours. You have ${s.time}.`,
       choices: [
-        { t: "Go to the fair", need: s => s.time >= 3, fx: s => { s.time -= 3; s.trust += 1; }, say: "Cotton candy, a Ferris wheel, and nothing you have to keep." },
-        { t: "Stay home, worn out", say: "You fall asleep on the couch at 7:15." }] },
+        { t: "Go to the fair", need: s => s.time >= 3, fx: s => { s.time -= 3; s.trust += 1; }, say: "Cotton candy, and no promises." },
+        { t: "Stay home, worn out", say: "Asleep on the couch by 7:15." }] },
   ],
   rate: s => s.trust >= 5 ? 3 : s.trust >= 1 ? 2 : 1,
   ending: s => s.trust >= 5 ? "Every promise kept, and you still made it to the fair." : s.trust >= 1 ? "You kept most of them. The valley noticed the ones you didn't." : "The valley echoed all night. Nobody believed you.",
@@ -1632,7 +1632,7 @@ const Voice = {
   init() { try { this.on = localStorage.getItem("rule-road-voice") === "on"; } catch {} }, // silent unless you switch the narrator on
   save() { try { localStorage.setItem("rule-road-voice", this.on ? "on" : "off"); } catch {} },
   say(key, force) {
-    if (!this.on && !force) return;
+    if ((!this.on && !force) || CLIPS_GONE.has(key)) return;
     if (!this.el) {
       this.el = new Audio(); this.el.preload = "auto";
       ["play", "pause", "ended"].forEach(ev => this.el.addEventListener(ev, () => this.paint()));
@@ -1647,7 +1647,9 @@ const Voice = {
   },
 };
 Voice.init();
-const listenBtn = key => `<button class="listen" data-act="say" data-k="${key}" aria-pressed="false">▶ Listen</button>`;
+// recordings that no longer match their (shortened) text were retired; no Listen button for those
+const CLIPS_GONE = new Set(["M2-end", "L2-end", "L4-end", "M4-end", "L5-end", "L-fallback-end", "M8-end", "M-chain-end", "M-shadow-end"]);
+const listenBtn = key => CLIPS_GONE.has(key) ? "" : `<button class="listen" data-act="say" data-k="${key}" aria-pressed="false">▶ Listen</button>`;
 
 /* ---------- state ---------- */
 let S = { screen: "home", t: 0, step: 0, phase: "arrive", s: null, res: null, stars: loadStars(), fan: { rule: "", lesson: "" },
@@ -1856,7 +1858,7 @@ function renderTown() {
       <div class="more-body">
         ${n < 3 && kidOf(T) ? `<div class="goal"><span class="goal-k">For 3 stars next time</span>${esc(kidOf(T).goal)}</div>` : ""}
         <p class="cta">${esc(T.cta)}</p>
-        <div class="listen-row">${listenBtn(T.id + "-end")}<span>Hear the ending</span></div>
+        ${listenBtn(T.id + "-end") ? `<div class="listen-row">${listenBtn(T.id + "-end")}<span>Hear the ending</span></div>` : ""}
         <div class="sharebox">
           <label for="alias">Your name on the challenge link</label>
           <div class="row"><input id="alias" maxlength="20" placeholder="Optional" value="${esc(Prefs.name)}"><button class="go" data-act="share">Share result</button></div>
