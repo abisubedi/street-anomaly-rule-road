@@ -693,13 +693,13 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=51"></script>
-<script src="/js/juice.js?v=51"></script>
-<script src="/js/road.js?v=51"></script>
-<script src="/js/glovebox.js?v=51"></script>
-<script src="/js/play.js?v=51"></script>
-<script src="/js/sketch.js?v=51"></script>
-<script src="/js/share.js?v=51"></script>
+<script src="/js/compat.js?v=52"></script>
+<script src="/js/juice.js?v=52"></script>
+<script src="/js/road.js?v=52"></script>
+<script src="/js/glovebox.js?v=52"></script>
+<script src="/js/play.js?v=52"></script>
+<script src="/js/sketch.js?v=52"></script>
+<script src="/js/share.js?v=52"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1629,7 +1629,7 @@ const Sound = {
 /* ---------- narrator: the Street Anomaly host, pre-recorded in the channel's voice (/voice/<key>.mp3) ---------- */
 const Voice = {
   on: true, key: null, el: null,
-  init() { try { this.on = localStorage.getItem("rule-road-voice") !== "off"; } catch {} },
+  init() { try { this.on = localStorage.getItem("rule-road-voice") === "on"; } catch {} }, // silent unless you switch the narrator on
   save() { try { localStorage.setItem("rule-road-voice", this.on ? "on" : "off"); } catch {} },
   say(key, force) {
     if (!this.on && !force) return;
@@ -1871,7 +1871,7 @@ function renderTown() {
     return `${topbar(true)}
     <div class="mini-sign">${T.name} · ${tagLabel}</div>
     ${meters(T, s)}${stage(T, s)}
-    <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p>${listenBtn(T.id + "-catch")}</div>
+    <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p></div>
     <button class="go" data-act="next">Keep going</button>`;
   }
   const r = S.phase === "result" ? S.lastResult : null;
@@ -1954,7 +1954,7 @@ function enterStep() {
   const st = TOWNS[S.t].steps[S.step];
   S.played = false;
   if (st && st.enter && !st.rehook) st.enter(S.s);
-  if (st && st.rehook) { Sound.drone(); Voice.say(TOWNS[S.t].id + "-catch"); }
+  if (st && st.rehook) Sound.drone();
   else if (st && st.clip) Voice.say(TOWNS[S.t].id + "-" + st.clip);
 }
 
