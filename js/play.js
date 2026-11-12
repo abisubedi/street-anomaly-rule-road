@@ -15,6 +15,7 @@ const Play = {
   // The Next button fills up as a countdown and still works for anyone who wants to skip ahead.
   // Not when the next step needs its own action (Laterton's heavy shadow, passing the phone in road-trip mode).
   autoNext() {
+    if (S.sleep) return; // Doubleton/Halfnight: midnight waits for you to hold the moon
     const b = document.querySelector('.go[data-act="next"]');
     if (!b || /Pass the phone/.test(b.textContent)) return;
     const r = S.lastResult || {}, chars = ((r.say || "") + (r.night || "").replace(/<[^>]+>/g, "")).length;
@@ -64,7 +65,8 @@ const Play = {
     if (T.id === "M-shadow" && S.s.lb > 50) heavyNext();
     if (document.getElementById("actitem")) actGame();
     if (T.id === "L1" && st && st.choices) sayGame(st); // Hushwick: hold a line to say it, one word token per beat
-    if (st && S.phase === "step") { if (st.loop) loopGame(st); if (st.tiptoe) tiptoeGame(st); if (st.tune) tuneGame(st); }
+    if (st && S.phase === "step") { if (st.loop) loopGame(st); if (st.tiptoe) tiptoeGame(st); if (st.tune) tuneGame(st); if (st.slider) sliderGame(st); }
+    if (S.sleep && S.phase === "result") moonGame();
   },
 };
 
@@ -352,6 +354,34 @@ function tuneGame(st) {
     Gest.cap(({ any: "Hold it still a little longer.", higher: "Higher than your line, and hold.", lower: "Lower than your line, and hold.", match: "Find the line from this morning, and hold.", slide: "Start at the bottom and swipe up in one go." })[cfg.mode]);
   });
   place();
+}
+
+// Laterton: slide toward "pay later" and the shadow stretches under your finger; let go at an end to choose
+function sliderGame(st) {
+  const L = document.getElementById("slider"); if (!L) return;
+  const knob = L.querySelector(".slide-knob"), shade = document.querySelector(".stage-shadow .shade"), x0 = 100, x1 = 284;
+  let f = 0.5, on = false;
+  const place = () => { knob.setAttribute("cx", (x0 + f * (x1 - x0)).toFixed(1)); if (shade) { shade.style.transition = "none"; shade.style.transform = `scaleX(${(1 + Math.max(0, f - 0.5) * 14).toFixed(2)})`; } };
+  Gest.bind(L, e => { on = true; f = Math.max(0, Math.min(1, (Gest.at(L, e)[0] - x0) / (x1 - x0))); place(); },
+    e => { if (!on) return; f = Math.max(0, Math.min(1, (Gest.at(L, e)[0] - x0) / (x1 - x0))); place(); if (f > 0.75) Juice.buzz([6]); },
+    () => {
+      if (!on) return; on = false;
+      if (f >= 0.85) return Gest.done(0);
+      if (f <= 0.15) return Gest.done(1);
+      f = 0.5; place(); Gest.cap("Slide all the way to one end.");
+    });
+}
+
+// Doubleton/Halfnight: hold the moon for a moment to sleep until midnight
+function moonGame() {
+  const b = document.getElementById("moonhold"); if (!b || b.dataset.bound) return; b.dataset.bound = "1";
+  let t = 0, p = 0;
+  const go = e => { if (e && e.cancelable) e.preventDefault(); clearInterval(t); const t0 = performance.now(); p = 0;
+    t = setInterval(() => { p = (performance.now() - t0) / 900; b.style.setProperty("--p", Math.min(100, p * 100) + "%"); if (p >= 1) { clearInterval(t); wake(); } }, 50); };
+  const stop = () => { if (p < 1) { clearInterval(t); p = 0; b.style.setProperty("--p", "0%"); } };
+  b.addEventListener("pointerdown", go); ["pointerup", "pointerleave", "pointercancel"].forEach(v => b.addEventListener(v, stop));
+  b.addEventListener("click", e => { if (e.detail === 0) wake(); }); // keyboard: Enter or Space sleeps straight away
+  b.addEventListener("contextmenu", e => e.preventDefault());
 }
 
 /* ---------- Leashville: pay the dogs back, smallest first ---------- */

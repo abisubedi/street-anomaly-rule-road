@@ -67,5 +67,6 @@ const Prefs = {
   coop: store.get("coop", false),
   party: store.get("party", false),
   name: store.get("name", ""),
+  haptics: store.get("haptics", true), // vibration on Android; iPhones get the on-screen shake instead
   save() { store.set("coop", this.coop); store.set("party", this.party); store.set("name", this.name); },
 };

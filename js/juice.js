@@ -3,7 +3,7 @@
 const Juice = {
   reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
 
-  buzz(pattern) { try { if (Sound.on && navigator.vibrate) navigator.vibrate(pattern); } catch {} },
+  buzz(pattern) { try { if (Prefs.haptics !== false && navigator.vibrate) navigator.vibrate(pattern); } catch {} },
 
   // a short rising ping per coin, so a big burst sounds like it's climbing
   ping(k) { Sound.tone(880 * Math.pow(1.06, k), 0.16, "triangle", 0.07, k * 0.045); },
@@ -33,7 +33,7 @@ const Juice = {
   // a rule broken: low buzz, double pulse, 3px shudder
   penalty() {
     Sound.tone(140, 0.25, "sawtooth", 0.09); Sound.tone(70, 0.3, "sine", 0.12, 0.02);
-    this.buzz([40, 30, 80]);
+    this.buzz([80]); // a broken rule: one heavy rumble
     this.shake();
   },
 
@@ -43,7 +43,18 @@ const Juice = {
     a.classList.remove("fx-shake"); void a.offsetWidth; a.classList.add("fx-shake");
   },
 
-  tap() { this.buzz([8]); },
+  tap() { this.buzz([15]); },
+
+  // a number that floats up from a meter: green when it moved the good way, red when not
+  float(el, delta, good) {
+    if (!el || !delta) return;
+    const r = el.getBoundingClientRect(), n = document.createElement("i");
+    n.className = "fx-num " + (good ? "up" : "down");
+    n.textContent = (delta > 0 ? "+" : "−") + Math.abs(Math.round(delta * 10) / 10).toLocaleString("en-US");
+    n.style.left = r.left + r.width * 0.6 + "px"; n.style.top = r.top + "px";
+    document.body.appendChild(n);
+    if (this.reduced) setTimeout(() => n.remove(), 900); else n.addEventListener("animationend", () => n.remove());
+  },
 
   // after a choice: fling coins/sparkles out of every meter that went up, shake on every one that went down
   meters(T, before, after) {

@@ -550,6 +550,20 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
 .go.auto { position: relative; overflow: hidden; }
 .go.auto::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(0,0,0,.18); animation: autofill var(--auto-ms, 3s) linear forwards; pointer-events: none; }
 @keyframes autofill { to { width: 100%; } }
+/* silent juice */
+.fx-num { position: fixed; z-index: 60; pointer-events: none; font: 800 20px var(--font-num); text-shadow: 0 2px 0 rgba(0,0,0,.5); animation: floatup 1.1s cubic-bezier(.2,.8,.3,1) forwards; }
+.fx-num.up { color: var(--leaf); } .fx-num.down { color: #FF6B76; }
+@keyframes floatup { 0% { transform: translate(-50%, 0) scale(.6); opacity: 0; } 15% { transform: translate(-50%, -8px) scale(1.15); opacity: 1; } 100% { transform: translate(-50%, -64px) scale(1); opacity: 0; } }
+.result .verdict { transform-origin: 20% 100%; animation: dropin .55s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes dropin { 0% { transform: translateY(-26px) scale(.7, 1.35); opacity: 0; } 55% { transform: translateY(0) scale(1.18, .82); opacity: 1; } 80% { transform: scale(.95, 1.06); } 100% { transform: none; } }
+body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; }
+.gest .slide-track { stroke: rgba(241,232,208,.45); stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.gest .slide-knob { fill: var(--sign); stroke: #14130C; stroke-width: 1.5; }
+.gest .slide-k { fill: #F1E8D0; font: 700 8px var(--font-sign); }
+.moon-hold { position: absolute; z-index: 3; right: 3%; top: 4%; display: grid; place-items: center; gap: 2px; padding: 6px 8px; border: 2px solid var(--sign); border-radius: 12px; background: rgba(14,23,48,.92); color: var(--sign); font: 700 12px var(--font-sign); font-size: calc(var(--ts) * 12px); cursor: pointer; touch-action: none; animation: bump 1.4s ease-in-out infinite; }
+.moon-hold b { font-size: 26px; line-height: 1; }
+.moon-hold i { display: block; width: 100%; height: 4px; border-radius: 4px; background: rgba(255,210,63,.25); overflow: hidden; }
+.moon-hold i::after { content: ""; display: block; height: 100%; width: var(--p, 0%); background: var(--sign); }
 /* the rule sign while playing, with the ❓ drawer */
 .rulebar { position: relative; display: flex; align-items: center; gap: 8px; background: var(--sign); color: var(--sign-ink); border-radius: 8px; padding: 4px 4px 4px 10px; box-shadow: 0 0 0 2px var(--sign-ink) inset; }
 .rb-rule { flex: 1; min-width: 0; font: 800 13px/1.2 var(--font-sign); font-size: calc(var(--ts) * 13px); text-transform: uppercase; letter-spacing: .02em; }
@@ -700,13 +714,13 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=54"></script>
-<script src="/js/juice.js?v=54"></script>
-<script src="/js/road.js?v=54"></script>
-<script src="/js/glovebox.js?v=54"></script>
-<script src="/js/play.js?v=54"></script>
-<script src="/js/sketch.js?v=54"></script>
-<script src="/js/share.js?v=54"></script>
+<script src="/js/compat.js?v=56"></script>
+<script src="/js/juice.js?v=56"></script>
+<script src="/js/road.js?v=56"></script>
+<script src="/js/glovebox.js?v=56"></script>
+<script src="/js/play.js?v=56"></script>
+<script src="/js/sketch.js?v=56"></script>
+<script src="/js/share.js?v=56"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1378,11 +1392,11 @@ const TOWNS = [
   init: () => ({ plans: 0, lb: 1, cash: false, hid: false, paid: false }),
   steps: [
     { rehook: "At noon you feel nothing. The weight arrives at sunset." },
-    { when: "Noon", text: "Red boots, 80 coins. Or four easy payments of 20.",
+    { when: "Noon", slider: true, text: "Red boots, 80 coins. Or four easy payments of 20.",
       choices: [
         { t: "Tap pay later", fx: s => { s.plans = 1; s.lb = 2; }, say: "Four easy payments. Nothing twitches." },
         { t: "Save up first", fx: s => { s.cash = true; }, say: "Light walk home. Boots Saturday." }] },
-    { when: "Every noon after", text: s => s.plans ? "Noon shopping feels free. Coat, lamp, couch." : "Everyone taps pay later. Shadows look fine.",
+    { when: "Every noon after", slider: true, text: s => s.plans ? "Noon shopping feels free. Coat, lamp, couch." : "Everyone taps pay later. Shadows look fine.",
       choices: [
         { t: "Keep tapping, it's noon", fx: s => { s.plans += 13; s.lb = s.plans / 2 + 1; }, say: s => `${s.plans} plans. Your shadow is still tiny.` },
         { t: "Add it up", fx: s => {}, say: s => s.plans ? "One plan. You can see the end of it." : "Nothing to add. Your shadow is just a shadow." }] },
@@ -1764,6 +1778,7 @@ function renderHome() {
 }
 
 function meters(T, s) {
+  if (S.sleep && S.prev) s = S.prev; // before midnight, the numbers haven't doubled yet
   return `<div class="meters">${T.meters.map(m => {
     const v = s[m.k], max = m.max;
     const low = m.battery ? v < 40 : (m.k === "words" ? v <= 3 : m.k === "sleep" ? v < 7 : m.k === "glass" ? v < 40 : false);
@@ -1900,7 +1915,7 @@ function renderTown() {
   }).join("");
   const who = Prefs.coop ? role(T, S.step) : null;
   const act = !r && typeof actOf === "function" ? actOf(st, s) : null;
-  const fold = !r && (act || st.drag || (st.pay && (s.pack || []).length) || st.loop || st.tiptoe || st.tune); // the gesture is the main way to choose; buttons stay one tap away
+  const fold = !r && (act || st.drag || (st.pay && (s.pack || []).length) || st.loop || st.tiptoe || st.tune || st.slider); // the gesture is the main way to choose; buttons stay one tap away
   return `${topbar(true)}
   ${rulebar}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
@@ -1912,7 +1927,7 @@ function renderTown() {
     ${st.drag && !r ? dragPanel(st) : ""}
     ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : fold ? `<details class="tapfall"><summary>or tap a button</summary><div class="choices compact">${choices}</div></details>` : `<div class="choices ${r ? "done" : ""} ${T.id === "L1" ? "compact" : ""}">${choices}</div>`}
     ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>${act ? "👆 Drag it onto your choice" : "👆 Tap A or B to choose"}</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
-    ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
+    ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}<p>${esc(r.say)}</p>${r.night && !S.sleep ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
   </section>`;
 }
@@ -1949,6 +1964,9 @@ function render() {
   document.body.classList.toggle("in-town", S.screen === "town");
   document.body.classList.toggle("playing", S.screen === "town" && (S.phase === "step" || S.phase === "result")); // compact layout so a whole day fits on one phone screen
   const cur = S.screen === "town" && S.phase === "step" ? TOWNS[S.t].steps[S.step] : null;
+  const drain = S.screen === "town" && TOWNS[S.t].id === "L3" && S.s && (S.phase === "step" || S.phase === "result"); // Chargeville: low battery, low colour
+  document.body.classList.toggle("drain", !!drain);
+  document.body.style.setProperty("--sat", drain ? Math.max(0.12, S.s.bat / 100).toFixed(2) : "1");
   document.body.classList.toggle("tight", !!(cur && (cur.drag || (TOWNS[S.t].id === "L1" && cur.choices)))); // drag days and Hushwick's spoken lines need room, so the drawing gives some up
   $app.innerHTML = (S.screen === "ignition" ? renderIgnition() : S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown());
   if (S.screen === "fan") bindFan();
@@ -1962,6 +1980,7 @@ function animateMeters(before) {
     const k = el.dataset.k, a = before[k], b = S.s[k];
     if (a === undefined || a === b) return;
     el.classList.add(b > a ? "bump" : "drop");
+    if (typeof a === "number" && typeof b === "number") { const T = TOWNS[S.t], down = dirOf(T, k) === "down"; Juice.float(el, b - a, down ? b < a : b > a); }
   });
 }
 
@@ -1987,6 +2006,8 @@ function pick(i, dyn, before0) {
   if (s.glass !== undefined) s.glass = Math.max(0, Math.min(100, s.glass));
   const night = st.night ? st.night(s) : (c.water !== undefined ? (c.water ? `The tree grows <strong>+${s.streak}</strong> coins.` : (before.coins ? `Skipped. The tree drops half: <strong>${before.coins} → ${s.coins}</strong>` : "Skipped. Nothing grows.")) : "");
   S.lastResult = { i: dyn ? -1 : i, say: val(c.say, s), night };
+  // Doubleton and Halfnight: the coins wait for you to "sleep until midnight" before they double
+  S.prev = before; S.sleep = (T.id === "M1" || T.id === "M-chain") && /→/.test(night || "");
   if (c.clip) Voice.say(T.id + "-" + c.clip);
   S.phase = "result";
   // was that choice good? each number counts in its good direction (KID up/down); towns without one count "up" as good
@@ -1997,7 +2018,13 @@ function pick(i, dyn, before0) {
   }, 0);
   S.grid.push(score < 0 ? "r" : score > 0 ? "g" : "y");
   score < 0 ? Sound.bad() : score > 0 ? Sound.good() : Sound.pluck();
-  render(); animateMeters(before); Juice.meters(T, before, s);
+  render(); if (!S.sleep) { animateMeters(before); Juice.meters(T, before, s); }
+}
+// the player held the moon: midnight arrives, the jar doubles in front of them
+function wake() {
+  if (!S.sleep) return;
+  const T = TOWNS[S.t], before = S.prev; S.sleep = false;
+  Sound.swell(); Juice.buzz([20, 40, 20]); render(); animateMeters(before); Juice.meters(T, before, S.s); Play.autoNext();
 }
 
 function next() {
@@ -2016,7 +2043,7 @@ function next() {
     else if (nearMiss(T, S.s)) Juice.buzz([20, 40, 20, 40, 60]);
     return;
   }
-  S.step += 1; S.phase = "step"; enterStep(); render(); window.scrollTo(0, 0);
+  S.sleep = false; S.step += 1; S.phase = "step"; enterStep(); render(); window.scrollTo(0, 0);
 }
 
 function startTown(i, opts = {}) {
@@ -2062,7 +2089,7 @@ $app.addEventListener("click", async e => {
   if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
   if (act === "say") { const k = b.dataset.k; Voice.playing(k) ? Voice.stop() : Voice.say(k, true); return; }
   if (act === "ignite") { ignite(); return; }
-  if (act === "equip-new") { const id = b.dataset.id; if (Glove.on.indexOf(id) < 0) Glove.toggle(id); Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.burst(b, 8, "money"); Sound.good(); render(); return; }
+  if (act === "equip-new") { Juice.buzz([25, 40, 25]); const id = b.dataset.id; if (Glove.on.indexOf(id) < 0) Glove.toggle(id); Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.burst(b, 8, "money"); Sound.good(); render(); return; }
   if (act === "glove-later") { Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.tap(); render(); return; }
   if (act === "equip") { const it = ITEMS.find(x => x.id === b.dataset.id); if (!it || !Glove.open(it)) { Juice.penalty(); return; } Glove.toggle(it.id); Glove.markSeen([it.id]); Juice.tap(); Sound.pluck(); render(); return; }
   if (act === "howto-ok") { store.set("howto", true); Juice.tap(); render(); return; }

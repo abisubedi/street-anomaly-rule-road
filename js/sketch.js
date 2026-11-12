@@ -116,8 +116,9 @@ const Sk = {
 
 /* ---------- Doubleton and Halfnight: the coin jar ---------- */
 function jarScene(s, st) {
-  const r = S.phase === "result" ? S.lastResult : null;
-  const night = !!(r && r.night), doubled = night && /→/.test(r.night), end = S.phase === "end", opened = !!s.opened;
+  const r = S.phase === "result" ? S.lastResult : null, asleep = S.sleep && S.phase === "result" && S.prev;
+  if (asleep) s = { ...s, jar: S.prev.jar }; // the evening's coins; they double once you sleep
+  const night = !asleep && !!(r && r.night), doubled = night && /→/.test(r.night), end = S.phase === "end", opened = !!s.opened;
   const mood = opened ? "worried" : doubled ? "happy" : Sk.mood();
   const shown = Math.min(s.jar, 84), extra = s.jar - shown, prev = Math.min(Play.mem.jar || 0, shown);
   const coins = Array.from({ length: shown }, (_, i) => {
@@ -145,7 +146,8 @@ function jarScene(s, st) {
     ${lid}${piggy}
     <g transform="rotate(-4 150 74)"><rect x="131" y="64" width="38" height="17" rx="2" fill="${INK}" opacity=".92"/>${Sk.text(150, 77, opened ? "oops" : "SAVE", DARK, 11)}</g>
     ${Sk.kid(58, 128, mood)}
-    ${extra > 0 ? Sk.text(150, 15, `+${fmt(extra)} more`, SUN, 12) : ""}`, act ? act.hint : cap, { under, h: 150, act });
+    ${extra > 0 ? Sk.text(150, 15, `+${fmt(extra)} more`, SUN, 12) : ""}`, asleep ? "Hold the moon to sleep until midnight." : act ? act.hint : cap,
+    { under, h: 150, act, overlay: asleep ? `<button class="moon-hold" id="moonhold" aria-label="Hold to sleep until midnight"><b>🌙</b>Hold to sleep<i></i></button>` : "" });
 }
 
 const SCENES = {
@@ -420,7 +422,7 @@ const SCENES = {
 
   /* Laterton: the shadow is nothing at noon and everything at sunset */
   "M-shadow"(s, st) {
-    const sunset = !!(st && /p\.m\.|sunset|November/i.test(st.when)) || S.phase === "end";
+    const sunset = !!(st && /p\.m\.|sunset|November/i.test(st.when)) || S.phase === "end", slide = st && st.slider && S.phase === "step";
     const len = sunset ? Math.min(220, 20 + Math.sqrt(s.lb) * 9) : 14 + s.plans; // the low sun sits behind you, so the shadow stretches away from it
     const dark = Math.min(0.92, 0.35 + s.lb / 2000), shades = has("shades");
     return Sk.frame("shadow", len, `Your shadow weighs ${s.lb} pounds`, `
@@ -429,8 +431,11 @@ const SCENES = {
       ${Sk.ground(110)}
       <ellipse class="shade" cx="${66 + len / 2}" cy="114" rx="${len / 2}" ry="${sunset ? 7 : 4}" fill="rgba(0,0,0,${dark})" stroke="${DIM}" stroke-width="1.2" stroke-dasharray="4 3" style="transform-origin: 66px 114px"/>
       ${Sk.kid(66, 112, Sk.mood(sunset && s.lb > 200 ? "worried" : ""), { scale: .8, shades })}`,
-      sunset ? `Sunset. Your shadow weighs ${fmt(s.lb)} lb.${shades ? " The sunglasses help a little." : ""}` : s.plans ? `Noon. ${plural(s.plans, "plan")}, and your shadow feels like nothing. For now.` : "Noon. A normal shadow.",
-      { h: 128, cls: sunset ? "dusk" : "noon" });
+      slide ? "Slide toward pay later and watch your shadow." : sunset ? `Sunset. Your shadow weighs ${fmt(s.lb)} lb.${shades ? " The sunglasses help a little." : ""}` : s.plans ? `Noon. ${plural(s.plans, "plan")}, and your shadow feels like nothing. For now.` : "Noon. A normal shadow.",
+      { h: 128, cls: sunset ? "dusk" : "noon", overlay: slide ? `<div class="gest" id="slider" data-h="128">
+        <svg viewBox="0 0 300 128" preserveAspectRatio="none" aria-hidden="true"><line class="slide-track" x1="100" x2="284" y1="124" y2="124"/>
+          <text class="slide-k" x="100" y="118">◀ ${esc(st.choices[1].t)}</text><text class="slide-k" x="284" y="118" text-anchor="end">${esc(st.choices[0].t)} ▶</text>
+          <circle class="slide-knob" cx="192" cy="124" r="7"/></svg></div>` : "" });
   },
 
   /* Whisperton: loud words crack the glass bridge */
@@ -582,7 +587,7 @@ const ROWS = {
   "M-monster": { item: HAND(90, 100), hint: "Drag your hand. Bills you dodge grow teeth.",
     days: { 1: [["💳", "Pay it now"], ["📅", "Tomorrow"]], 2: [["📬", "Check mail"], ["🙈", "Leave it"]], 3: [["📞", "Call and ask"], ["🏚️", "Hide in attic"]] } },
   "M-shadow": { item: HAND(94, 88), box: { x0: 124, y: 32, h: 74 }, hint: "Drag your hand. Every pay-later weighs on your shadow.",
-    days: { 1: [["📲", "Pay later"], ["🐷", "Save up"]], 2: [["📲", "Keep tapping"], ["🧮", "Add it up"]], 3: [["💡", "Every light on"], ["💸", "Pay them off"]] } },
+    days: { 3: [["💡", "Every light on"], ["💸", "Pay them off"]] } },
   "L-whisper": { item: WORDS(94, 86), box: { x0: 122, y: 14, h: 88 }, hint: "Drag your words. Loud ones crack the glass.",
     days: { 2: [["🤫", "Wait quietly"], ["📢", "Yell louder"], ["🙏", "Whisper please"]], 5: [["🤭", "Into sleeve"], ["😂", "Laugh out loud"], ["😊", "Save it"]] } },
   "L-hum": { item: WORDS(92, 100), box: { x0: 116 }, hint: "Drag your voice to what you'll do.",
