@@ -18,6 +18,13 @@ const Passport = {
     return { seals: v.filter(n => n >= 3).length, entered: v.filter(n => n === 2).length, citations: v.filter(n => n === 1).length, empty: v.filter(n => !n).length };
   },
 
+  // each town's law has an official number: its mile on the road
+  order(t) { const m = roadPos(t) + 1; return `${["Order", "Bylaw", "Ordinance", "Decree"][(m - 1) % 4]} No. ${String(m).padStart(2, "0")}`; },
+  // what the border officer writes under your stamp
+  verdict: n => n >= 3 ? "Clearance granted: full compliance" : n === 2 ? "Provisional entry: minor infraction" : "Citation issued: the law was broken",
+  // your whole record, for the share message and card
+  record() { const c = this.counts(); return { stamps: TOWNS.length - c.empty - c.citations, citations: c.citations }; },
+
   // the passport page on the home screen: one slot per town, in road order
   panel() {
     const c = this.counts(), stamped = TOWNS.length - c.empty;

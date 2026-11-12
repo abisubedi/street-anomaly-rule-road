@@ -56,7 +56,11 @@ async function drawCard(T, stars) {
   T.meters.forEach(m => { g.fillText(`${m.label}: ${S.s[m.k]}${m.unit || ""}`, W / 2, y); y += 56; });
   // the dare
   g.fillStyle = "#E63946"; g.font = `400 46px ${DISP}`;
-  g.fillText(S.challenge && stars > S.challenge.s ? `I BEAT ${(S.challenge.c || "MY FRIEND").toUpperCase()}. YOUR TURN.` : "CAN YOU BEAT ME?", W / 2, H - 150);
+  const rec = Passport.record();
+  g.font = `700 38px ${SIGN}`; g.fillStyle = "#EEF1F8";
+  g.fillText(`MY PASSPORT: ${rec.stamps} STAMP${rec.stamps === 1 ? "" : "S"} · ${rec.citations} CITATION${rec.citations === 1 ? "" : "S"}`, W / 2, H - 220);
+  g.fillStyle = "#E63946"; g.font = `400 46px ${DISP}`;
+  g.fillText(S.challenge && stars > S.challenge.s ? `I BEAT ${(S.challenge.c || "MY FRIEND").toUpperCase()}. YOUR TURN.` : "BEAT MY BORDER RECORD?", W / 2, H - 150);
   g.fillStyle = "#9AA7C4"; g.font = `700 36px ${SIGN}`;
   g.fillText("streetanomaly.pages.dev", W / 2, H - 90);
   return new Promise(r => c.toBlob(r, "image/png"));
@@ -70,7 +74,8 @@ function roundRect(g, x, y, w, h, r) {
 async function shareResult(T, stars) {
   const toast = document.getElementById("share-toast");
   const url = challengeUrl(T, stars);
-  const text = `I got ${"★".repeat(stars)}${"☆".repeat(3 - stars)} in ${T.name} on Rule Road. Can you beat me?`;
+  const rec = Passport.record();
+  const text = `${T.name}: ${Passport.label(stars)} ${"★".repeat(stars)}${"☆".repeat(3 - stars)}. My Rule Road passport: ${rec.stamps} stamp${rec.stamps === 1 ? "" : "s"}, ${rec.citations} citation${rec.citations === 1 ? "" : "s"}. Can you beat my border record?`;
   const blob = await drawCard(T, stars);
   const file = new File([blob], `RuleRoad-${T.name.replace(/\s+/g, "")}.png`, { type: "image/png" });
   try {

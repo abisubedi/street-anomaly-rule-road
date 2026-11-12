@@ -558,6 +558,7 @@ html.in-play { overscroll-behavior-y: contain; } /* Android: a downward drag in 
   body.in-town .bar .iconbtn { padding: 4px 10px; font-size: 12px; font-size: calc(var(--ts) * 12px); }
   .rulebar { padding: 2px 2px 2px 8px; }
   .rb-rule { font-size: 11px; font-size: calc(var(--ts) * 11px); }
+  .rb-no { display: none; } /* very short screens keep the law, drop its number */
   .play-help > summary { width: 26px; height: 26px; font-size: 13px; }
   body.playing .meter { padding: 4px 8px; }
   body.playing .meter .mv { font-size: 18px; font-size: calc(var(--ts) * 18px); }
@@ -625,6 +626,9 @@ html.in-play { overscroll-behavior-y: contain; } /* Android: a downward drag in 
 .pslot.empty { border: 2px dashed var(--line); border-radius: 50%; color: var(--muted); font: 700 10px/1.1 var(--font-sign); text-transform: uppercase; text-align: center; padding: 6px; }
 .pslot.locked { cursor: default; opacity: .6; font-size: 11px; }
 .pslot:focus-visible { outline: 3px solid var(--sign); outline-offset: 2px; border-radius: 50%; }
+.rb-no { display: block; font-size: 9px; letter-spacing: .14em; opacity: .75; }
+.border-verdict { margin: 8px 0 0; text-align: center; font: 800 12px var(--font-sign); font-size: calc(var(--ts) * 12px); letter-spacing: .1em; text-transform: uppercase; border-top: 1.5px dashed rgba(20,19,12,.35); padding-top: 6px; }
+.border-verdict.g-seal { color: #8A5A00; } .border-verdict.g-entered { color: #2F5DA8; } .border-verdict.g-citation { color: #C8102E; }
 .tag-stamp { font: 800 11px var(--font-sign); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid currentColor; border-radius: 6px; padding: 1px 6px; rotate: -3deg; }
 .tag-stamp.g-seal { color: var(--gold); } .tag-stamp.g-entered { color: #8FB4F0; } .tag-stamp.g-citation { color: #FF6B76; }
 /* silent juice */
@@ -791,14 +795,14 @@ body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=59"></script>
-<script src="/js/juice.js?v=59"></script>
-<script src="/js/road.js?v=59"></script>
-<script src="/js/glovebox.js?v=59"></script>
-<script src="/js/passport.js?v=59"></script>
-<script src="/js/play.js?v=59"></script>
-<script src="/js/sketch.js?v=59"></script>
-<script src="/js/share.js?v=59"></script>
+<script src="/js/compat.js?v=60"></script>
+<script src="/js/juice.js?v=60"></script>
+<script src="/js/road.js?v=60"></script>
+<script src="/js/glovebox.js?v=60"></script>
+<script src="/js/passport.js?v=60"></script>
+<script src="/js/play.js?v=60"></script>
+<script src="/js/sketch.js?v=60"></script>
+<script src="/js/share.js?v=60"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1902,13 +1906,13 @@ function renderTown() {
       <button class="film" data-act="begin" aria-label="Enter ${esc(T.name)}. In this town, ${esc(T.rule)}">
         <span class="film-frame">${Film.arrive(T)}<span class="film-sign" aria-hidden="true">${esc(T.name)}</span></span>
         <span class="film-cap">
-          <span class="kicker">Mile ${mile} · By order of the mayor${badges ? `<span class="badges">${badges}</span>` : ""}</span>
+          <span class="kicker">${Passport.order(S.t)} · By order of the mayor${badges ? `<span class="badges">${badges}</span>` : ""}</span>
           <span class="rule">In this town, ${esc(T.rule)}</span>
         </span>
       </button>
     </section>` : `<section class="hero">
       <button class="sign sign-go" data-act="begin" aria-label="Enter ${esc(T.name)}"><span class="sign-inner">
-        <span class="kicker">${T.name} · By order of the mayor${badges ? `<span class="badges">${badges}</span>` : ""}</span>
+        <span class="kicker">${T.name} · ${Passport.order(S.t)}${badges ? `<span class="badges">${badges}</span>` : ""}</span>
         <span class="rule ${T.rule.length > 58 ? "long" : ""}">In this town, ${esc(T.rule)}</span>
       </span></button>
       <div class="pole"></div>
@@ -1944,6 +1948,7 @@ function renderTown() {
     <figure class="polaroid">
       ${stage(T, s)}
       ${Passport.stamp(T, n, "slam pol-stamp")}
+      <p class="border-verdict g-${Passport.grade(n)}">${Passport.verdict(n)}</p>
       <figcaption>${esc(T.ending(s))}</figcaption>
     </figure>
     ${stamps ? `<div class="stamps">${stamps}</div>` : ""}
@@ -1972,7 +1977,7 @@ function renderTown() {
   const st = T.steps[S.step];
   // while playing: the town's rule as a slim road sign, and ❓ for the plain-language explainer, goal and narrator
   const K = kidOf(T);
-  const rulebar = `<div class="rulebar"><span class="rb-rule">In this town, ${esc(T.rule)}</span>${K ? `<details class="help play-help"><summary aria-label="What does this mean?">❓</summary>
+  const rulebar = `<div class="rulebar"><span class="rb-rule"><b class="rb-no">${Passport.order(S.t)} · By order of the mayor</b>In this town, ${esc(T.rule)}</span>${K ? `<details class="help play-help"><summary aria-label="What does this mean?">❓</summary>
     <div class="help-body"><p><b>🤔 What does this mean?</b> ${esc(K.what)}</p><p><b>⭐⭐⭐</b> ${esc(K.goal)}</p>${listenBtn(T.id + "-kid")}</div></details>` : ""}</div>`;
   if (st.rehook) {
     return `${topbar(true)}
