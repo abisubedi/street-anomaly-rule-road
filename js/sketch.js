@@ -154,7 +154,7 @@ const SCENES = {
     }).join("");
     return Sk.frame("words", left, `${left} words left, friendship ${s.heart}`, `${Sk.ground()}${tokens}
       ${Sk.heart(200, 82, .7 + heart / 14 * .9)}${Sk.kid(58, 128, Sk.mood(left <= 2 && S.phase !== "end" ? "worried" : ""), { arms: "M58 94 L46 108 M58 94 L74 86" })}`,
-      S.phase === "step" && st && st.choices ? `${st.mic ? "Say it out loud, or hold a line below." : "Hold a line to say it."} Each word uses a token.`
+      S.phase === "step" && st && st.choices ? "Hold a line to say it. Each word uses a token."
         : `${plural(left, "word")} left today.${heart ? ` Friendship: ${s.heart}.` : ""}`);
   },
 
@@ -575,7 +575,7 @@ const ACTS = {
   },
 };
 function actOf(st, s) {
-  if (!st || S.phase !== "step" || st.rehook || st.mic || st.drag || st.play || st.pay || !st.choices) return null;
+  if (!st || S.phase !== "step" || st.rehook || st.drag || st.play || st.pay || !st.choices) return null;
   const id = TOWNS[S.t].id, f = ACTS[id];
   return f ? f(st, s) : ROWS[id] ? rowAct(st, s, ROWS[id]) : null;
 }

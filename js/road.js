@@ -23,6 +23,7 @@ function road() {
   return (_road = placed);
 }
 const roadPos = t => road().indexOf(t);
+const freq = i => (88.1 + 0.8 * i).toFixed(1); // each town has its own radio frequency, shown on its sign
 const nextOnRoad = t => road()[roadPos(t) + 1];
 const totalStars = () => Object.values(S.stars).reduce((a, b) => a + b, 0);
 const districtOf = t => DISTRICTS.findIndex(d => d.ids.includes(TOWNS[t].id));

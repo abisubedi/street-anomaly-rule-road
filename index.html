@@ -212,7 +212,7 @@ a { color: var(--sign); }
 /* CRT night: faint scanlines and a vignette over everything, never over the controls' readability */
 body::after { content: ""; position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; z-index: 50;
   background: repeating-linear-gradient(to bottom, rgba(255,255,255,.022) 0 1px, transparent 1px 3px), radial-gradient(120% 90% at 50% 40%, transparent 60%, rgba(0,0,0,.35)); }
-body.in-town .app { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+
 
 .tag-voice { color: var(--fg); background: rgba(255,210,63,.14); border-radius: 99px; padding: 1px 8px; letter-spacing: .06em; text-transform: none; font-weight: 700; }
 .district { display: flex; flex-direction: column; gap: 14px; }
@@ -251,56 +251,15 @@ body.in-town .app { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px
 .challenge { background: rgba(230,57,70,.14); border: 1px solid var(--red); border-radius: 12px; padding: 10px 14px; font-weight: 700; text-align: center; }
 .challenge .end-stars, .challenge span[aria-label] { font-size: 1em; letter-spacing: 1px; color: var(--sign); }
 .challenge.daily-tag { background: rgba(255,210,63,.12); border-color: var(--sign); color: var(--sign); }
-.voice-note { margin: 0; color: var(--muted); font-size: 16px; font-size: calc(var(--ts) * 16px); }
-.voice-note b { color: var(--fg); }
 .role { margin-left: 10px; padding: 2px 8px; border-radius: 99px; font-size: 14px; font-size: calc(var(--ts) * 14px); letter-spacing: .12em; }
 .role-driver { background: var(--sign); color: var(--sign-ink); }
 .role-navigator { background: var(--leaf); color: #0B1428; }
 .or-tap { text-align: center; font-family: var(--font-sign); font-weight: 700; font-size: 14px; font-size: calc(var(--ts) * 14px); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-.result .heard { color: var(--sign); font-style: italic; }
 .nearmiss { text-align: center; font-family: var(--font-sign); font-weight: 900; color: var(--red); letter-spacing: .06em; animation: pop .5s cubic-bezier(.3,1.8,.5,1) both; }
 
-/* the mic panel */
-.micpanel { background: #0E1730; border: 2px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.micpanel.cracked { border-color: var(--red); background-image: linear-gradient(115deg, transparent 47%, rgba(255,255,255,.18) 48%, transparent 49%), linear-gradient(60deg, transparent 63%, rgba(255,255,255,.12) 64%, transparent 65%); }
-.mp-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--font-sign); font-weight: 900; font-size: 14px; font-size: calc(var(--ts) * 14px); letter-spacing: .14em; text-transform: uppercase; color: var(--leaf); }
-.mp-cracks { font-family: var(--font-num); color: var(--red); letter-spacing: .3em; font-size: 17px; font-size: calc(var(--ts) * 17px); }
-.mp-count { font-family: var(--font-num); color: var(--sign); font-size: 16px; font-size: calc(var(--ts) * 16px); letter-spacing: 0; }
-.mp-count.over { color: var(--red); animation: shake .3s; }
-.mp-line { margin: 0; font-size: 19px; font-size: calc(var(--ts) * 19px); font-weight: 700; }
-.mp-scope { display: block; width: 100%; height: auto; background: linear-gradient(#0B1428, #101C3A); border-radius: 8px; }
-.mp-ghost { font-size: 14px; font-size: calc(var(--ts) * 14px); color: var(--muted); }
-.mp-words { margin: 0; min-height: 1.5em; color: var(--sign); font-style: italic; font-size: 19px; font-size: calc(var(--ts) * 19px); }
-.mp-bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
-.mp-bar i { display: block; height: 100%; width: 0; background: var(--leaf); transition: width .1s linear; }
-.mp-status { margin: 0; color: var(--muted); font-size: 15px; font-size: calc(var(--ts) * 15px); }
 
-/* the dashboard: radio display + CB handset */
-.dash { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; align-items: stretch;
-  padding: 10px 16px;
-  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  background: linear-gradient(#1A1F2E, #0C101B); border-top: 2px solid #2B3348; box-shadow: 0 -10px 30px rgba(0,0,0,.5); }
-.dash > * { max-width: 260px; }
-.dash { justify-content: center; }
-.dash-radio { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: #071007; border: 1px solid #23402A; border-radius: 10px; padding: 8px 12px; font-family: var(--font-num); color: #8CF29B; text-shadow: 0 0 8px rgba(140,242,155,.5); }
-.dash-radio .fm { font-size: 19px; font-size: calc(var(--ts) * 19px); white-space: nowrap; }
-.dash-radio .st { font-size: 14px; font-size: calc(var(--ts) * 14px); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .85; }
-.eq { display: flex; gap: 2px; align-items: flex-end; height: 16px; }
-.eq i { width: 3px; height: 4px; background: #8CF29B; }
-.dash.on-air .eq i { animation: eq .5s ease-in-out infinite alternate; }
-.dash.on-air .eq i:nth-child(2) { animation-delay: .15s; } .dash.on-air .eq i:nth-child(3) { animation-delay: .3s; }
-.cb { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; border: 2px solid #3A4460; background: radial-gradient(circle at 30% 30%, #3A4460, #1B2133); color: var(--fg);
-  font-family: var(--font-sign); font-weight: 900; font-size: 16px; font-size: calc(var(--ts) * 16px); letter-spacing: .08em; text-transform: uppercase; padding: 12px 16px; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.cb:not(:disabled) { border-color: var(--sign); box-shadow: 0 0 0 4px rgba(255,210,63,.12); }
-.cb:disabled { opacity: .5; cursor: default; }
-.cb-dot { width: 12px; height: 12px; border-radius: 50%; background: #5B6680; flex: none; }
-.cb:not(:disabled) .cb-dot { background: var(--sign); }
-.cb.live { background: var(--red); border-color: #fff; transform: scale(.97); }
-.cb.live .cb-dot { background: #fff; animation: flicker 1s infinite; }
 
-.reel, .sharebox { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.reel-k { font-family: var(--font-sign); font-weight: 900; font-size: 14px; font-size: calc(var(--ts) * 14px); letter-spacing: .1em; text-transform: uppercase; color: var(--sign); }
-.reel-cap { margin: 0; min-height: 1.4em; color: #8CF29B; font-family: var(--font-num); font-size: 15px; font-size: calc(var(--ts) * 15px); }
+.sharebox { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .sharebox label { font-size: 14px; font-size: calc(var(--ts) * 14px); color: var(--muted); font-family: var(--font-sign); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .sharebox input { flex: 1 1 140px; min-width: 0; background: var(--night); color: var(--fg); border: 2px solid var(--line); border-radius: 10px; padding: 12px 14px; font: inherit; }
 
@@ -313,9 +272,6 @@ body.in-town .app { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px
 /* party mode: everything that matters, bigger */
 body.party .meter .mv { font-size: 50px; font-size: calc(var(--ts) * 50px); }
 body.party .story { font-size: 26px; font-size: calc(var(--ts) * 26px); }
-body.party .mp-count { font-size: 27px; font-size: calc(var(--ts) * 27px); }
-body.party .mp-line { font-size: 25px; font-size: calc(var(--ts) * 25px); }
-body.party .mp-cracks { font-size: 27px; font-size: calc(var(--ts) * 27px); }
 body.party .choice { font-size: 19px; font-size: calc(var(--ts) * 19px); padding: 18px; }
 
 @keyframes fly { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 55% { transform: translate(var(--dx), var(--dy)) rotate(calc(var(--rot) / 2)); opacity: 1; } 100% { transform: translate(calc(var(--dx) * 1.2), calc(var(--dy) * -1.4)) rotate(var(--rot)); opacity: 0; } }
@@ -323,10 +279,10 @@ body.party .choice { font-size: 19px; font-size: calc(var(--ts) * 19px); padding
 @keyframes eq { from { height: 3px; } to { height: 16px; } }
 /* old Safari (iOS 12–14.0) and old Chrome have no flexbox gap: space the same stacks with margins */
 .no-flexgap .app > * + *, .no-flexgap .choices > * + *, .no-flexgap .scene > * + *, .no-flexgap .road > * + *, .no-flexgap .district > * + *,
-.no-flexgap .micpanel > * + *, .no-flexgap .reel > * + *, .no-flexgap .sharebox > * + *, .no-flexgap .rehook > * + *, .no-flexgap .result > * + *,
+.no-flexgap .sharebox > * + *, .no-flexgap .rehook > * + *, .no-flexgap .result > * + *,
 .no-flexgap .stop-card > * + *, .no-flexgap .meter > * + *, .no-flexgap .hero > p { margin-top: 14px; }
-.no-flexgap .row > * + *, .no-flexgap .toggles > * + *, .no-flexgap .dash > * + *, .no-flexgap .listen-row > * + *, .no-flexgap .bar > * + *,
-.no-flexgap .meters > * + *, .no-flexgap .tags > * + *, .no-flexgap .dial > * + *, .no-flexgap .dash-radio > * + *, .no-flexgap .cb > * + * { margin-left: 10px; }
+.no-flexgap .row > * + *, .no-flexgap .toggles > * + *, .no-flexgap .listen-row > * + *, .no-flexgap .bar > * + *,
+.no-flexgap .meters > * + *, .no-flexgap .tags > * + *, .no-flexgap .dial > * + * { margin-left: 10px; }
 .no-flexgap .row > *, .no-flexgap .meters > * { margin-bottom: 10px; }
 
 /* tablets: iPad and Android tablets, in both orientations. A wider column, the road in two lanes, bigger reading type. */
@@ -343,8 +299,6 @@ body.party .choice { font-size: 19px; font-size: calc(var(--ts) * 19px); padding
   .stop-card { height: 100%; }
   .meters .meter { flex-basis: 200px; }
   .choices { display: grid; grid-template-columns: 1fr; }
-  .micpanel { padding: 16px 20px; }
-  .dash > * { max-width: 340px; }
   .station { width: 110px; }
   .no-flexgap .district > * + * { margin-top: 0; }
 }
@@ -353,9 +307,6 @@ body.party .choice { font-size: 19px; font-size: calc(var(--ts) * 19px); padding
 }
 /* a tablet or phone on its side: keep the radio dash short so the story has room */
 @media (orientation: landscape) and (max-height: 520px) {
-  .dash { padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
-  .cb { padding: 8px 14px; }
-  body.in-town .app { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
   .hero .rule { font-size: 42px; font-size: calc(var(--ts) * 42px); }
 }
 /* blueprint art */
@@ -383,12 +334,12 @@ body.party .choice { font-size: 19px; font-size: calc(var(--ts) * 19px); padding
 /* ---------- type & touch pass: reading text, pressable controls ---------- */
 body { font-size: 19px; font-size: calc(var(--ts) * 19px); line-height: 1.5; }
 .story { line-height: 1.42; max-width: 34em; }
-.sign .kicker, .dname, .daily-k, .when, .lesson-k, .rehook .k, .reel-k, .mp-head, .mini-sign, .unlock, .open-road figcaption { font-family: var(--font-display); font-weight: 400; letter-spacing: .06em; }
+.sign .kicker, .dname, .daily-k, .when, .lesson-k, .rehook .k, .mini-sign, .unlock, .open-road figcaption { font-family: var(--font-display); font-weight: 400; letter-spacing: .06em; }
 .sign .rule, .lesson { font-weight: 700; line-height: 1.08; letter-spacing: .01em; }
 .hero .rule { font-family: var(--font-display); font-weight: 400; }
 
 /* everything you can tap is at least 48px tall and sits on a keycap edge that sinks when pressed */
-.go, .choice, .daily, .mode, .station, .listen, .iconbtn, .cb { -webkit-user-select: none; user-select: none; }
+.go, .choice, .daily, .mode, .station, .listen, .iconbtn { -webkit-user-select: none; user-select: none; }
 .go { font-family: var(--font-sign); font-weight: 700; letter-spacing: .04em; min-height: 54px; box-shadow: 0 5px 0 #9C7A10; transition: transform .06s, box-shadow .06s; }
 .go.ghost { box-shadow: 0 4px 0 var(--press); }
 .go:active { transform: translateY(4px); box-shadow: 0 1px 0 #9C7A10; }
@@ -412,10 +363,8 @@ body { font-size: 19px; font-size: calc(var(--ts) * 19px); line-height: 1.5; }
 .daily { box-shadow: 0 5px 0 #6E5A12, 0 0 0 4px rgba(255,210,63,.08); }
 .daily.done { box-shadow: 0 4px 0 var(--press); }
 .stop-card { box-shadow: 0 4px 0 var(--press); }
-.cb { min-height: 52px; font-family: var(--font-sign); font-weight: 700; }
 .tsize { min-width: 48px; font-family: var(--font-sign) !important; font-weight: 700 !important; letter-spacing: 0; text-transform: none; }
 .field input, .sharebox input { min-height: 50px; font-size: 18px; font-size: calc(var(--ts) * 18px); }
-.mp-line { font-family: var(--font-sign); font-weight: 600; }
 .result p { font-size: 19px; font-size: calc(var(--ts) * 19px); }
 .meters .meter { flex-basis: 120px; }
 .meter .ml { letter-spacing: .05em; line-height: 1.2; }
@@ -567,18 +516,11 @@ body.playing .meter .dir { display: inline; margin: 0 0 0 4px; font-size: inheri
 body.playing .catch { height: 150px; }
 body.tight .stage > svg, body.tight .stage > .act-wrap { max-width: 210px; margin-inline: auto; }
 body.tight .stage figcaption { display: none; }
-body.in-town .dash { padding-top: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
-body.in-town .cb { padding: 8px 12px; font-size: 14px; font-size: calc(var(--ts) * 14px); white-space: nowrap; }
-body.in-town .dash-radio { padding: 6px 10px; }
-body.in-town .dash-radio .fm { font-size: 17px; font-size: calc(var(--ts) * 17px); }
-body.in-town .app { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
-body.playing .mp-status { font-size: 12px; font-size: calc(var(--ts) * 12px); line-height: 1.3; }
+body.in-town .app { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); } /* no radio bar any more */
 @media (max-height: 720px) {
   body.playing .stage > svg, body.playing .stage > .act-wrap { max-width: 270px; margin-inline: auto; }
   body.playing .story { font-size: 16px; font-size: calc(var(--ts) * 16px); }
   body.tight .stage > svg, body.tight .stage > .act-wrap { max-width: 150px; }
-  body.tight .mp-scope { max-height: 44px; }
-  body.tight .mp-line { font-size: 15px; font-size: calc(var(--ts) * 15px); }
   body.playing .app, body.playing .scene { gap: 8px; }
 }
 body.playing .app { gap: 10px; }
@@ -593,9 +535,6 @@ body.playing .stage { padding: 6px 8px; }
 body.playing .stage figcaption { font-size: 14px; font-size: calc(var(--ts) * 14px); margin-top: 2px; }
 body.playing .when { font-size: 12px; font-size: calc(var(--ts) * 12px); }
 body.playing .story { font-size: 17px; font-size: calc(var(--ts) * 17px); line-height: 1.35; }
-body.playing .micpanel { padding: 8px 12px; gap: 4px; }
-body.playing .mp-line { font-size: 16px; font-size: calc(var(--ts) * 16px); }
-body.playing .mp-scope { max-height: 64px; }
 body.playing .result { gap: 4px; }
 body.playing .result p { margin: 0; font-size: 16px; font-size: calc(var(--ts) * 16px); }
 body.playing .choices.done { display: none; } /* once you've chosen, the result says what you did */
@@ -702,7 +641,6 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
 .item:active:not(.locked) { transform: translateY(3px); box-shadow: 0 1px 0 var(--press); }
 .item-on { background: rgba(123,211,137,.12); border: 1px solid var(--leaf); border-radius: 12px; padding: 8px 12px; font-size: 16px; }
 .cjar.big { width: 96px; margin-left: -48px; }
-.mp-hint { margin: 0; color: var(--sign); font: 600 16px var(--font-sign); }
 @keyframes pulse { 50% { box-shadow: 0 0 0 18px rgba(255,210,63,.06), 0 8px 0 #000, 0 0 70px rgba(255,210,63,.45); } }
 @media (prefers-reduced-motion: reduce) { .ignite { animation: none; } }
 /* ---------- device punch-list ---------- */
@@ -733,16 +671,13 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=49"></script>
-<script src="/js/juice.js?v=49"></script>
-<script src="/js/mic.js?v=49"></script>
-<script src="/js/road.js?v=49"></script>
-<script src="/js/radio.js?v=49"></script>
-<script src="/js/reel.js?v=49"></script>
-<script src="/js/glovebox.js?v=49"></script>
-<script src="/js/play.js?v=49"></script>
-<script src="/js/sketch.js?v=49"></script>
-<script src="/js/share.js?v=49"></script>
+<script src="/js/compat.js?v=50"></script>
+<script src="/js/juice.js?v=50"></script>
+<script src="/js/road.js?v=50"></script>
+<script src="/js/glovebox.js?v=50"></script>
+<script src="/js/play.js?v=50"></script>
+<script src="/js/sketch.js?v=50"></script>
+<script src="/js/share.js?v=50"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -800,7 +735,6 @@ const TOWNS = [
 },
 {
   id: "L1", track: "life", name: "Hushwick", rule: "you only get 10 words a day.",
-  reel: "This is Rule Road radio, live from Hushwick, where you only get ten words a day. Here's how our traveler spent theirs.",
   hook: "So why is one kid saving her words like they're gold?",
   meters: [{ k: "words", label: "Words left", max: 10 }, { k: "heart", label: "Friendship", life: true }],
   init: () => ({ words: 10, heart: 0 }),
@@ -1017,32 +951,32 @@ const TOWNS = [
   meters: [{ k: "flowers", label: "Flowers in your yard", life: true }, { k: "thorns", label: "Thorns" }],
   init: () => ({ flowers: 0, thorns: 0 }),
   steps: [
-    { when: "8:00 a.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You bump into the mail carrier and her letters go everywhere.",
+    { when: "8:00 a.m.", text: "You bump into the mail carrier and her letters go everywhere.",
       choices: [
         { t: "Say sorry and help pick them up", fx: s => { s.flowers += 1; }, say: "Pop. A red tulip by your porch." },
         { t: "Keep walking, you're late", fx: s => { s.thorns += 1; }, say: "Something sharp pokes out of the dirt." }] },
-    { when: "Lunch", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You snapped at your little brother for taking the last cookie.",
+    { when: "Lunch", text: "You snapped at your little brother for taking the last cookie.",
       choices: [
         { t: "Tell him sorry", fx: s => { s.flowers += 1; }, say: "Pop. A pink rose. He gives you half the cookie." },
         { t: "Say it was his fault", fx: s => { s.thorns += 1; }, say: "Another thorn. He doesn't talk to you all afternoon." }] },
-    { when: "3:00 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "Your soccer ball smashed a flowerpot next door.",
+    { when: "3:00 p.m.", text: "Your soccer ball smashed a flowerpot next door.",
       choices: [
         { t: "Knock and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. Your neighbor laughs and lends you a new pot." },
         { t: "Blame the wind", fx: s => { s.thorns += 2; }, say: "The wind did not do that. Two big thorns." }] },
     { rehook: "Every sorry you DON'T say grows thorns. And Grandma is coming tonight. If thorns block the gate, she can't get in." },
-    { when: "Recess", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You knocked over a kid's sandcastle by accident.",
+    { when: "Recess", text: "You knocked over a kid's sandcastle by accident.",
       choices: [
         { t: "“Sorry! Let me help fix it.”", fx: s => { s.flowers += 1; }, say: "Pop. A yellow daisy. The new castle is even bigger." },
         { t: "Pretend you didn't see it", fx: s => { s.thorns += 1; }, say: "Ouch. A thorn pokes up by your gate." }] },
-    { when: "4:00 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "You borrowed your friend's bike and scratched it.",
+    { when: "4:00 p.m.", text: "You borrowed your friend's bike and scratched it.",
       choices: [
         { t: "Tell her the truth and say sorry", fx: s => { s.flowers += 2; }, say: "Pop, pop. She shrugs. “It's a bike. Bikes get scratched.”" },
         { t: "Give it back and say nothing", fx: s => { s.thorns += 2; }, say: "Two thorns. And she'll notice tomorrow." }] },
-    { when: "5:30 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "Mom asked you to take out the trash. You forgot. Again.",
+    { when: "5:30 p.m.", text: "Mom asked you to take out the trash. You forgot. Again.",
       choices: [
         { t: "“Sorry, Mom. Doing it now.”", fx: s => { s.flowers += 1; }, say: "Pop. A purple flower. Mom blows you a kiss." },
         { t: "“I was busy!”", fx: s => { s.thorns += 1; }, say: "A thorn. And the trash still smells." }] },
-    { when: "6:00 p.m.", mic: { kind: "speech", line: "Say what you'd say. A real sorry grows a flower.", resolve: (r, s) => sorryResolve(r, s) }, text: "Grandma's car pulls up. What's the last thing you do?",
+    { when: "6:00 p.m.", text: "Grandma's car pulls up. What's the last thing you do?",
       choices: [
         { t: "Go back and say every sorry you skipped", fx: s => { s.flowers += s.thorns; s.thorns = 0; }, say: "Pop, pop, pop. The thorns shrink away." },
         { t: "Hide inside and hope she doesn't notice", fx: s => { s.thorns += 1; }, say: "She notices." }] },
@@ -1231,12 +1165,10 @@ const TOWNS = [
   steps: [
     { rehook: "Here's what nobody tells you: hit zero and your wallet falls asleep for a month, right before Black Friday. And your mom's birthday IS Black Friday." },
     { when: "Early sale", clip: "w-sale", text: "A shiny blender, 70% off. \"You HAVE a blender!\" the wallet yells.",
-      mic: { kind: "speech", line: "Talk back to your wallet. Tell it what you'll do.", resolve: (r, s) => walletTalk(r, s) },
       choices: [
         { t: "Listen and walk past it", clip: "w-purr", fx: s => { s.trust += 2; }, say: "The wallet purrs. You keep your 32 coins." },
         { t: "Buy it anyway", clip: "w-ouch", fx: s => { s.cash -= 29; s.trust -= 1; }, say: "Beep. Three coins left." }] },
     { when: "Giant sign", clip: "w-box", text: "\"Mystery box. Three coins.\" Everyone is grabbing one. \"Don't,\" the wallet whispers.",
-      mic: { kind: "speech", line: "Answer your wallet out loud.", resolve: (r, s) => walletTalk(r, s) },
       choices: [
         { t: "Zip it shut and walk out", clip: "w-purr", fx: s => { s.trust += 2; }, say: "Behind you, someone opens the box. One sock." },
         { t: "Grab a box", clip: "w-ouch", fx: s => { s.cash -= 3; s.trust -= 2; }, say: "One sock. And your wallet goes quiet." }] },
@@ -1436,17 +1368,14 @@ const TOWNS = [
   cta: "How many pay-later plans do you have running right now?"
 },
 {
-  id: "L-whisper", track: "life", name: "Whisperton", voice: "whisper", rule: "sound has weight. Loud words crack the glass streets.",
+  id: "L-whisper", track: "life", name: "Whisperton", rule: "sound has weight. Loud words crack the glass streets.",
   hook: "So why is a whole town tiptoeing… and one kid is stuck on a glass bridge with a birthday cake?",
-  reel: "This is Rule Road radio, coming to you very quietly from Whisperton. Tonight, a traveler tried to carry a cake across the glass bridge. Here's the tape.",
   meters: [{ k: "glass", label: "Bridge glass", max: 100, unit: "%" }, { k: "trust", label: "Town trust", life: true }],
   init: () => ({ glass: 100, trust: 0 }),
   steps: [
     { when: "Town gate", text: "The gatekeeper holds up a brass ear trumpet. “Say hello in your normal voice, so the town knows what loud means for you.”",
-      mic: { kind: "calibrate", line: "Hello, Whisperton!" },
       choices: [{ t: "“Hello, Whisperton!”", say: "The trumpet rings. “Got it. Now… never talk like that again.”" }] },
     { when: "The glass bridge", text: "A glass bridge over the river. The guard leans close: “Why are you crossing?”",
-      mic: { kind: "whisper", line: "I'm bringing a cake to my grandma.", secs: 2, cracks: 3, cost: 8 },
       choices: [
         { t: "Whisper your answer", mic: true, fx: s => { s.trust += 1; }, say: "Not a single crack. The guard waves you across." },
         { t: "Answer in your normal voice", fx: s => { s.glass -= 35; s.trust -= 1; }, say: "CRACK. A spiderweb shoots across the glass under your feet." }] },
@@ -1457,7 +1386,6 @@ const TOWNS = [
         { t: "Lean in and whisper “please”", fx: s => { s.trust += 2; }, say: "She smiles and serves you first." }] },
     { rehook: "Sound doesn't fade here. Every loud word you said today is stacked on the bridge home. And Grandma's party is on the other side." },
     { when: "Grandma's street", text: "A baby is asleep in a stroller next to you. Her dad looks terrified you'll speak.",
-      mic: { kind: "whisper", line: "Your baby is so cute.", secs: 2, cracks: 2, cost: 10 },
       choices: [
         { t: "Whisper it", mic: true, fx: s => { s.trust += 2; }, say: "The baby sighs and keeps sleeping. Her dad mouths: “thank you.”" },
         { t: "Say it out loud", fx: s => { s.glass -= 30; s.trust -= 1; }, say: "The baby wakes up screaming. The whole street cracks." }] },
@@ -1467,7 +1395,6 @@ const TOWNS = [
         { t: "Laugh out loud", fx: s => { s.glass -= 25; s.trust += 1; }, say: "Best laugh of the year. Worst crack of the year." },
         { t: "Smile and save it for later", say: "You'll laugh about it at the party." }] },
     { when: "The last crossing", text: "The bridge home groans under every word you said today. Whisper your birthday wish to get across.",
-      mic: { kind: "whisper", line: "Happy birthday, Grandma. I love you.", secs: 2.5, cracks: 2, cost: 12 },
       choices: [
         { t: "Whisper your wish", mic: true, fx: s => { s.trust += 3; }, say: "The glass hums like a bell. Grandma opens the door before you knock." },
         { t: "Shout it so she hears", fx: s => { s.glass -= 40; }, say: "She hears it. So does the bridge." }] },
@@ -1478,19 +1405,16 @@ const TOWNS = [
   cta: "So… could YOU cross the glass bridge?"
 },
 {
-  id: "L-hum", track: "life", name: "Harmonia", voice: "pitch", rule: "every door opens to a note. Only your own voice can find it.",
+  id: "L-hum", track: "life", name: "Harmonia", rule: "every door opens to a note. Only your own voice can find it.",
   hook: "So why is one kid humming at a locked front door?",
-  reel: "This is Rule Road radio, live from Harmonia, where every door has a note. Here's how our traveler sang their way home.",
   meters: [{ k: "doors", label: "Doors opened", max: 5 }, { k: "courage", label: "Courage", life: true }],
   init: () => ({ doors: 0, courage: 0 }),
   steps: [
     { when: "7:00 a.m.", text: "Your front door won't open. Doors here open to a hum. Hum any note and hold it steady.",
-      mic: { kind: "pitch", mode: "any", secs: 1.2, line: "Hum any note… and hold it." },
       choices: [
         { t: "Hum and hold a note", mic: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Click. That note is YOUR note now. Remember it." },
         { t: "Climb out the window", say: "You make it out. Your sweater doesn't." }] },
     { when: "School", text: "The classroom door is shy. It only opens to a note HIGHER than yours.",
-      mic: { kind: "pitch", mode: "higher", secs: 1, line: "Hum higher than your note." },
       choices: [
         { t: "Hum a higher note", mic: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "The door giggles open." },
         { t: "Wait for someone else to open it", fx: s => { s.courage -= 1; }, say: "You wait. And wait. You're late." }] },
@@ -1501,12 +1425,10 @@ const TOWNS = [
         { t: "Hide behind the piano", fx: s => { s.courage -= 1; }, say: "The piano knows you're there." }] },
     { rehook: "If you don't use your note, you forget it, and every door in town forgets you. And tonight is your sister's big recital." },
     { when: "The recital hall", text: "The big hall door only opens to a note LOWER than yours. Your sister is inside, waiting.",
-      mic: { kind: "pitch", mode: "lower", secs: 1, line: "Hum lower than your note." },
       choices: [
         { t: "Hum a lower note", mic: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "BOOM. The hall doors swing wide." },
         { t: "Knock really hard", fx: s => { s.courage -= 1; }, say: "Knocking doesn't count here. You sneak in late through the back." }] },
     { when: "Backstage", text: "Your sister's dressing room has a slide-lock. Start low and slide UP, like a siren.",
-      mic: { kind: "pitch", mode: "slide", secs: 0.3, line: "Start low… and slide up like a siren." },
       choices: [
         { t: "Siren up", mic: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Weeeeeooo. The lock spins open. Your sister laughs so hard she forgets she's nervous." },
         { t: "Slide a note under the door", say: "She reads it. It helps a little." }] },
@@ -1516,7 +1438,6 @@ const TOWNS = [
         { t: "Clap to cheer her on", fx: s => { s.courage += 1; }, say: "She smiles. It takes her a moment, but she starts." },
         { t: "Cover your eyes", fx: s => { s.courage -= 1; }, say: "You miss the best part." }] },
     { when: "The way home", text: "The old town gate only opens to the exact note you found this morning.",
-      mic: { kind: "pitch", mode: "match", secs: 1.2, line: "Hum your note from this morning." },
       choices: [
         { t: "Hum your note", mic: true, fx: s => { s.doors += 1; s.courage += 1; }, say: "Same note, same click. Home." },
         { t: "Wait for the gatekeeper", fx: s => { s.courage -= 1; }, say: "He shows up at midnight. Grumpy." }] },
@@ -1527,20 +1448,17 @@ const TOWNS = [
   cta: "So… what note would open YOUR door?"
 },
 {
-  id: "M-rhyme", track: "money", name: "Rhymeburg", voice: "speech", rule: "you can buy anything, but only if your offer rhymes.",
+  id: "M-rhyme", track: "money", name: "Rhymeburg", rule: "you can buy anything, but only if your offer rhymes.",
   hook: "So why did one kid get a sun hat for half price… just by saying “that”?",
-  reel: "This is Rule Road radio, live from the Rhymeburg market, where offers have to rhyme. Our traveler went shopping. Listen.",
   meters: [{ k: "coins", label: "Coins", max: 30 }, { k: "stuff", label: "Things you got" }],
   init: () => ({ coins: 30, stuff: 0, miss: 0, bus: false }),
   steps: [
     { when: "Hat stand", text: s => `A sun hat costs ${6 + s.miss} coins. The seller winks: “Rhyme with HAT and it's yours for 3.”`,
-      mic: { kind: "speech", line: "Make your offer. End it with a word that rhymes with HAT.", rhyme: "hat", resolve: (r, s) => rhymeDeal(r, s, "hat", 3, 6) },
       choices: [
         { t: "“How about that?”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "“Deal!” He drops the hat on your head." },
         { t: "“Can I have it for less?”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "“No rhyme, no deal.” You pay full price." },
         { t: "Skip it", say: "You walk on with a sunburned nose." }] },
     { when: "Bakery", text: s => `A strawberry cake costs ${8 + s.miss} coins. “Rhyme with CAKE and pay 4.”`,
-      mic: { kind: "speech", line: "Offer for the cake. End it with a rhyme for CAKE.", rhyme: "cake", resolve: (r, s) => rhymeDeal(r, s, "cake", 4, 8) },
       choices: [
         { t: "“For goodness sake!”", cost: "−4", need: s => s.coins >= 4, fx: s => { s.coins -= 4; s.stuff += 1; }, say: "The baker laughs and boxes it up." },
         { t: "“I'll just pay.”", cost: s => "−" + (8 + s.miss), need: s => s.coins >= 8 + s.miss, fx: s => { s.coins -= 8 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. The baker shrugs." },
@@ -1552,19 +1470,16 @@ const TOWNS = [
         { t: "Say no", say: "She frowns, but she gets it." }] },
     { rehook: "Every shop in town raises its price by one coin each time you DON'T rhyme. They've been counting all day. And the bus home costs 10." },
     { when: "Toy shop", text: s => `A toy boat for your brother's birthday: ${7 + s.miss} coins. Rhyme with BOAT for 3.`,
-      mic: { kind: "speech", line: "Offer for the boat. End it with a rhyme for BOAT.", rhyme: "boat", resolve: (r, s) => rhymeDeal(r, s, "boat", 3, 7) },
       choices: [
         { t: "“I'll trade you my coat!”", cost: "−3", need: s => s.coins >= 3, fx: s => { s.coins -= 3; s.stuff += 1; }, say: "He keeps your coat as a joke, then gives it back. Boat's yours." },
         { t: "“Here's the money.”", cost: s => "−" + (7 + s.miss), need: s => s.coins >= 7 + s.miss, fx: s => { s.coins -= 7 + s.miss; s.stuff += 1; s.miss += 1; }, say: "No rhyme. Full price, plus the town's extra." },
         { t: "Skip it", say: "Your brother will get a hug instead." }] },
     { when: "Kite stall", text: s => `A red kite: ${6 + s.miss} coins. Rhyme with KITE for 2.`,
-      mic: { kind: "speech", line: "Offer for the kite. End it with a rhyme for KITE.", rhyme: "kite", resolve: (r, s) => rhymeDeal(r, s, "kite", 2, 6) },
       choices: [
         { t: "“Is two coins right?”", cost: "−2", need: s => s.coins >= 2, fx: s => { s.coins -= 2; s.stuff += 1; }, say: "“Right!” The kite tugs at your hand." },
         { t: "“Just give it to me.”", cost: s => "−" + (6 + s.miss), need: s => s.coins >= 6 + s.miss, fx: s => { s.coins -= 6 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. The kite sulks." },
         { t: "Skip it", say: "You keep your coins for the bus." }] },
     { when: "Ice cream truck", text: s => `Ice cream: ${4 + s.miss} coins. The driver yells: “Rhyme with CONE!”`,
-      mic: { kind: "speech", line: "Order your ice cream. End it with a rhyme for CONE.", rhyme: "cone", resolve: (r, s) => rhymeDeal(r, s, "cone", 1, 4) },
       choices: [
         { t: "“One for me, I'm on my own!”", cost: "−1", need: s => s.coins >= 1, fx: s => { s.coins -= 1; s.stuff += 1; }, say: "One coin. Two scoops." },
         { t: "“Vanilla, please.”", cost: s => "−" + (4 + s.miss), need: s => s.coins >= 4 + s.miss, fx: s => { s.coins -= 4 + s.miss; s.stuff += 1; s.miss += 1; }, say: "Full price. It's melting already." },
@@ -1580,26 +1495,22 @@ const TOWNS = [
   cta: "So… what would YOU rhyme to get a cake for half?"
 },
 {
-  id: "L-echo", track: "life", name: "Echo Valley", voice: "speech", rule: "whatever you say comes back three days later as a promise you have to keep.",
+  id: "L-echo", track: "life", name: "Echo Valley", rule: "whatever you say comes back three days later as a promise you have to keep.",
   hook: "So why is one kid carrying a fish tank, calling his grandma and drawing pictures all on the same Saturday?",
-  reel: "This is Rule Road radio, live from Echo Valley, where every word comes back. Here's what our traveler said this week.",
   meters: [{ k: "time", label: "Saturday hours", max: 12 }, { k: "trust", label: "Trust", life: true }],
   init: () => ({ time: 12, trust: 0, echo: [] }),
   steps: [
     { when: "Wednesday, lunch", text: "Your friend Leo asks if you'll help him move his fish tank this weekend.",
-      mic: { kind: "speech", line: "Answer Leo out loud. The valley is listening.", resolve: (r, s) => echoSay(r, s) },
       choices: [
         { t: "“Sure, I'll help!”", fx: s => echo(s, "Sure, I'll help!", 1), say: "Leo grins. Somewhere, the valley writes it down." },
         { t: "“I'll help you forever, I promise!”", fx: s => echo(s, "I'll help you forever, I promise!", 3), say: "Leo blinks. That's… a lot of helping." },
         { t: "“Maybe, if I can.”", fx: s => echo(s, "Maybe, if I can.", 0), say: "Leo nods. Honest enough." }] },
     { when: "Wednesday, art class", text: "Mia loves your drawing and asks if you'll draw one for her too.",
-      mic: { kind: "speech", line: "Answer Mia out loud.", resolve: (r, s) => echoSay(r, s) },
       choices: [
         { t: "“I'll draw you one this week.”", fx: s => echo(s, "I'll draw you one this week.", 1), say: "She claps. The valley hums." },
         { t: "“I'll draw you a hundred!”", fx: s => echo(s, "I'll draw you a hundred!", 3), say: "She gasps. The valley hums very loudly." },
         { t: "“Thanks! Maybe someday.”", fx: s => echo(s, "Thanks! Maybe someday.", 0), say: "She smiles. Fair." }] },
     { when: "Thursday night", text: "Grandma calls. “Will you call me more often, sweetheart?”",
-      mic: { kind: "speech", line: "Answer Grandma out loud.", resolve: (r, s) => echoSay(r, s) },
       choices: [
         { t: "“I'll call you every single day!”", fx: s => echo(s, "I'll call you every single day!", 3), say: "Grandma cries a little. The valley writes it in pen." },
         { t: "“I'll call on Sundays.”", fx: s => echo(s, "I'll call on Sundays.", 1), say: "“Sundays it is,” she says." },
@@ -1658,73 +1569,11 @@ const KID = {
 const kidOf = T => KID[T.id] || null;
 const dirOf = (T, k) => { const K = kidOf(T); return K && K.up && K.up.indexOf(k) >= 0 ? "up" : K && K.down && K.down.indexOf(k) >= 0 ? "down" : ""; };
 
-/* ---------- voice-town helpers (Rhymeburg deals, Echo Valley promises, talk-back Hushwick) ---------- */
-function rhymeDeal(r, s, target, cheap, full) {
-  const text = r.text, T = target.toUpperCase();
-  if (Talk.has(text, ["skip", "no thanks", "pass", "never mind"])) return { t: `“${text}”`, heard: text, say: "You keep walking. Coins safe." };
-  if (Talk.rhymes(text, target)) {
-    if (s.coins < cheap) return { t: `“${text}”`, heard: text, say: "Great rhyme. Empty pockets." };
-    return { t: `“${text}”`, heard: text, fx: s => { s.coins -= cheap; s.stuff += 1; }, say: `It rhymes with ${T}! “Deal,” says the seller. Just ${cheap} coin${cheap > 1 ? "s" : ""}.` };
-  }
-  const price = full + s.miss;
-  if (s.coins < price) return { t: `“${text}”`, heard: text, fx: s => { s.miss += 1; }, say: `That doesn't rhyme with ${T}, and you can't pay ${price}. The seller turns away.` };
-  return { t: `“${text}”`, heard: text, fx: s => { s.coins -= price; s.stuff += 1; s.miss += 1; }, say: `That doesn't rhyme with ${T}. Full price: ${price} coins.` };
-}
-
-// Tillsbury: argue with your wallet out loud; buy words spend, no words save, mumbles count as no
-function walletTalk(r, s) {
-  const st = TOWNS[S.t].steps[S.step], buy = st.choices.find(c => c.clip === "w-ouch"), keep = st.choices.find(c => c.clip === "w-purr");
-  if (Talk.has(r.text, ["buy", "yes", "want", "take", "mine", "need", "deal", "grab", "treat", "whatever"]) && !Talk.has(r.text, ["no", "not", "don't", "won't"])) return { ...buy, t: `“${r.text}”`, heard: r.text };
-  if (Talk.has(r.text, ["no", "nope", "fine", "okay", "ok", "walk", "leave", "won't", "don't", "skip", "pass", "right", "sorry", "save"])) return { ...keep, t: `“${r.text}”`, heard: r.text };
-  return { ...keep, t: `“${r.text}”`, heard: r.text, clip: "w-huh" };
-}
-
+/* ---------- Echo Valley promises ---------- */
 function echo(s, text, weight) { s.echo.push({ text, weight }); }
-function echoWeight(text) {
-  if (Talk.has(text, ["forever", "always", "every", "everything", "anything", "promise", "hundred", "never", "whole", "all"])) return 3;
-  if (Talk.has(text, ["maybe", "try", "might", "if", "someday", "sometimes", "think", "perhaps"])) return 0;
-  return 1;
-}
-function echoSay(r, s) {
-  const w = echoWeight(r.text);
-  return { t: `“${r.text}”`, heard: r.text, fx: s => echo(s, r.text, w),
-    say: w === 3 ? "Big words. The valley writes them down in pen." : w === 0 ? "Careful words. The valley barely hears them." : "The valley writes it down." };
-}
 const echoText = (s, i) => (s.echo[i] || { text: "…" }).text;
 const echoCost = (s, i) => ({ 0: 1, 1: 3, 3: 6 })[(s.echo[i] || { weight: 0 }).weight] || 3; // hours a promise takes to keep
 const echoKept = (s, i, plain) => (s.echo[i] || {}).weight === 3 ? `A promise that big takes ${echoCost(s, i)} hours. You keep it, barely.` : plain;
-
-// Hushwick talk-back: say your answer out loud; every spoken word costs one of your 10
-const HUSH = [
-  { kind: ["thank", "thanks", "love", "yummy", "delicious", "great", "best"], mean: ["again", "ugh", "pancakes", "gross", "hate", "boring"], kh: 1, ks: "She smiles all the way to the bus.", mh: -1, ms: "Her smile drops.", ps: "She nods, a little confused." },
-  { kind: ["okay", "ok", "alright", "help", "hug", "sorry", "listen", "here"], mean: ["cheer", "deal", "whatever", "stop", "baby"], kh: 2, ks: "She tells you everything. You just listen.", mh: -1, ms: "She turns to the window.", ps: "She shrugs and looks out the window." },
-  { kind: ["nice", "try", "thanks", "cool", "funny", "okay"], mean: ["ugly", "worse", "stupid", "dumb", "haircut", "shut", "loser"], kh: 1, ks: "He shrugs. It's over.", mh: -2, ms: "Everyone goes “Ooooh.” You feel worse, not better.", ps: "He blinks. It's over." },
-  { kind: ["twelve", "12", "groups", "four", "three"], mean: [], kh: 1, ks: "Gold star!", mh: 0, ms: "", ps: "The teacher waits… then calls on someone else." },
-  { kind: ["beautiful", "love", "amazing", "pretty", "awesome", "wow", "great", "cool", "best"], mean: ["weird", "ugly", "blob", "gross"], kh: 2, ks: "She hugs your leg and won't let go.", mh: -1, ms: "Her lip wobbles.", ps: "She tilts her head, then skips away." },
-  { kind: ["me", "i", "yes", "mine"], mean: ["not", "no", "someone"], kh: 1, ks: "The whole team follows you.", mh: 0, ms: "Coach picks someone else.", ps: "Coach squints at you, then picks someone else." },
-  { kind: ["yummy", "good", "love", "thanks", "thank", "great", "delicious", "tasty"], mean: ["gross", "pizza", "burnt", "yuck", "disgusting", "ew"], kh: 2, ks: "He laughs. “Liar.” But he's smiling.", mh: -2, ms: "He puts his fork down. The kitchen gets quiet.", ps: "He nods and keeps eating." },
-  { kind: ["love", "miss", "goodnight", "night", "thanks", "thank", "grandpa"], mean: ["busy", "bye", "later"], kh: 3, ks: "He goes quiet. Then: “That made my whole week.”", mh: 0, ms: "“Oh. Okay, kiddo.” Click.", ps: "He chuckles. “Love you too, kiddo.”" },
-];
-function hushResolve(L, st) {
-  return (r, s) => {
-    const n = Talk.words(r.text).length;
-    if (!n) return Math.max(0, st.choices.findIndex(c => c.w === 0));
-    const kind = Talk.has(r.text, L.kind), mean = !kind && Talk.has(r.text, L.mean);
-    let h = kind ? L.kh : mean ? L.mh : 0, say = kind ? L.ks : mean ? L.ms : L.ps, w = n;
-    if (n > s.words) { w = s.words; h = Math.min(h, 0) - 1; say = `Your voice cuts out after ${s.words === 1 ? "one word" : s.words + " words"}. The rest just… vanishes.`; }
-    return { t: `“${r.text}”`, heard: r.text, w, h, say };
-  };
-}
-(function talkBackHushwick() {
-  const T = TOWNS.find(t => t.id === "L1");
-  if (!T) return;
-  T.voice = "speech";
-  let k = 0;
-  T.steps.forEach(st => {
-    if (st.rehook || !HUSH[k]) return;
-    st.mic = { kind: "speech", words: true, line: "Say your answer out loud. Every word you say costs one.", resolve: hushResolve(HUSH[k++], st) };
-  });
-})();
 
 /* ---------- saved stars (per viewer, optional) ---------- */
 const KEY = "rule-road-stars-v1";
@@ -1773,7 +1622,6 @@ const Voice = {
   playing(key) { return !!(this.el && !this.el.paused && !this.el.ended && this.key === key); },
   paint() {
     document.querySelectorAll('[data-act="say"]').forEach(b => { const on = this.playing(b.dataset.k); b.textContent = on ? "■ Stop" : "▶ Listen"; b.setAttribute("aria-pressed", on); });
-    const dsh = document.querySelector(".dash"); if (dsh) dsh.classList.toggle("on-air", !!(this.el && !this.el.paused && !this.el.ended));
   },
 };
 Voice.init();
@@ -1781,7 +1629,7 @@ const listenBtn = key => `<button class="listen" data-act="say" data-k="${key}" 
 
 /* ---------- state ---------- */
 let S = { screen: "home", t: 0, step: 0, phase: "arrive", s: null, res: null, stars: loadStars(), fan: { rule: "", lesson: "" },
-  reel: [], grid: [], heard: [], ghostOut: null, cal: null, base: 0, challenge: null, daily: false };
+  grid: [], base: 0, challenge: null, daily: false };
 const $app = document.getElementById("app");
 const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const val = (x, s) => typeof x === "function" ? x(s) : x;
@@ -1818,14 +1666,13 @@ function installCard() {
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if (S.screen === "home" || S.phase === "end") render(); });
 window.addEventListener("appinstalled", () => { installEvt = null; render(); });
 
-const VOICE_TAG = { whisper: "🎙 Whisper", pitch: "🎙 Hum", speech: "🎙 Talk" };
 
 function stopCard(i) {
   const T = TOWNS[i], st = S.stars[T.id], open = districtOpen(districtOf(i));
   return `<button class="stop ${st ? "done" : ""} ${open ? "" : "locked"}" data-act="town" data-i="${i}" ${open ? "" : 'aria-disabled="true"'}>
     <span class="mile"><span><small>MILE</small>${roadPos(i) + 1}</span></span>
     <span class="stop-card">
-      <span class="tags"><span class="${T.track === "money" ? "tag-money" : "tag-life"}">${T.track === "money" ? "Money town" : "Life town"}</span>${T.voice ? `<span class="tag-voice">${VOICE_TAG[T.voice]}</span>` : ""}${starRow(st)}</span>
+      <span class="tags"><span class="${T.track === "money" ? "tag-money" : "tag-life"}">${T.track === "money" ? "Money town" : "Life town"}</span>${starRow(st)}</span>
       <span class="tname">${T.name}</span>
       ${open && !st ? `<span class="trule">In this town, ${esc(T.rule)}</span>` : ""}
     </span>
@@ -1899,7 +1746,7 @@ function meters(T, s) {
 }
 
 // road trip mode: the Navigator does every voice step, the Driver the rest, and plain towns alternate
-const role = (T, i) => { const st = T.steps[i]; return !st || st.rehook ? null : st.mic ? "Navigator" : (T.steps.slice(0, i + 1).filter(x => !x.rehook).length % 2 ? "Driver" : "Navigator"); };
+const role = (T, i) => { const st = T.steps[i]; return !st || st.rehook ? null : (T.steps.slice(0, i + 1).filter(x => !x.rehook).length % 2 ? "Driver" : "Navigator"); };
 const nextRole = () => { const T = TOWNS[S.t]; for (let i = S.step + 1; i < T.steps.length; i++) { const r = role(T, i); if (r) return r; } return null; };
 
 // "near miss": a meter ended within a whisker of empty
@@ -1918,10 +1765,9 @@ function renderTown() {
   if (S.phase === "arrive") {
     // one moment: the sign swings in, the narrator reads the hook, you drive in. Help lives behind ❓
     const ch = S.challenge && S.challenge.t === S.t ? S.challenge : null, K = kidOf(T), fresh = !store.get("howto", false);
-    // little badges on the sign itself: equipped Glovebox items, a mic town, road-trip mode (spelled out under ❓)
+    // little badges on the sign itself: equipped Glovebox items and road-trip mode (spelled out under ❓)
     const badges = [
       ...Glove.forTown(T).map(it => `<span class="badge" role="img" aria-label="${esc(it.name)} equipped" title="${esc(it.name)}: ${esc(it.what)}">${it.icon}</span>`),
-      T.voice ? `<span class="badge" role="img" aria-label="Mic town" title="This town listens">🎙</span>` : "",
       Prefs.coop ? `<span class="badge" role="img" aria-label="Road trip mode" title="Road trip">🚗</span>` : "",
     ].join("");
     return `${topbar(true)}
@@ -1951,7 +1797,6 @@ function renderTown() {
           ${K ? `<p><b>🤔 What does this mean?</b> ${esc(K.what)}</p>${listenBtn(T.id + "-kid")}` : ""}
           <ol class="howto"><li><span>🪧</span>Read the town's strange rule.</li><li><span>👆</span>Drag onto your choice, or tap a button.</li><li><span>⬆</span>Watch your numbers. Green arrows show which way is good.</li><li><span>⚠️</span>Halfway through, a red card shows the catch.</li></ol>
           ${Glove.forTown(T).map(it => `<p>${it.icon} <b>${esc(it.name)}</b> is on: ${esc(it.what)}</p>`).join("")}
-          ${T.voice ? `<p>🎙 This town listens: hold the CB handset and ${T.voice === "whisper" ? "whisper" : T.voice === "pitch" ? "hum" : "talk"}. No mic? Tap instead.</p>` : ""}
           ${Prefs.coop ? `<p>🚗 Road trip: the <b>Driver</b> picks, the <b>Navigator</b> does the talking. Swap when the game says so.</p>` : ""}
           ${fresh ? `<button class="go ghost" data-act="howto-ok">Got it</button>` : ""}
         </div>
@@ -1985,11 +1830,6 @@ function renderTown() {
       ${nxt !== undefined ? `<button class="go" data-act="town" data-i="${nxt}">Next town →</button>` : `<button class="go" data-act="fan">Your own town →</button>`}
     </div>
     <p class="toast" id="share-toast" aria-live="polite"></p>
-    ${S.reel.length ? `<div class="reel">
-      <div class="reel-k">📻 Your broadcast · ${S.reel.length} take${S.reel.length > 1 ? "s" : ""} of your voice</div>
-      <p class="reel-cap" id="reel-cap" aria-live="polite"></p>
-      <div class="row"><button class="go" data-act="reel">▶ Play it</button><button class="go ghost" data-act="reelsave">Save it</button></div>
-    </div>` : ""}
     <details class="more"><summary>⋯ More</summary>
       <div class="more-body">
         ${n < 3 && kidOf(T) ? `<div class="goal"><span class="goal-k">For 3 stars next time</span>${esc(kidOf(T).goal)}</div>` : ""}
@@ -2013,21 +1853,18 @@ function renderTown() {
     <button class="go" data-act="next">Keep going</button>`;
   }
   const r = S.phase === "result" ? S.lastResult : null;
-  const showMic = st.mic && !r;
   const choices = st.choices.map((c, i) => {
     const words = c.w !== undefined;
-    const lockedToMic = micOnly(st, c);
-    const ok = !lockedToMic && (c.need ? c.need(s) : (words ? s.words >= c.w : true));
+    const ok = c.need ? c.need(s) : (words ? s.words >= c.w : true);
     const cl = val(c.cost, s);
-    const cost = lockedToMic ? "use the mic" : words ? (c.w ? `${c.w} word${c.w > 1 ? "s" : ""}` : "0 words") : (cl ? (/[a-z]$/i.test(cl) ? cl : `${cl} coins`) : "");
+    const cost = words ? (c.w ? `${c.w} word${c.w > 1 ? "s" : ""}` : "0 words") : (cl ? (/[a-z]$/i.test(cl) ? cl : `${cl} coins`) : "");
     return `<button class="choice ${r && r.i === i ? "picked" : ""}" data-act="pick" data-c="${i}" ${ok && !r ? "" : "disabled"} ${r && r.i === i ? 'style="border-color:var(--sign);opacity:1"' : ""}>
-      <span>${esc(c.t)}</span>${cost ? `<span class="cost">${ok || lockedToMic ? cost : "not enough"}</span>` : ""}
+      <span>${esc(c.t)}</span>${cost ? `<span class="cost">${ok ? cost : "not enough"}</span>` : ""}
     </button>`;
   }).join("");
   const who = Prefs.coop ? role(T, S.step) : null;
   const act = !r && typeof actOf === "function" ? actOf(st, s) : null;
-  const micBlocked = st.mic && (Mic.state === "denied" || Mic.state === "unsupported" || (st.mic.kind === "speech" && !Mic.speechOK));
-  const fold = !r && (act || st.drag || st.pay || (showMic && !micBlocked)); // the gesture is the main way to choose; buttons stay one tap away
+  const fold = !r && (act || st.drag || st.pay); // the gesture is the main way to choose; buttons stay one tap away
   return `${topbar(true)}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
   ${meters(T, s)}${stage(T, s)}
@@ -2035,12 +1872,10 @@ function renderTown() {
   <section class="scene" ${r ? 'style="animation:none"' : ""}>
     <div class="when">${esc(st.when)}${who ? `<span class="role role-${who.toLowerCase()}">${who}</span>` : ""}</div>
     <p class="story">${esc(val(st.text, s))}</p>
-    ${showMic ? micPanel(st) : ""}
-    ${showMic && !fold ? `<div class="or-tap">or tap</div>` : ""}
     ${st.drag && !r ? dragPanel(st) : ""}
     ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : fold ? `<details class="tapfall"><summary>or tap a button</summary><div class="choices compact">${choices}</div></details>` : `<div class="choices ${r ? "done" : ""}">${choices}</div>`}
     ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>${act ? "👆 Drag it onto your choice" : "👆 Tap A or B to choose"}</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
-    ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}${r.heard ? `<p class="heard">You said: “${esc(r.heard)}”</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
+    ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
   </section>`;
 }
@@ -2077,12 +1912,11 @@ function render() {
   document.body.classList.toggle("in-town", S.screen === "town");
   document.body.classList.toggle("playing", S.screen === "town" && (S.phase === "step" || S.phase === "result")); // compact layout so a whole day fits on one phone screen
   const cur = S.screen === "town" && S.phase === "step" ? TOWNS[S.t].steps[S.step] : null;
-  document.body.classList.toggle("tight", !!(cur && (cur.mic || cur.drag))); // mic and drag days carry an extra panel, so the drawing gives up some room
-  $app.innerHTML = (S.screen === "ignition" ? renderIgnition() : S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown()) + dash();
+  document.body.classList.toggle("tight", !!(cur && cur.drag)); // drag days carry an extra panel, so the drawing gives up some room
+  $app.innerHTML = (S.screen === "ignition" ? renderIgnition() : S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown());
   if (S.screen === "fan") bindFan();
   if (S.screen === "home") bindDial();
   Play.mount();
-  const st = MicRun.step(); if (st && st.mic && !MicRun.done) MicRun.draw(st); // show the red line / target band before the first word
 }
 
 function animateMeters(before) {
@@ -2100,7 +1934,6 @@ function enterStep() {
   if (st && st.enter && !st.rehook) st.enter(S.s);
   if (st && st.rehook) { Sound.drone(); Voice.say(TOWNS[S.t].id + "-catch"); }
   else if (st && st.clip) Voice.say(TOWNS[S.t].id + "-" + st.clip);
-  if (st && st.mic) micEnter();
 }
 
 // a choice was made: by tap (i), or by voice (dyn = a choice built from what was said or how it sounded)
@@ -2116,8 +1949,7 @@ function pick(i, dyn, before0) {
   if (s.bat !== undefined) s.bat = Math.max(0, Math.min(100, s.bat));
   if (s.glass !== undefined) s.glass = Math.max(0, Math.min(100, s.glass));
   const night = st.night ? st.night(s) : (c.water !== undefined ? (c.water ? `The tree grows <strong>+${s.streak}</strong> coins.` : (before.coins ? `Skipped. The tree drops half: <strong>${before.coins} → ${s.coins}</strong>` : "Skipped. Nothing grows.")) : "");
-  S.lastResult = { i: dyn ? -1 : i, say: val(c.say, s), night, heard: c.heard || "" };
-  if (c.heard) S.heard.push(c.heard);
+  S.lastResult = { i: dyn ? -1 : i, say: val(c.say, s), night };
   if (c.clip) Voice.say(T.id + "-" + c.clip);
   S.phase = "result";
   // was that choice good? each number counts in its good direction (KID up/down); towns without one count "up" as good
@@ -2131,29 +1963,9 @@ function pick(i, dyn, before0) {
   render(); animateMeters(before); Juice.meters(T, before, s);
 }
 
-// a voice challenge finished: turn it into a choice
-function onMicResult(res) {
-  const T = TOWNS[S.t], st = T.steps[S.step], s = S.s, m = st.mic;
-  const before = { ...s };
-  let out;
-  if (m.resolve) out = m.resolve(res, s);
-  else if (m.kind === "calibrate") out = 0;
-  else {
-    out = res.ok ? st.choices.findIndex(c => c.mic) : st.choices.findIndex(c => !c.mic);
-    if (m.kind === "whisper" && res.ok && res.cracks && m.cost) s.glass -= res.cracks * m.cost; // small slips still chip the glass
-  }
-  // a whisper that got across with a slip or two: same choice, honest words
-  if (typeof out === "number" && m.kind === "whisper" && res.ok && res.cracks) {
-    const c = st.choices[out];
-    out = { ...c, say: `${res.cracks === 1 ? "One crack" : res.cracks + " cracks"} under your feet… but you made it. ${val(c.say, s).replace(/^Not a single crack\. /, "")}` };
-  }
-  if (typeof out === "number") pick(Math.max(0, out), null, before);
-  else pick(-1, out, before);
-}
-
 function next() {
   const T = TOWNS[S.t];
-  Sound.pluck(); Voice.stop(); Reel.stop(); Play.stop();
+  Sound.pluck(); Voice.stop(); Play.stop();
   if (S.step + 1 >= T.steps.length) {
     const was = totalStars();
     S.phase = "end"; S.res = T.rate(S.s);
@@ -2172,9 +1984,9 @@ function next() {
 
 function startTown(i, opts = {}) {
   if (!districtOpen(districtOf(i)) && !opts.free) { Juice.penalty(); return; }
-  MicRun.reset(); Reel.stop(); Play.stop(); Play.mem = {};
+  Play.stop(); Play.mem = {};
   S.screen = "town"; S.t = i; S.step = 0; S.phase = "arrive"; S.s = TOWNS[i].init(); S.lastResult = null;
-  S.firstRide = false; S.reel = []; S.grid = []; S.heard = []; S.ghostOut = null; S.base = 0; S.dailyJust = false; S.daily = !!opts.daily;
+  S.firstRide = false; S.grid = []; S.base = 0; S.dailyJust = false; S.daily = !!opts.daily;
   render(); window.scrollTo(0, 0); Voice.say(TOWNS[i].id + "-arrive");
 }
 
@@ -2221,7 +2033,7 @@ $app.addEventListener("click", async e => {
   if (act === "voice") { Voice.on = !Voice.on; Voice.save(); if (!Voice.on) Voice.stop(); render(); return; }
   if (act === "sound") { Sound.on = !Sound.on; store.set("sound", Sound.on); Sound.init(); if (Sound.on) Sound.pluck(); render(); return; }
   Sound.init();
-  if (act === "home") { MicRun.reset(); Reel.stop(); S.screen = "home"; Sound.pluck(); Voice.stop(); render(); window.scrollTo(0, 0); }
+  if (act === "home") { S.screen = "home"; Sound.pluck(); Voice.stop(); render(); window.scrollTo(0, 0); }
   else if (act === "town") { Sound.pluck(); startTown(+b.dataset.i, { free: S.screen === "town" }); }
   else if (act === "tune") {
     const i = +b.dataset.i;
@@ -2236,8 +2048,6 @@ $app.addEventListener("click", async e => {
   else if (act === "fan") { S.screen = "fan"; Sound.pluck(); render(); window.scrollTo(0, 0); Voice.say("fan"); }
   else if (act === "coop") { Prefs.coop = !Prefs.coop; Prefs.save(); Sound.pluck(); render(); }
   else if (act === "party") { Prefs.party = !Prefs.party; Prefs.save(); Sound.pluck(); render(); }
-  else if (act === "reel") Reel.play(TOWNS[S.t], false);
-  else if (act === "reelsave") Reel.play(TOWNS[S.t], true);
   else if (act === "share") {
     const a = document.getElementById("alias"); if (a) { Prefs.name = a.value.trim().slice(0, 20); Prefs.save(); }
     shareResult(TOWNS[S.t], S.res);

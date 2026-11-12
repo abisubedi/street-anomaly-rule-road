@@ -63,7 +63,7 @@ const Play = {
     if (st && st.pay && S.phase === "step") payGame(st);
     if (T.id === "M-shadow" && S.s.lb > 50) heavyNext();
     if (document.getElementById("actitem")) actGame();
-    if (T.id === "L1" && st && st.choices) sayGame(st); // Hushwick: the tap fallback under the mic becomes hold-to-say
+    if (T.id === "L1" && st && st.choices) sayGame(st); // Hushwick: hold a line to say it, one word token per beat
   },
 };
 
@@ -286,9 +286,3 @@ function heavyNext() {
   b.addEventListener("keyup", stop);
 }
 
-/* ---------- Petalton: say sorry out loud ---------- */
-function sorryResolve(r, s) {
-  const st = TOWNS[S.t].steps[S.step], yes = st.choices[0], no = st.choices[1];
-  if (/\bsorry\b|apolog|my bad|forgive|i was wrong/i.test(r.text)) return { ...yes, t: `“${r.text}”`, heard: r.text };
-  return { ...no, t: `“${r.text}”`, heard: r.text, say: "That wasn't a sorry. " + val(no.say, s) };
-}

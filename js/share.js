@@ -4,7 +4,6 @@ function challengeUrl(T, stars) {
   u.searchParams.set("town", T.id);
   if (Prefs.name) u.searchParams.set("c", Prefs.name);
   u.searchParams.set("s", stars);
-  if (S.ghostOut && T.voice === "whisper") u.searchParams.set("g", S.ghostOut);
   return u.toString();
 }
 
@@ -52,11 +51,6 @@ async function drawCard(T, stars) {
   // the numbers
   g.font = `700 40px ${BODY}`; g.fillStyle = "#EEF1F8";
   T.meters.forEach(m => { g.fillText(`${m.label}: ${S.s[m.k]}${m.unit || ""}`, W / 2, y); y += 56; });
-  const heard = S.heard.filter(Boolean);
-  if (heard.length) {
-    y += 14; g.font = `italic 400 38px ${BODY}`; g.fillStyle = "#FFD23F";
-    wrap(g, `“${heard.join(" … ").slice(0, 120)}”`, 860).slice(0, 3).forEach(l => { g.fillText(l, W / 2, y); y += 50; });
-  }
   // the dare
   g.fillStyle = "#E63946"; g.font = `400 46px ${DISP}`;
   g.fillText(S.challenge && stars > S.challenge.s ? `I BEAT ${(S.challenge.c || "MY FRIEND").toUpperCase()}. YOUR TURN.` : "CAN YOU BEAT ME?", W / 2, H - 150);
