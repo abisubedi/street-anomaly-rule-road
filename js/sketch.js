@@ -10,6 +10,10 @@ const plural = (n, w, ws) => `${fmt(n)} ${n === 1 ? w : ws || w + "s"}`;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const has = id => typeof Glove !== "undefined" && Glove.has(id);
 
+// painted towns: load the art while the player reads the arrival sign, so the first day appears complete
+const PAINT = { M5: ["bg", "dog", "traveler-pull", "traveler-free", "puppy", "bubble-worry", "bubble-coin"].map(n => `/img/leashville/${n}.webp`) };
+const paintPreload = id => { (PAINT[id] || []).forEach(src => { const im = new Image(); im.src = src; }); PAINT[id] = null; };
+
 const KID_FACES = {
   happy: `<path d="M50 73 q3 -4 6 0 M60 73 q3 -4 6 0" fill="none" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/><path d="M50 78 Q58 78 66 78 Q64 87 58 87 Q52 87 50 78 Z" fill="${DARK}"/>`,
   calm: `<circle cx="54" cy="72" r="1.8" fill="${DARK}"/><circle cx="62" cy="72" r="1.8" fill="${DARK}"/><path d="M53 79 Q58 82 63 79" fill="none" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/>`,
@@ -222,29 +226,54 @@ const SCENES = {
       pile ? `${plural(s.pile, "thing")} washed back up on your beach.` : "Nothing came back. The beach is clear.");
   },
 
-  /* Leashville: every loan is a dog on a leash, sized by what you owe, pulling you back */
+  /* Leashville, painted: the journal art from img/leashville, laid out as cut-out pieces that follow the numbers.
+     Every loan is a dog on a leash, sized by what you owe. Paying back makes it trot off; the Dog Biscuit keeps
+     the first one a puppy. The scene is 300×152 units over the background strip; pieces are placed in those units. */
   M5(s, st) {
-    const pack = s.pack || [], pull = Math.min(70, s.size * 5), paying = st && st.pay && S.phase === "step";
+    const pack = s.pack || [], paying = st && st.pay && S.phase === "step", W = 300, H = 152, G = 141; // G: where feet touch the ground
+    if (S.phase === "end") { // the ending is a full painting, chosen by how it went
+      const free = !pack.length && !s.dogs;
+      return Sk.frame("dogs", 0, free ? "You paid every dog back" : "The dogs are still pulling you", "",
+        free ? "Every dog paid back." : `${plural(pack.length || s.dogs, "dog")} still on the leash.`,
+        { cls: "painted", html: `<img class="paint-full" src="/img/leashville/end-${free ? "paid" : "debt"}.webp" width="880" height="650" alt="">` });
+    }
+    const pc = (v, t) => (v / t * 100).toFixed(2) + "%";
     const order = pack.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
-    const dogs = pack.map((v, i) => {
-      const w = Math.min(110, 34 + v * 10), rank = order.indexOf(i) + 1;
-      // Dog Biscuit (Glovebox): the first dog stays a puppy and is busy chewing
+    const pull = Math.min(70, s.size * 5);
+    // dogs line up to the left of the traveler, each one's size from what that loan has grown to
+    let right = 202;
+    const placed = pack.map((v, i) => {
       const pup = i === 0 && has("biscuit") && v <= 1;
-      const svg = `<svg viewBox="0 0 64 46" width="${w}" aria-hidden="true"><g class="ink">
-        ${Sk.line("M52 22 q8 -6 8 -14", INK, 2)}${Sk.wash("ellipse", 'cx="36" cy="26" rx="17" ry="9"', WOOD)}
-        ${Sk.wash("circle", 'cx="16" cy="18" r="9"', WOOD)}<path d="M12 10 q-6 2 -6 10 q4 0 6 -4" fill="#8A5A2B" stroke="${INK}" stroke-width="1"/>
-        <circle cx="12" cy="17" r="1.6" fill="${DARK}"/><circle cx="7" cy="21" r="2" fill="${DARK}"/>
-        ${Sk.line("M24 32 v10 M32 34 v9 M42 34 v9 M50 32 v10", INK, 2)}
-        ${pup ? `<g transform="translate(2 26) rotate(-15)"><rect x="0" y="0" width="12" height="4" rx="2" fill="${INK}"/><circle cx="0" cy="0" r="2.4" fill="${INK}"/><circle cx="0" cy="4" r="2.4" fill="${INK}"/><circle cx="12" cy="0" r="2.4" fill="${INK}"/><circle cx="12" cy="4" r="2.4" fill="${INK}"/></g><path d="M24 4 C24 0 20 0 20 3 C20 6 24 8 24 9 C24 8 28 6 28 3 C28 0 24 0 24 4Z" fill="${PINK}"/>` : ""}
-      </g></svg>`;
+      const h = pup ? 34 : clamp(30 + v * 9, 30, 92), w = pup ? h * 0.873 : h * 1.88;
+      const x = right - w; right = x + w * 0.22;
+      const collar = pup ? [x + w * 0.42, G - h * 0.52] : [x + w * 0.25, G - h * 0.76];
+      return { v, i, pup, x, h, w, collar };
+    });
+    const hands = [221, 62]; // the traveler's fists in the pulling pose (mirrored to face the dogs)
+    const leash = placed.map(d => `<path d="M${hands[0]} ${hands[1]} L${d.collar[0].toFixed(1)} ${d.collar[1].toFixed(1)}" />`).join("");
+    const dogs = placed.map(d => {
+      const box = `left:${pc(d.x, W)};top:${pc(G - d.h, H)};width:${pc(d.w, W)};height:${pc(d.h, H)};--amp:${Math.min(3, 0.6 + d.v * 0.35)}px`;
+      const img = `<img src="/img/leashville/${d.pup ? "puppy" : "dog"}.webp" alt="" draggable="false">`;
       return paying
-        ? `<button class="dog" data-dog="${i}" aria-label="Pay back dog ${rank}, size ${v}">${svg}<i>${v}</i></button>`
-        : `<span class="dog">${svg}</span>`;
+        ? `<button class="pdog" data-dog="${d.i}" style="${box}" aria-label="Pay back dog ${order.indexOf(d.i) + 1}, size ${d.v}">${img}<i>${d.v}</i></button>`
+        : `<span class="pdog" style="${box}">${img}</span>`;
     }).join("");
-    const walker = `<svg viewBox="20 56 80 76" width="64" aria-hidden="true"><g class="ink">${Sk.kid(58, 128, Sk.mood(pack.length > 2 ? "worried" : ""), { arms: pack.length ? "M58 94 L40 104 M58 94 L70 106" : "" })}</g></svg>`;
+    const free = !pack.length;
+    const justPaid = S.phase === "result" && free && (S.lastResult || {}).i !== undefined && st && st.pay;
+    const worry = !free && !paying && (S.phase === "result" || s.size >= 4);
+    const walker = free
+      ? `<img class="ptrav free" src="/img/leashville/traveler-free.webp" alt="" style="left:${pc(226, W)};top:${pc(G - 100, H)};height:${pc(100, H)}">`
+      : `<img class="ptrav pull" src="/img/leashville/traveler-pull.webp" alt="" style="left:${pc(204, W)};top:${pc(G - 100, H)};height:${pc(100, H)};--amp:${Math.min(4, 1 + s.size * 0.3)}px">`;
+    const html = `<div class="paint" style="aspect-ratio:${W}/${H}">
+      <img class="paint-bg" src="/img/leashville/bg.webp" alt="" width="900" height="456">
+      ${worry ? `<img class="pbub" src="/img/leashville/bubble-worry.webp" alt="" style="left:${pc(176, W)};top:${pc(-4, H)};width:${pc(76, W)}">` : ""}
+      ${free && (justPaid || s.free >= 5) ? `<img class="pbub" src="/img/leashville/bubble-coin.webp" alt="" style="left:${pc(244, W)};top:${pc(-6, H)};width:${pc(56, W)}">` : ""}
+      <svg class="pleash" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${leash}</svg>
+      ${dogs}${walker}
+    </div>`;
     return Sk.frame("dogs", pull, `${pack.length} dogs following you`, "",
-      pack.length ? `${plural(pack.length, "dog")} on the leash, pulling you back${paying ? ". Tap them to pay them back, smallest first." : "."}` : "Nobody behind you.",
-      { html: `<div class="dogrow ${pack.length ? "leashed" : ""}"><div class="pack">${dogs || '<span class="free">No dogs. Just you and the open street.</span>'}</div><span class="walker" style="transform: translateX(${pull}px)">${walker}</span></div>` });
+      pack.length ? `${plural(pack.length, "dog")} on the leash, pulling you back${paying ? ". Tap them to pay them back, smallest first." : "."}` : "Nobody behind you. Just you and the open street.",
+      { cls: "painted", html, actH: H });
   },
 
   /* Tockfield: the pantry shelf of saved hours, and the catch game */
@@ -471,7 +500,7 @@ const ROWS = {
   L5: { item: HAND(90, 100), box: { x0: 120, y: 24, h: 82 }, hint: "Keep it, or toss it. Whatever you toss comes back.",
     days: { 0: [["🥪", "Wrap it up"], ["🗑️", "Trash it"]], 1: [["🧒", "Give it away"], ["🗑️", "Throw it out"]], 2: [["🚰", "Refill it"], ["🗑️", "Toss, buy new"]], 4: [["✏️", "Draw on back"], ["🗑️", "Crumple it"]],
       5: [["🧒", "Give to cousin"], ["🗑️", "Bin them"]], 6: [["🍱", "Lunch tomorrow"], ["🗑️", "Toss it"]], 7: [["🔧", "Fix & share"], ["🗑️", "Throw it all"]] } },
-  M5: { item: COIN(234, 68), box: { x0: 8, x1: 200, y: 6, h: 96 }, hint: "Drag the coin. Every loan comes home as a dog.",
+  M5: { item: COIN(226, 60), box: { x0: 6, x1: 196, y: 18, h: 120 }, hint: "Drag the coin. Every loan comes home as a dog.",
     days: { 0: [["🎟️", "Save up"], ["🐕", "Borrow 50"]], 1: [["📺", "Old TV is fine"], ["🐕", "Borrow for TV"]], 2: [["🚲", "Keep the bike"], ["🐕", "Borrow for car"]], 4: [["📱", "Keep my phone"], ["🐕", "Borrow for it"]],
       5: [["🍕", "Pizza at home"], ["🐕", "Borrow"]], 6: [["🐷", "Pay from jar"], ["🐕", "Borrow 15"]] } },
   "L-fallback": { item: HAND(36, 96), box: { x0: 76, x1: 296, y: 14, h: 104 }, hint: "Drag your hand: use your saved hours, or keep them.",

@@ -54,6 +54,7 @@ const Play = {
     this.stop();
     if (S.screen !== "town") return;
     const T = TOWNS[S.t], st = S.phase === "step" ? T.steps[S.step] : null;
+    if (typeof paintPreload === "function") paintPreload(T.id);
     animateStage(T);
     this.boil();
     if (st && st.play && st.play.kind === "catch" && !S.played) catchGame(st);

@@ -459,6 +459,34 @@ button.dog { cursor: pointer; filter: drop-shadow(0 0 6px rgba(255,210,63,.5)); 
 /* home: a locked district is one line of town names under its lock */
 .locked-towns { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .locked-towns span { font: 700 13px var(--font-sign); font-size: calc(var(--ts) * 13px); color: var(--muted); border: 1px dashed var(--line); border-radius: 999px; padding: 3px 10px; }
+/* painted towns (Leashville): journal art as cut-out pieces that follow the numbers */
+.stage.sketch.painted { background: #E9DCC0; padding: 0; border-color: #6B5A3E; overflow: visible; }
+.stage.painted figcaption { background: #18264A; margin: 0; padding: 6px 10px; border-radius: 0 0 12px 12px; }
+.paint { position: relative; width: 100%; overflow: hidden; border-radius: 12px 12px 0 0; }
+.paint > * { position: absolute; }
+.paint-bg { inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.paint-full { display: block; width: 100%; height: auto; border-radius: 12px 12px 0 0; }
+.pleash { inset: 0; width: 100%; height: 100%; overflow: visible; }
+.pleash path { fill: none; stroke: #5A3A22; stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.pdog { display: block; padding: 0; border: 0; background: none; transition: opacity .35s, translate .45s ease-in; }
+.pdog img { width: 100%; height: 100%; object-fit: contain; display: block; animation: strain 1s ease-in-out infinite alternate; }
+.pdog i { position: absolute; top: 2px; left: 50%; translate: -50% 0; font: 700 12px var(--font-num); color: var(--sign-ink); background: var(--sign); border-radius: 99px; padding: 1px 6px; font-style: normal; }
+button.pdog { cursor: pointer; filter: drop-shadow(0 0 5px rgba(255,210,63,.75)); }
+button.pdog:focus-visible { outline: 3px solid var(--sign); outline-offset: 2px; border-radius: 8px; }
+.pdog.gone { opacity: 0; translate: -70% 0; }
+.pdog.nope { animation: shake .4s; }
+.ptrav { width: auto; transform-origin: 50% 100%; }
+.ptrav.pull { transform: scaleX(-1); animation: tug 1s ease-in-out infinite alternate; }
+.ptrav.free { animation: breathe 3s ease-in-out infinite; }
+.pbub { height: auto; transform-origin: 80% 100%; animation: pop .35s cubic-bezier(.3,1.6,.5,1) both, bob 2.4s ease-in-out .4s infinite alternate; }
+@keyframes strain { from { translate: 0 0; } to { translate: calc(var(--amp, 1px) * -1) 0; } }
+@keyframes tug { from { transform: scaleX(-1) rotate(0deg); } to { transform: scaleX(-1) translateX(calc(var(--amp, 1px) * -1)) rotate(-1.5deg); } }
+@keyframes breathe { 50% { translate: 0 -1px; } }
+.polaroid .stage.painted { border: 0; }
+.painted .act-zone { border-color: rgba(58,38,20,.6); justify-content: flex-end; }
+.painted .act-zone b { display: none; } /* the painting shows the thing; emoji would clash with it */
+.painted .act-zone.hot { border-color: #3A2614; background: rgba(255,210,63,.28); }
+.polaroid .stage.painted .paint-full { border-radius: 2px; }
 /* arrival: one sign moment */
 .sign-go { display: block; width: 100%; border: 0; color: var(--sign-ink); font: inherit; text-align: inherit; cursor: pointer; } /* the arrival sign is the door into town */
 .sign-go:active { translate: 0 3px; }
@@ -686,16 +714,16 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=46"></script>
-<script src="/js/juice.js?v=46"></script>
-<script src="/js/mic.js?v=46"></script>
-<script src="/js/road.js?v=46"></script>
-<script src="/js/radio.js?v=46"></script>
-<script src="/js/reel.js?v=46"></script>
-<script src="/js/glovebox.js?v=46"></script>
-<script src="/js/play.js?v=46"></script>
-<script src="/js/sketch.js?v=46"></script>
-<script src="/js/share.js?v=46"></script>
+<script src="/js/compat.js?v=47"></script>
+<script src="/js/juice.js?v=47"></script>
+<script src="/js/mic.js?v=47"></script>
+<script src="/js/road.js?v=47"></script>
+<script src="/js/radio.js?v=47"></script>
+<script src="/js/reel.js?v=47"></script>
+<script src="/js/glovebox.js?v=47"></script>
+<script src="/js/play.js?v=47"></script>
+<script src="/js/sketch.js?v=47"></script>
+<script src="/js/share.js?v=47"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1972,7 +2000,7 @@ function renderTown() {
   const who = Prefs.coop ? role(T, S.step) : null;
   const act = !r && typeof actOf === "function" ? actOf(st, s) : null;
   const micBlocked = st.mic && (Mic.state === "denied" || Mic.state === "unsupported" || (st.mic.kind === "speech" && !Mic.speechOK));
-  const fold = !r && (act || st.drag || (showMic && !micBlocked));
+  const fold = !r && (act || st.drag || st.pay || (showMic && !micBlocked)); // the gesture is the main way to choose; buttons stay one tap away
   return `${topbar(true)}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
   ${meters(T, s)}${stage(T, s)}
