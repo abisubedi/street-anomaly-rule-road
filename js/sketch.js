@@ -12,7 +12,34 @@ const has = id => typeof Glove !== "undefined" && Glove.has(id);
 
 // painted towns: load the art while the player reads the arrival sign, so the first day appears complete
 const PAINT = { M5: ["bg", "dog", "traveler-pull", "traveler-free", "puppy", "bubble-worry", "bubble-coin"].map(n => `/img/leashville/${n}.webp`) };
-const paintPreload = id => { (PAINT[id] || []).forEach(src => { const im = new Image(); im.src = src; }); PAINT[id] = null; };
+const paintPreload = id => {
+  (PAINT[id] || []).forEach(src => { const im = new Image(); im.src = src; }); PAINT[id] = null;
+  // near the end of the town, warm up the ending clips (the service worker keeps them for offline)
+  const f = FILM[id], T = TOWNS[S.t];
+  if (f && f.ends && !f.warm && S.phase !== "arrive" && S.step >= T.steps.length - 2) { f.warm = true; ["end-debt", "end-paid"].forEach(n => fetch(`${f.dir}/${n}.mp4`).catch(() => {})); }
+};
+
+/* film: short hand-animated clips for a town's arrival and ending. Each plays once and rests on its last frame.
+   Phones set to reduce motion get the last frame as a still. */
+const FILM = { M5: { dir: "/img/leashville", arrive: true, ends: true } };
+const Film = {
+  seen: new Set(), // arrivals already watched this session: re-renders show the last frame instead of replaying
+  clip(src, poster, still, cls, id) {
+    if (Juice.reduced || (id && this.seen.has(id))) return `<img class="${cls}" src="${still}" alt="" width="768" height="432">`;
+    return `<video class="${cls}" src="${src}" poster="${poster}" muted playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback ${id ? `data-film="${id}"` : ""} aria-hidden="true"></video>`;
+  },
+  arrive(T) {
+    const f = FILM[T.id]; if (!f || !f.arrive) return "";
+    return this.clip(`${f.dir}/arrive.mp4`, `${f.dir}/arrive-first.webp`, `${f.dir}/arrive-last.webp`, "film-v", T.id);
+  },
+  end(T, free) {
+    const f = FILM[T.id]; if (!f || !f.ends) return "";
+    const n = free ? "end-paid" : "end-debt";
+    return this.clip(`${f.dir}/${n}.mp4`, `${f.dir}/${n}.webp`, `${f.dir}/${n}.webp`, "paint-full");
+  },
+};
+// "ended" doesn't bubble, so listen in the capture phase
+document.addEventListener("ended", e => { const id = e.target && e.target.dataset && e.target.dataset.film; if (id) Film.seen.add(id); }, true);
 
 const KID_FACES = {
   happy: `<path d="M50 73 q3 -4 6 0 M60 73 q3 -4 6 0" fill="none" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/><path d="M50 78 Q58 78 66 78 Q64 87 58 87 Q52 87 50 78 Z" fill="${DARK}"/>`,
@@ -235,7 +262,7 @@ const SCENES = {
       const free = !pack.length && !s.dogs;
       return Sk.frame("dogs", 0, free ? "You paid every dog back" : "The dogs are still pulling you", "",
         free ? "Every dog paid back." : `${plural(pack.length || s.dogs, "dog")} still on the leash.`,
-        { cls: "painted", html: `<img class="paint-full" src="/img/leashville/end-${free ? "paid" : "debt"}.webp" width="880" height="650" alt="">` });
+        { cls: "painted", html: Film.end(TOWNS[S.t], free) });
     }
     const pc = (v, t) => (v / t * 100).toFixed(2) + "%";
     const order = pack.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]).map(x => x[1]);

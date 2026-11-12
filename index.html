@@ -487,6 +487,25 @@ button.pdog:focus-visible { outline: 3px solid var(--sign); outline-offset: 2px;
 .painted .act-zone b { display: none; } /* the painting shows the thing; emoji would clash with it */
 .painted .act-zone.hot { border-color: #3A2614; background: rgba(255,210,63,.28); }
 .polaroid .stage.painted .paint-full { border-radius: 2px; }
+/* film arrival: the town's clip, its name painted on the blank signboard, the rule hand-lettered underneath */
+.film { display: block; width: 100%; padding: 8px 8px 10px; border: 0; border-radius: 4px; background: #F1E8D0; color: #14130C; text-align: center; cursor: pointer; rotate: -1deg; box-shadow: 0 10px 24px rgba(0,0,0,.45); font: inherit; }
+.film:active { translate: 0 3px; }
+.film:focus-visible { outline: 3px solid var(--sign); outline-offset: 4px; }
+.film-frame { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 2px; background: #E9DCC0; }
+.film-v { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; }
+.film-sign { position: absolute; left: 6.6%; top: 4.5%; width: 17%; height: 15%; display: grid; place-items: center; rotate: -1.5deg; color: #3A2614; z-index: 2; font: 700 11px/1 var(--font-display); font-size: clamp(8px, 2.5vw, 14px); letter-spacing: 0; opacity: 0; animation: signin .6s ease 3.2s forwards; pointer-events: none; }
+@keyframes signin { to { opacity: .92; } }
+.film-cap { display: block; padding: 8px 6px 0; }
+.film-cap .kicker { display: flex; justify-content: center; align-items: center; gap: 6px; font: 700 12px var(--font-sign); font-size: calc(var(--ts) * 12px); letter-spacing: .16em; text-transform: uppercase; color: #6B5A3E; }
+.film-cap .rule { display: block; margin-top: 4px; font: 700 22px/1.12 var(--font-sign); font-size: calc(var(--ts) * clamp(19px, 5.6vw, 28px)); text-transform: uppercase; text-wrap: balance; color: #14130C; }
+.film-cap .badges { margin-left: 0; }
+.polaroid video.paint-full { aspect-ratio: 16 / 9; object-fit: cover; }
+@media (prefers-reduced-motion: reduce) { .film-sign { opacity: .92; } }
+@media (max-height: 720px) {
+  .film { padding: 6px 6px 8px; }
+  .film-cap { padding-top: 5px; }
+  .film-cap .rule { font-size: 17px; font-size: calc(var(--ts) * clamp(15px, 4.5vw, 22px)); }
+}
 /* arrival: one sign moment */
 .sign-go { display: block; width: 100%; border: 0; color: var(--sign-ink); font: inherit; text-align: inherit; cursor: pointer; } /* the arrival sign is the door into town */
 .sign-go:active { translate: 0 3px; }
@@ -714,16 +733,16 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=47"></script>
-<script src="/js/juice.js?v=47"></script>
-<script src="/js/mic.js?v=47"></script>
-<script src="/js/road.js?v=47"></script>
-<script src="/js/radio.js?v=47"></script>
-<script src="/js/reel.js?v=47"></script>
-<script src="/js/glovebox.js?v=47"></script>
-<script src="/js/play.js?v=47"></script>
-<script src="/js/sketch.js?v=47"></script>
-<script src="/js/share.js?v=47"></script>
+<script src="/js/compat.js?v=48"></script>
+<script src="/js/juice.js?v=48"></script>
+<script src="/js/mic.js?v=48"></script>
+<script src="/js/road.js?v=48"></script>
+<script src="/js/radio.js?v=48"></script>
+<script src="/js/reel.js?v=48"></script>
+<script src="/js/glovebox.js?v=48"></script>
+<script src="/js/play.js?v=48"></script>
+<script src="/js/sketch.js?v=48"></script>
+<script src="/js/share.js?v=48"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1908,13 +1927,21 @@ function renderTown() {
     return `${topbar(true)}
     ${ch ? `<div class="challenge">${esc(ch.c || "A friend")} got ${starRow(ch.s, "")} here${ch.g ? " and left a whisper ghost" : ""}. Beat them.</div>` : ""}
     ${S.daily ? `<div class="challenge daily-tag">Today's Anomaly Mile</div>` : ""}
-    <section class="hero">
+    ${typeof Film !== "undefined" && Film.arrive(T) ? `<section class="hero film-hero">
+      <button class="film" data-act="begin" aria-label="Enter ${esc(T.name)}. In this town, ${esc(T.rule)}">
+        <span class="film-frame">${Film.arrive(T)}<span class="film-sign" aria-hidden="true">${esc(T.name)}</span></span>
+        <span class="film-cap">
+          <span class="kicker">Mile ${mile} · ${freq(roadPos(S.t))} FM${badges ? `<span class="badges">${badges}</span>` : ""}</span>
+          <span class="rule">In this town, ${esc(T.rule)}</span>
+        </span>
+      </button>
+    </section>` : `<section class="hero">
       <button class="sign sign-go" data-act="begin" aria-label="Enter ${esc(T.name)}"><span class="sign-inner">
         <span class="kicker">${T.name} · Mile ${mile} · ${freq(roadPos(S.t))} FM${badges ? `<span class="badges">${badges}</span>` : ""}</span>
         <span class="rule ${T.rule.length > 58 ? "long" : ""}">In this town, ${esc(T.rule)}</span>
       </span></button>
       <div class="pole"></div>
-    </section>
+    </section>`}
     <p class="story hook">${esc(T.hook)}</p>
     ${K ? `<div class="goal mini">⭐⭐⭐ ${esc(K.goal)}</div>` : ""}
     <div class="arrive-row">

@@ -1,6 +1,6 @@
 // Rule Road offline support. Bump VERSION whenever index.html changes so players get the new towns.
-const VERSION = "rule-road-v47";
-const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/img/hero-sign.jpg", "/img/open-road.jpg", "/img/tape.jpg", "/js/compat.js?v=47", "/js/juice.js?v=47", "/js/mic.js?v=47", "/js/road.js?v=47", "/js/radio.js?v=47", "/js/reel.js?v=47", "/js/glovebox.js?v=47", "/js/play.js?v=47", "/js/sketch.js?v=47", "/js/share.js?v=47"];
+const VERSION = "rule-road-v48";
+const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/img/hero-sign.jpg", "/img/open-road.jpg", "/img/tape.jpg", "/js/compat.js?v=48", "/js/juice.js?v=48", "/js/mic.js?v=48", "/js/road.js?v=48", "/js/radio.js?v=48", "/js/reel.js?v=48", "/js/glovebox.js?v=48", "/js/play.js?v=48", "/js/sketch.js?v=48", "/js/share.js?v=48"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -18,6 +18,26 @@ self.addEventListener("fetch", e => {
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put("/index.html", copy)); return res; })
       .catch(() => caches.match("/index.html")));
+    return;
+  }
+  // Town films: cache the whole clip by path, and answer the video element's byte-range requests with
+  // proper 206 slices of it (Safari won't play a video that gets a whole file back for a range request).
+  if (url.origin === location.origin && url.pathname.endsWith(".mp4")) {
+    e.respondWith(caches.open(VERSION).then(async c => {
+      let hit = await c.match(url.pathname);
+      if (!hit) {
+        const res = await fetch(url.pathname);
+        if (res.status !== 200) return res;
+        await c.put(url.pathname, res.clone());
+        hit = res;
+      }
+      const range = req.headers.get("range"), m = range && /bytes=(\d*)-(\d*)/.exec(range);
+      if (!m) return hit;
+      const buf = await hit.arrayBuffer(), size = buf.byteLength;
+      const start = m[1] ? +m[1] : Math.max(0, size - +m[2]), end = m[1] && m[2] ? Math.min(+m[2], size - 1) : size - 1;
+      return new Response(buf.slice(start, end + 1), { status: 206, headers: {
+        "Content-Type": "video/mp4", "Content-Range": `bytes ${start}-${end}/${size}`, "Content-Length": String(end - start + 1), "Accept-Ranges": "bytes" } });
+    }));
     return;
   }
   // Narrator clips: the audio element asks for byte ranges, so cache and serve whole files by path.
