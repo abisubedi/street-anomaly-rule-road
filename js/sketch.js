@@ -127,7 +127,7 @@ function jarScene(s, st) {
   }).join("");
   const lid = opened
     ? `<g transform="rotate(-24 214 118)">${Sk.wash("rect", 'x="196" y="112" width="46" height="9" rx="3"', RED)}</g>`
-    : Sk.wash("rect", 'x="120" y="26" width="60" height="10" rx="3"', RED);
+    : `<g class="lid-g">${Sk.wash("rect", 'x="120" y="26" width="60" height="10" rx="3"', RED)}</g>`;
   // Piggy Charm (Glovebox): a little pig hangs off the jar's neck
   const piggy = has("piggy") ? `${Sk.line("M180 40 Q186 44 190 50", INK, 1.2)}<g transform="translate(193 57)">${Sk.wash("circle", 'cx="0" cy="0" r="7"', PINK)}<path d="M-5 -6 l2 -4 l2 3 M3 -6 l2 -4 l1 4" fill="${PINK}" stroke="${INK}" stroke-width="1"/><ellipse cx="3" cy="2" rx="3" ry="2.2" fill="#FFC2D4" stroke="${DARK}" stroke-width=".8"/><circle cx="-2" cy="-2" r="1" fill="${DARK}"/></g>` : "";
   const cap = opened ? "The lid is off. No magic tonight."
@@ -141,7 +141,7 @@ function jarScene(s, st) {
     ${night ? `<path d="M262 14 a14 14 0 1 0 12 22 a11 11 0 1 1 -12 -22 Z" fill="#FFE27A" opacity=".9" stroke="${INK}" stroke-width="1.2"/><path d="M236 22 l2 5 l5 1 l-5 1 l-2 5 l-2 -5 l-5 -1 l5 -1 Z" fill="${INK}" opacity=".7"/>` : ""}
     ${doubled ? `<g stroke="${SUN}" stroke-width="2" stroke-linecap="round">${[0, 40, 140, 180, 220, 320].map(a => { const c = Math.cos(a * Math.PI / 180), d = Math.sin(a * Math.PI / 180); return `<line x1="${150 + c * 50}" y1="${82 + d * 50}" x2="${150 + c * 62}" y2="${82 + d * 62}"/>`; }).join("")}</g>${Sk.text(212, 42, "×2!", SUN, 20, 'transform="rotate(-10 212 42)"')}` : ""}
     ${Sk.ground()}${coins}
-    <path d="M118 42 Q113 46 113 56 L112 118 Q112 128 124 128 L176 128 Q188 128 188 118 L187 56 Q187 46 182 42 Z" fill="rgba(154,200,230,.10)" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+    <path class="jar-body" d="M118 42 Q113 46 113 56 L112 118 Q112 128 124 128 L176 128 Q188 128 188 118 L187 56 Q187 46 182 42 Z" fill="rgba(154,200,230,.10)" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
     ${Sk.line("M122 36 L122 42 M178 36 L178 42")}${Sk.line("M120 54 Q121 80 121 110", INK, 1.2).replace("/>", ' opacity=".45"/>')}
     ${lid}${piggy}
     <g transform="rotate(-4 150 74)"><rect x="131" y="64" width="38" height="17" rx="2" fill="${INK}" opacity=".92"/>${Sk.text(150, 77, opened ? "oops" : "SAVE", DARK, 11)}</g>
@@ -176,6 +176,7 @@ const SCENES = {
     const drops = Array.from({ length: clamp(s.streak, 0, 7) }, (_, i) => `<path d="M${116 + i * 5} ${96 + (i % 2) * 8} q-3 5 0 6 q3 -1 0 -6 Z" fill="${SKY}"/>`).join("");
     return Sk.frame("tree", n, `${s.coins} coins on the tree, watered ${s.streak} days in a row`, `${Sk.ground()}
       ${Sk.wash("path", 'd="M184 128 L186 84 Q187 74 182 66 M188 92 Q198 84 204 76"', WOOD)}
+      <g class="pv-drops">${[0, 1, 2, 3, 4].map(i => `<path d="M${164 + i * 12} ${8 + (i % 2) * 6} q-3 5 0 6 q3 -1 0 -6 Z" fill="${SKY}"/>`).join("")}</g>
       ${Sk.wash("path", 'd="M150 66 Q148 30 186 26 Q230 24 230 62 Q232 92 190 92 Q150 94 150 66 Z"', dry ? "#8A9A5B" : LEAF, .55)}${coins}
       ${dry ? [0, 1, 2, 3].map(i => Sk.coin(160 + i * 14, 125, 3.6)).join("") : ""}
       ${s.streak && !act ? `${Sk.wash("path", 'd="M88 92 L108 92 L106 108 L90 108 Z"', SKY, .6)}${Sk.line("M108 96 L118 90")}${drops}` : ""}
@@ -201,7 +202,7 @@ const SCENES = {
   /* Yawnmore: every unneeded buy steals an hour of sleep */
   M3(s) {
     const sleep = clamp(s.sleep, 0, 9);
-    const moons = Array.from({ length: 9 }, (_, i) => { const x = 150 + i * 15, on = i < sleep; return `<path d="M${x} 16 a6 6 0 1 0 5 9 a5 5 0 1 1 -5 -9 Z" fill="${on ? "#FFE27A" : "none"}" stroke="${on ? INK : DIM}" stroke-width="1" ${on ? "" : 'stroke-dasharray="2 2"'}/>`; }).join("");
+    const moons = Array.from({ length: 9 }, (_, i) => { const x = 150 + i * 15, on = i < sleep; return `<path class="${on && i === sleep - 1 ? "moon-last" : ""}" d="M${x} 16 a6 6 0 1 0 5 9 a5 5 0 1 1 -5 -9 Z" fill="${on ? "#FFE27A" : "none"}" stroke="${on ? INK : DIM}" stroke-width="1" ${on ? "" : 'stroke-dasharray="2 2"'}/>`; }).join("");
     const coins = Array.from({ length: clamp(Math.round(s.coins / 2), 0, 12) }, (_, i) => `<ellipse cx="250" cy="${124 - i * 3.2}" rx="9" ry="2.6" fill="${GOLD}" stroke="#5A4512" stroke-width=".8"/>`).join("");
     const tired = sleep <= 5;
     return Sk.frame("sleep", sleep, `${s.sleep} hours of sleep tonight`, `${Sk.ground()}${moons}
@@ -222,7 +223,7 @@ const SCENES = {
     return Sk.frame("bat", b, `Your battery is at ${b}%`, `${Sk.ground()}
       ${Sk.wash("rect", 'x="140" y="12" width="70" height="116" rx="12"', "#22355F", .9)}
       <rect x="160" y="26" width="30" height="80" rx="4" fill="none" stroke="${INK}" stroke-width="1.6"/><rect x="169" y="21" width="12" height="5" rx="1" fill="${INK}"/>
-      <rect x="163" y="${103 - h}" width="24" height="${h}" rx="2" fill="${c}" opacity=".9"/>
+      <rect class="bat-fill" data-y="${103 - h}" data-h="${h}" x="163" y="${103 - h}" width="24" height="${h}" rx="2" fill="${c}" opacity=".9"/>
       ${Sk.text(175, 122, b + "%", INK, 12)}
       ${b < 25 ? Sk.line("M232 40 l-8 14 h8 l-8 14", SUN, 2.4) : ""}
       ${Sk.kid(70, 128, mood, b < 25 ? { arms: "M58 94 L50 112 M58 94 L66 112" } : {})}`,
@@ -272,7 +273,7 @@ const SCENES = {
       ${Sk.line("M8 128 H292", DIM, 1.6)}${Sk.line("M222 120 q8 -6 16 0 t16 0 t16 0 t16 0 M210 110 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0", SKY, 1.8)}
       <g transform="rotate(-20 220 30)">${Sk.wash("path", 'd="M200 34 Q220 14 244 30 L238 36 Q220 26 206 40 Z"', WOOD, .9)}</g>
       ${Sk.line("M120 70 Q170 10 214 36", DIM, 1.2).replace("/>", ' stroke-dasharray="4 4"/>')}
-      ${junk}${Sk.kid(58, 128, Sk.mood(pile > 3 ? "worried" : pile === 0 && s.happy > 3 ? "happy" : ""))}`,
+      ${junk}<g class="pv-ghostjunk">${Sk.wash("rect", `x="${130 + (pile % 5) * 16}" y="${116 - Math.floor(pile / 5) * 12 - 14}" width="13" height="11" rx="2"`, WOOD, .8)}</g>${Sk.kid(58, 128, Sk.mood(pile > 3 ? "worried" : pile === 0 && s.happy > 3 ? "happy" : ""))}`,
       pile ? `${plural(s.pile, "thing")} washed back up on your beach.` : "Nothing came back. The beach is clear.");
   },
 
@@ -316,6 +317,7 @@ const SCENES = {
       : `<img class="ptrav pull" src="/img/leashville/traveler-pull.webp" alt="" style="left:${pc(204, W)};top:${pc(G - 100, H)};height:${pc(100, H)};--amp:${Math.min(4, 1 + s.size * 0.3)}px">`;
     const html = `<div class="paint" style="aspect-ratio:${W}/${H}">
       <img class="paint-bg" src="/img/leashville/bg.webp" alt="" width="900" height="456">
+      ${paying ? "" : `<img class="pv-ghostdog" src="/img/leashville/puppy.webp" alt="" style="left:${pc(right - 40, W)};top:${pc(G - 36, H)};height:${pc(36, H)}">`}
       ${worry ? `<img class="pbub" src="/img/leashville/bubble-worry.webp" alt="" style="left:${pc(176, W)};top:${pc(-4, H)};width:${pc(76, W)}">` : ""}
       ${free && (justPaid || s.free >= 5) ? `<img class="pbub" src="/img/leashville/bubble-coin.webp" alt="" style="left:${pc(244, W)};top:${pc(-6, H)};width:${pc(56, W)}">` : ""}
       <svg class="pleash" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${leash}</svg>
@@ -399,7 +401,8 @@ const SCENES = {
     const birds = clamp(s.birds, 0, 9), coins = clamp(Math.round(s.coins / 70), 0, 15);
     const bird = (x, y, k) => `<g transform="translate(${x} ${y}) scale(${k})">${Sk.wash("ellipse", 'cx="0" cy="0" rx="8" ry="6"', SKY, .9)}<circle cx="-5" cy="-4" r="4" fill="${SKY}" stroke="${INK}" stroke-width="1"/><circle cx="-6" cy="-5" r="1" fill="${DARK}"/><path d="M-9 -4 l-4 1 l4 1" fill="${SUN}"/></g>`;
     return Sk.frame("birds", birds, `${s.birds} birds in your coat`, `${Sk.ground()}${Sk.line("M8 26 Q150 40 292 24", DIM, 1.4)}
-      ${Array.from({ length: birds }, (_, i) => bird(130 + i * 18, 26 + Math.sin(i) * 3, .9)).join("")}
+      <g class="birds-g">${Array.from({ length: birds }, (_, i) => bird(130 + i * 18, 26 + Math.sin(i) * 3, .9)).join("")}</g>
+      <g class="pv-ghostbird">${bird(130 + birds * 18, 26 + Math.sin(birds) * 3, .9)}</g>
       ${Array.from({ length: coins }, (_, i) => `<ellipse cx="${200 + (i % 3) * 20}" cy="${124 - Math.floor(i / 3) * 4}" rx="9" ry="2.6" fill="${GOLD}" stroke="#5A4512" stroke-width=".8"/>`).join("")}
       ${birds ? bird(232, 102, .8) + bird(212, 106, .7) : ""}
       ${Sk.kid(70, 128, Sk.mood(birds > 4 ? "worried" : ""), { extra: `<path d="M48 88 L46 116 L70 116 L68 88 Z" fill="${PLUM}" opacity=".5" stroke="${INK}" stroke-width="1.2"/>` })}`,
@@ -410,12 +413,12 @@ const SCENES = {
   "M-monster"(s) {
     const k = s.bill ? clamp(.5 + Math.log10(s.bill + 1) / 2.2, .5, 1.6) : 0;
     return Sk.frame("monster", s.bill, `You owe ${s.bill}`, `${Sk.ground()}
-      ${k ? `<g transform="translate(210 128) scale(${k}) translate(-210 -128)">
+      ${k ? `<g class="monster-g"><g transform="translate(210 128) scale(${k}) translate(-210 -128)">
         ${Sk.wash("path", 'd="M170 128 Q166 70 210 64 Q254 70 250 128 Q240 120 230 128 Q220 120 210 128 Q200 120 190 128 Q180 120 170 128 Z"', PLUM, .85)}
         <circle cx="198" cy="88" r="6" fill="${INK}"/><circle cx="222" cy="88" r="6" fill="${INK}"/><circle cx="199" cy="89" r="2.6" fill="${DARK}"/><circle cx="221" cy="89" r="2.6" fill="${DARK}"/>
         <path d="M196 104 Q210 114 224 104 Z" fill="${DARK}"/><path d="M200 105 l3 5 l3 -4 l3 5 l3 -5 l3 4 l3 -4" fill="${INK}"/>
         <g transform="rotate(8 250 90)">${Sk.wash("rect", 'x="240" y="74" width="26" height="32" rx="2"', INK, .9)}${Sk.text(253, 94, fmt(s.bill), DARK, 9)}</g>
-      </g>` : `<g transform="rotate(-8 210 90)">${Sk.wash("rect", 'x="180" y="62" width="60" height="56" rx="3"', INK, .9)}${Sk.text(210, 96, "PAID", LEAF, 16)}</g>`}
+      </g></g>` : `<g transform="rotate(-8 210 90)">${Sk.wash("rect", 'x="180" y="62" width="60" height="56" rx="3"', INK, .9)}${Sk.text(210, 96, "PAID", LEAF, 16)}</g>`}
       ${Sk.kid(58, 128, Sk.mood(k > 1 ? "worried" : !s.bill ? "happy" : ""))}`,
       s.bill ? `The bill says ${fmt(s.bill)}. ${s.bill > 50 ? "It's getting big." : "It's still small."}` : "Paid. No monster today.");
   },

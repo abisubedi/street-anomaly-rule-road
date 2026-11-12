@@ -9,7 +9,7 @@ const Play = {
   mem: {},        // last drawn values per town, so scenes animate from the old value to the new one
   timer: 0, raf: 0, boilT: 0, autoT: 0,
 
-  stop() { cancelAnimationFrame(this.raf); clearTimeout(this.timer); clearInterval(this.boilT); clearTimeout(this.autoT); this.raf = this.boilT = this.autoT = 0; },
+  stop() { cancelAnimationFrame(this.raf); clearTimeout(this.timer); clearInterval(this.boilT); clearTimeout(this.autoT); this.raf = this.boilT = this.autoT = 0; if (typeof Preview !== "undefined") Preview.on = -1; },
 
   // after a finger gesture lands on a choice: show the result long enough to read, then go to the next day.
   // The Next button fills up as a countdown and still works for anyone who wants to skip ahead.
@@ -162,14 +162,15 @@ function dragGame(st) {
     chip.style.transform = `translate(${p.clientX - sx}px, ${p.clientY - sy}px) rotate(-4deg)`;
     moved = Math.max(moved, Math.hypot(p.clientX - sx, p.clientY - sy));
     const c = centre(), z = moved > 36 ? at(c[0], c[1]) : null; zones.forEach(q => q.classList.toggle("hot", q === z));
+    if (z) Preview.show(+z.dataset.zone); else Preview.clear();
     if (e.cancelable) e.preventDefault();
   };
   const up = e => {
     if (!on) return; on = false;
     const c = centre(), z = moved > 36 ? at(c[0], c[1]) : null; moved = 0;
     chip.classList.remove("lifted"); zones.forEach(q => q.classList.remove("hot"));
-    if (z) { chip.style.opacity = "0"; pick(+z.dataset.zone); Play.autoNext(); }
-    else { chip.style.transition = "transform .25s cubic-bezier(.3,1.5,.5,1)"; chip.style.transform = ""; setTimeout(() => { chip.style.transition = ""; }, 260); }
+    if (z) { chip.style.opacity = "0"; Juice.buzz([12]); Preview.clear(); pick(+z.dataset.zone); Play.autoNext(); }
+    else { Preview.clear(); Juice.buzz([6]); chip.style.transition = "transform .38s cubic-bezier(.175,.885,.32,1.275)"; chip.style.transform = ""; setTimeout(() => { chip.style.transition = ""; }, 400); }
   };
   if (window.PointerEvent) {
     chip.addEventListener("pointerdown", e => { try { chip.setPointerCapture(e.pointerId); } catch {} down(e); });
@@ -187,6 +188,48 @@ function dragPanel(st) {
   </div>`;
 }
 
+/* ---------- live preview while dragging: the page reacts to a choice before you let go ----------
+   It shows WHICH meters a choice would touch (a pulsing dot, bigger for bigger changes), never which way or how much,
+   so each town's catch stays hidden. The drawing acts out the rule on the sign (the ceiling creaks down, a ghost dog
+   trots in) through pv-<meter>-up/down classes on the scene, plus a few scenes that need the actual numbers. */
+const SCENE_PREVIEW = {
+  // Inchwick: the house squashes by exactly the inches this would cost
+  "M-shrink": (fig, a, b) => { const g = fig.querySelector(".house"); if (g && b.door !== a.door) { g.style.transition = "transform .35s cubic-bezier(.175,.885,.32,1.275)"; g.style.transform = `scaleY(${(Math.max(40, b.door) / Math.max(40, a.door)).toFixed(3)})`; } },
+  // Chargeville: the battery fill slides to where this would leave you
+  L3: (fig, a, b) => { const r = fig.querySelector(".bat-fill"); if (r && b.bat !== a.bat) { const h = Math.round(Math.max(0, Math.min(100, b.bat)) * .74); r.style.transition = "y .35s, height .35s"; r.setAttribute("y", 103 - h); r.setAttribute("height", h); } },
+};
+const Preview = {
+  on: -1,
+  show(i, toward) {
+    if (i === this.on) return;
+    this.clear(); if (!(i >= 0)) return;
+    const r = dryRun(i), fig = document.querySelector("[data-scene]"); if (!r || !fig) return;
+    this.on = i;
+    const T = TOWNS[S.t];
+    T.meters.forEach(m => {
+      const a = r.before[m.k], b = r.after[m.k];
+      if (typeof a !== "number" || typeof b !== "number" || a === b) return;
+      const box = document.querySelector(`.mv[data-k="${m.k}"]`); const el = box && box.closest(".meter");
+      const big = Math.abs(b - a) >= (m.max ? m.max * 0.2 : Math.max(2, Math.abs(a) * 0.5));
+      if (el) el.classList.add("pv", big ? "pv-big" : "pv-small");
+      fig.classList.add(`pv-${m.k}-${b > a ? "up" : "down"}`);
+    });
+    if (r.after.opened && !r.before.opened) fig.classList.add("pv-opened");
+    fig.classList.add("previewing"); fig.style.setProperty("--pvtilt", (toward || 0) * 1.2 + "deg");
+    if (SCENE_PREVIEW[T.id]) SCENE_PREVIEW[T.id](fig, r.before, r.after);
+    Juice.buzz([5]);
+  },
+  clear() {
+    if (this.on < 0) return; this.on = -1;
+    document.querySelectorAll(".meter.pv").forEach(e => e.classList.remove("pv", "pv-big", "pv-small"));
+    const fig = document.querySelector("[data-scene]"); if (!fig) return;
+    [...fig.classList].filter(c => c.startsWith("pv-")).forEach(c => fig.classList.remove(c));
+    fig.classList.remove("previewing");
+    const g = fig.querySelector(".house"); if (g && TOWNS[S.t].id === "M-shrink") g.style.transform = "";
+    const f = fig.querySelector(".bat-fill"); if (f && f.dataset.y) { f.setAttribute("y", f.dataset.y); f.setAttribute("height", f.dataset.h); }
+  },
+};
+
 /* ---------- act it out: drag the item on the drawing onto a zone to choose ---------- */
 function actGame() {
   const item = document.getElementById("actitem"), zones = [...document.querySelectorAll(".act-zone")];
@@ -194,7 +237,8 @@ function actGame() {
   let sx = 0, sy = 0, on = false, hot = null;
   const at = (x, y) => zones.find(z => { const r = z.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
   const pt = e => e.touches ? e.touches[0] || e.changedTouches[0] : e;
-  const back = () => { item.style.transition = "transform .3s cubic-bezier(.3,1.5,.5,1)"; item.style.transform = ""; setTimeout(() => { item.style.transition = ""; }, 320); };
+  const back = () => { Preview.clear(); Juice.buzz([6]); item.style.transition = "transform .38s cubic-bezier(.175,.885,.32,1.275)"; item.style.transform = ""; setTimeout(() => { item.style.transition = ""; }, 400); };
+  const side = z => { const a = item.getBoundingClientRect(), b = z.getBoundingClientRect(); return Math.sign((b.left + b.width / 2) - (a.left + a.width / 2)); };
   const down = e => {
     const p = pt(e); if (!p) return; on = true; sx = p.clientX; sy = p.clientY;
     item.classList.add("lifted"); Sound.tone(520, .06, "triangle", .05);
@@ -205,7 +249,11 @@ function actGame() {
     if (!on) return; const p = pt(e); if (!p) return;
     item.style.transform = `translate(${p.clientX - sx}px, ${p.clientY - sy}px) scale(1.15)`;
     const z = at(p.clientX, p.clientY);
-    if (z !== hot) { zones.forEach(q => q.classList.toggle("hot", q === z && z.dataset.zone !== "off")); hot = z; if (z) { Juice.buzz([8]); Sound.tone(z.dataset.zone === "off" ? 200 : 700, .05, "triangle", .04); } }
+    if (z !== hot) {
+      zones.forEach(q => q.classList.toggle("hot", q === z && z.dataset.zone !== "off")); hot = z;
+      if (z) { Juice.buzz([8]); Sound.tone(z.dataset.zone === "off" ? 200 : 700, .05, "triangle", .04); }
+      if (z && z.dataset.zone !== "off") Preview.show(+z.dataset.zone, side(z)); else Preview.clear();
+    }
     if (e.cancelable) e.preventDefault();
   };
   const up = () => {
@@ -214,7 +262,7 @@ function actGame() {
     if (!z) return back();
     if (z.dataset.zone === "off") { Juice.penalty(); z.classList.add("nope"); setTimeout(() => z.classList.remove("nope"), 400); return back(); }
     item.style.transition = "opacity .2s"; item.style.opacity = "0";
-    pick(+z.dataset.zone); Play.autoNext();
+    Juice.buzz([12]); Preview.clear(); pick(+z.dataset.zone); Play.autoNext();
   };
   if (window.PointerEvent) {
     item.addEventListener("pointerdown", down); item.addEventListener("pointermove", move);
