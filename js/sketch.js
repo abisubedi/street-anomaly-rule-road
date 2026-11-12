@@ -26,7 +26,7 @@ const Film = {
   seen: new Set(), // arrivals already watched this session: re-renders show the last frame instead of replaying
   clip(src, poster, still, cls, id) {
     if (Juice.reduced || (id && this.seen.has(id))) return `<img class="${cls}" src="${still}" alt="" width="768" height="432">`;
-    return `<video class="${cls}" src="${src}" poster="${poster}" muted playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback ${id ? `data-film="${id}"` : ""} aria-hidden="true"></video>`;
+    return `<video class="${cls}" src="${src}" poster="${poster}" data-still="${still}" muted playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback ${id ? `data-film="${id}"` : ""} aria-hidden="true"></video>`;
   },
   arrive(T) {
     const f = FILM[T.id]; if (!f || !f.arrive) return "";
@@ -40,6 +40,14 @@ const Film = {
 };
 // "ended" doesn't bubble, so listen in the capture phase
 document.addEventListener("ended", e => { const id = e.target && e.target.dataset && e.target.dataset.film; if (id) Film.seen.add(id); }, true);
+// if a clip can't play (Safari won't stream a video whose server ignores byte ranges, before the service worker
+// takes over), show its still frame instead of a frozen poster
+const filmStill = v => { if (!v || !v.dataset || !v.dataset.still || !document.body.contains(v)) return; const im = new Image(); im.className = v.className; im.alt = ""; im.src = v.dataset.still; v.replaceWith(im); };
+document.addEventListener("error", e => { if (e.target && e.target.tagName === "VIDEO") filmStill(e.target); }, true);
+Film.watch = () => document.querySelectorAll("video[data-still]").forEach(v => {
+  if (v.dataset.watched) return; v.dataset.watched = "1";
+  setTimeout(() => { if (v.readyState < 2 || (v.paused && !v.ended && v.currentTime === 0)) filmStill(v); }, 3000);
+});
 
 const KID_FACES = {
   happy: `<path d="M50 73 q3 -4 6 0 M60 73 q3 -4 6 0" fill="none" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/><path d="M50 78 Q58 78 66 78 Q64 87 58 87 Q52 87 50 78 Z" fill="${DARK}"/>`,
