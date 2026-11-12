@@ -53,6 +53,7 @@ const KID_FACES = {
   happy: `<path d="M50 73 q3 -4 6 0 M60 73 q3 -4 6 0" fill="none" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/><path d="M50 78 Q58 78 66 78 Q64 87 58 87 Q52 87 50 78 Z" fill="${DARK}"/>`,
   calm: `<circle cx="54" cy="72" r="1.8" fill="${DARK}"/><circle cx="62" cy="72" r="1.8" fill="${DARK}"/><path d="M53 79 Q58 82 63 79" fill="none" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/>`,
   worried: `<circle cx="54" cy="73" r="2" fill="${DARK}"/><circle cx="62" cy="73" r="2" fill="${DARK}"/><path d="M49 68 L56 65 M67 68 L60 65" stroke="${DARK}" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="58" cy="81" rx="3" ry="3.6" fill="${DARK}"/><path d="M75 62 q-4 6 0 8 q4 -2 0 -8 Z" fill="${SKY}" stroke="${INK}" stroke-width="1"/>`,
+  zipped: `<circle cx="54" cy="72" r="1.8" fill="${DARK}"/><circle cx="62" cy="72" r="1.8" fill="${DARK}"/><path d="M50 80 h16" stroke="${DARK}" stroke-width="2.2" stroke-linecap="round"/><path d="M52 78 v4 M55 78 v4 M58 78 v4 M61 78 v4 M64 78 v4" stroke="${DARK}" stroke-width="1"/><rect x="65" y="78" width="4" height="5" rx="1" fill="${SUN}" stroke="${DARK}" stroke-width=".8"/>`,
   sleepy: `<path d="M51 73 h6 M59 73 h6" stroke="${DARK}" stroke-width="2" stroke-linecap="round"/><ellipse cx="58" cy="81" rx="2" ry="2.4" fill="${DARK}"/>`,
 };
 
@@ -91,16 +92,23 @@ const Sk = {
   // act it out: a draggable item and drop zones laid over the drawing, in the drawing's own units (300 wide)
   actLayer(a, h) {
     const pc = (v, t) => (v / t * 100).toFixed(2) + "%";
-    const zones = a.zones.map(z => `<div class="act-zone ${z.top ? "top" : ""} ${z.off ? "off" : ""}" data-zone="${z.off ? "off" : z.c}" style="left:${pc(z.x, 300)};top:${pc(z.y, h)};width:${pc(z.w, 300)};height:${pc(z.h, h)}">${z.icon ? `<b>${z.icon}</b>` : ""}<span>${esc(z.label)}</span></div>`).join("");
+    const zones = a.zones.map(z => `<div class="act-zone ${z.top ? "top" : ""} ${z.off ? "off" : ""} ${z.glow ? "glow" : ""}" data-zone="${z.off ? "off" : z.c}" style="left:${pc(z.x, 300)};top:${pc(z.y, h)};width:${pc(z.w, 300)};height:${pc(z.h, h)}">${z.icon ? `<b>${z.icon}</b>` : ""}<span>${esc(z.label)}</span></div>`).join("");
     return `<div class="act-layer">${zones}<button class="act-item" id="actitem" style="left:${pc(a.item.x, 300)};top:${pc(a.item.y, h)}" aria-label="${esc(a.item.label)}. Or use the buttons below.">${a.item.icon}</button></div>`;
+  },
+
+  // gesture days: the other choice is a small sticker on the page; one tap picks it
+  sticker(st, i, x, y) {
+    const c = st.choices[i]; if (!c) return "";
+    return `<button class="gsticker" data-act="pick" data-c="${i}" style="left:${x}%;top:${y}%">${esc(c.t)}</button>`;
   },
 
   // the journal page: ruled paper, tape, the drawing, and a one-line caption
   frame(id, val, label, svg, cap, o = {}) {
     const act = o.act !== undefined ? o.act : actOf(S.phase === "step" ? TOWNS[S.t].steps[S.step] : null, S.s), h = svg ? o.h || 140 : o.actH || 110;
     const draw = svg ? `<svg viewBox="0 0 300 ${h}" width="100%" aria-hidden="true">${o.under || ""}<g class="ink">${svg}</g></svg>` : "";
+    const layer = act ? Sk.actLayer(act, h) : o.overlay || "";
     return `<figure class="stage stage-${id} sketch ${o.cls || ""}" data-scene="${id}" data-val="${val}" data-town="${esc(TOWNS[S.t].name)}" aria-label="${label}">
-      ${act ? `<div class="act-wrap">${draw}${svg ? "" : o.html || ""}${Sk.actLayer(act, h)}</div>${svg ? o.html || "" : ""}` : draw + (o.html || "")}
+      ${layer ? `<div class="act-wrap">${draw}${svg ? "" : o.html || ""}${layer}</div>${svg ? o.html || "" : ""}` : draw + (o.html || "")}
       <figcaption>${act ? act.hint : cap}</figcaption>
     </figure>`;
   },
@@ -153,7 +161,8 @@ const SCENES = {
         : `<rect x="${x}" y="${y}" width="28" height="18" rx="7" fill="none" stroke="${DIM}" stroke-dasharray="3 3"/>${Sk.line(`M${x + 8} ${y + 4} l12 10 M${x + 20} ${y + 4} l-12 10`, DIM, 1.2)}`;
     }).join("");
     return Sk.frame("words", left, `${left} words left, friendship ${s.heart}`, `${Sk.ground()}${tokens}
-      ${Sk.heart(200, 82, .7 + heart / 14 * .9)}${Sk.kid(58, 128, Sk.mood(left <= 2 && S.phase !== "end" ? "worried" : ""), { arms: "M58 94 L46 108 M58 94 L74 86" })}`,
+      ${Sk.heart(200, 82, .7 + heart / 14 * .9)}${Sk.kid(58, 128, left === 0 ? "zipped" : Sk.mood(left <= 2 && S.phase !== "end" ? "worried" : ""), { arms: "M58 94 L46 108 M58 94 L74 86" })}
+      ${left === 0 ? `<g class="stamp-in" transform="rotate(-10 196 106)"><rect x="118" y="88" width="156" height="36" rx="4" fill="rgba(230,57,70,.12)" stroke="${RED}" stroke-width="3"/>${Sk.text(196, 113, "OUT OF WORDS", RED, 19)}</g>` : ""}`,
       S.phase === "step" && st && st.choices ? "Hold a line to say it. Each word uses a token."
         : `${plural(left, "word")} left today.${heart ? ` Friendship: ${s.heart}.` : ""}`);
   },
@@ -219,8 +228,8 @@ const SCENES = {
   },
 
   /* Petalton: one flower per sorry, one thorn per sorry you skipped */
-  L4(s) {
-    const n = Math.min(s.flowers, 18), t = Math.min(s.thorns, 12), prev = Play.mem.yard || 0;
+  L4(s, st) {
+    const n = Math.min(s.flowers, 18), t = Math.min(s.thorns, 12), prev = Play.mem.yard || 0, looping = !!(st && st.loop && S.phase === "step");
     const petals = [RED, PINK, SUN, PLUM, "#FF9F43", LEAF];
     const flower = i => {
       const x = 14 + ((i * 53) % 230), h = 24 + ((i * 17) % 22), c = petals[i % petals.length];
@@ -232,8 +241,12 @@ const SCENES = {
       ${Sk.wash("rect", 'x="0" y="119" width="300" height="12" rx="2"', "#5B4636", .7)}
       ${Array.from({ length: t }, (_, i) => thorn(i)).join("")}${Array.from({ length: n }, (_, i) => flower(i)).join("")}
       ${Sk.line("M252 120 V84 M292 120 V84 M252 92 H292 M252 108 H292", s.thorns > 1 ? RED : DIM, 2)}
-      ${Sk.kid(272, 119, Sk.mood(s.thorns > 1 ? "worried" : ""), { scale: .75 })}`,
-      s.thorns > 1 ? "Thorns are creeping toward the gate." : s.flowers ? `${plural(s.flowers, "flower")} in your yard.` : "Just dirt, for now.");
+      ${Sk.kid(272, 119, Sk.mood(s.thorns > 1 ? "worried" : ""), { scale: .75 })}
+      ${looping ? `${Sk.line("M150 119 Q148 108 150 100", LEAF, 2.2)}${Sk.wash("path", 'd="M150 84 Q141 92 145 100 Q150 104 155 100 Q159 92 150 84 Z"', PINK, .8)}` : ""}`,
+      looping ? "Circle the bud with one finger to say sorry." : s.thorns > 1 ? "Thorns are creeping toward the gate." : s.flowers ? `${plural(s.flowers, "flower")} in your yard.` : "Just dirt, for now.",
+      { overlay: looping ? `<div class="gest" id="loop" data-h="140" data-cx="150" data-cy="94">
+        <svg viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true"><circle class="ring" cx="150" cy="94" r="30"/><polyline class="trail" points=""/></svg>
+        ${Sk.sticker(st, 1, 3, 6)}</div>` : "" });
   },
 
   /* Futureville: the bank app shows you your future self */
@@ -421,20 +434,25 @@ const SCENES = {
   },
 
   /* Whisperton: loud words crack the glass bridge */
-  "L-whisper"(s) {
-    const cracked = clamp(Math.round((100 - s.glass) / 10), 0, 10);
+  "L-whisper"(s, st) {
+    const cracked = clamp(Math.round((100 - s.glass) / 10), 0, 10), tip = st && st.tiptoe && S.phase === "step" ? st.tiptoe : null;
+    const loud = tip && !tip.intro ? st.choices.findIndex(c => !c.gesture) : -1;
     const tiles = Array.from({ length: 10 }, (_, i) => { const x = 8 + i * 28.4, bad = i >= 10 - cracked; return `<rect x="${x}" y="108" width="26" height="12" rx="1" fill="${SKY}" opacity="${bad ? .15 : .35}" stroke="${INK}" stroke-width="1"/>${bad ? Sk.line(`M${x + 4} 109 l6 5 l-2 3 l8 2 M${x + 14} 110 l5 8`, INK, 1) : ""}`; }).join("");
     const muffler = has("muffler");
     return Sk.frame("glass", s.glass, `The glass bridge is ${s.glass}% whole`, `${tiles}
       ${Sk.line("M8 108 V70 M292 108 V70 M8 76 H292", DIM, 1.4)}
       ${Sk.text(150, 30, "shh…", DIM, 14)}
-      ${Sk.kid(70, 108, Sk.mood(s.glass < 40 ? "worried" : ""), { scale: .8, scarf: muffler, arms: "M58 94 L48 108 M58 94 L66 80" })}`,
-      `The glass bridge is ${s.glass}% whole.${muffler ? " Your muffler softens your voice." : ""}`, { h: 128 });
+      ${tip ? `<g id="tipkid">${Sk.kid(21, 108, "calm", { scale: .7, scarf: muffler, arms: "M58 94 L48 108 M58 94 L66 80" })}</g>` : Sk.kid(70, 108, Sk.mood(s.glass < 40 ? "worried" : ""), { scale: .8, scarf: muffler, arms: "M58 94 L48 108 M58 94 L66 80" })}`,
+      tip ? (tip.intro ? "Tap the next tile, gently. Three soft steps." : "Tiptoe: tap each tile lightly, one at a time.") : `The glass bridge is ${s.glass}% whole.${muffler ? " Your muffler softens your voice." : ""}`,
+      { h: 128, overlay: tip ? `<div class="gest" id="tiptoe" data-h="128">
+        <svg viewBox="0 0 300 128" preserveAspectRatio="none" aria-hidden="true"><rect class="next" x="36.4" y="96" width="26" height="26" rx="3"/><g class="cracks"></g></svg>
+        ${loud >= 0 ? Sk.sticker(st, loud, 62, 6) : ""}</div>` : "" });
   },
 
   /* Harmonia: every door opens to a note */
-  "L-hum"(s) {
-    const open = clamp(s.doors, 0, 5), fork = has("fork");
+  "L-hum"(s, st) {
+    const open = clamp(s.doors, 0, 5), fork = has("fork"), tune = st && st.tune && S.phase === "step" ? st.tune : null;
+    const other = tune ? st.choices.findIndex(c => !c.gesture) : -1, base = S.base || 0.5, Y = v => 26 + v * 88;
     const doors = Array.from({ length: 5 }, (_, i) => {
       const x = 118 + i * 34, on = i < open;
       return on ? `<rect x="${x}" y="70" width="24" height="58" fill="${SUN}" opacity=".35"/>${Sk.wash("path", `d="M${x} 70 L${x + 10} 76 L${x + 10} 132 L${x} 128 Z"`, WOOD, .9)}${Sk.note(x + 14, 52)}`
@@ -443,7 +461,19 @@ const SCENES = {
     return Sk.frame("doors", open, `${s.doors} doors open`, `${Sk.ground()}${doors}
       ${Sk.note(86, 52, INK)}${Sk.note(98, 36, INK)}
       ${Sk.kid(58, 128, Sk.mood(), { extra: fork ? `${Sk.line("M80 100 V86 M80 86 l-4 -10 M80 86 l4 -10", "#C0C8D8", 2)}` : "", arms: "M58 94 L46 108 M58 94 L80 100" })}`,
-      `${open} of 5 doors open.${fork ? " The tuning fork hums along." : ""}`);
+      tune ? ({ any: "Drag the note anywhere, then hold it still.", higher: "Hold the note above your line.", lower: "Hold the note below your line.", match: "Find your note from this morning and hold it.", slide: "Start low, then swipe up in one smooth slide." })[tune.mode]
+        : `${open} of 5 doors open.${fork ? " The tuning fork hums along." : ""}`,
+      { overlay: tune ? `<div class="gest" id="tune" data-h="140" data-mode="${tune.mode}">
+        <svg viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true">
+          <rect class="staff-bg" x="114" y="20" width="178" height="100" rx="6"/>
+          ${[0, 1, 2, 3, 4].map(i => `<line class="staff" x1="122" x2="286" y1="${30 + i * 20}" y2="${30 + i * 20}"/>`).join("")}
+          ${tune.mode === "higher" ? `<rect class="band" x="118" y="20" width="170" height="${Math.max(0, Y(base) - 10.5 - 20)}"/>` : ""}
+          ${tune.mode === "lower" ? `<rect class="band" x="118" y="${Y(base) + 10.5}" width="170" height="${Math.max(0, 120 - Y(base) - 10.5)}"/>` : ""}
+          ${tune.mode === "match" ? `<rect class="band" x="118" y="${Y(base) - (fork ? 10.5 : 6.2)}" width="170" height="${fork ? 21 : 12.4}"/>` : ""}
+          ${tune.mode === "slide" ? `<path class="band-arrow" d="M266 112 V34 M258 44 L266 34 L274 44"/>` : ""}
+          ${tune.mode !== "any" && tune.mode !== "slide" ? `<line class="base" x1="118" x2="290" y1="${Y(base)}" y2="${Y(base)}"/><text class="base-k" x="290" y="${Y(base) - 3}">your note</text>` : ""}
+          <g class="note" transform="translate(203 ${Y(tune.mode === "slide" ? 0.95 : 0.5)})"><circle class="hold" r="14"/><circle class="dot" r="9"/></g>
+        </svg>${other >= 0 ? Sk.sticker(st, other, 3, 6) : ""}</div>` : "" });
   },
 
   /* Rhymeburg: offers have to rhyme */
@@ -506,14 +536,15 @@ function rowAct(st, s, A) {
   const p = A.days[S.step], n = st.choices.length;
   if (!p || p.length !== n) return null;
   const b = { x0: 120, x1: 296, y: 30, h: 98, ...A.box }, gap = 6, w = (b.x1 - b.x0 - gap * (n - 1)) / n;
+  const order = (A.orders && A.orders[S.step]) || st.choices.map((_, i) => i); // where each choice sits, left to right
   return {
-    item: A.item,
+    item: (A.items && A.items[S.step]) || A.item,
     zones: st.choices.map((c, i) => {
-      const ok = !c.need || c.need(s), cost = val(c.cost, s);
-      return { c: i, x: b.x0 + i * (w + gap), y: b.y, w, h: b.h, icon: p[i][0], off: !ok,
-        label: ok ? p[i][1] + (cost && String(cost).length <= 9 ? " " + cost : "") : "Not enough" };
+      const ok = !c.need || c.need(s), cost = val(c.cost, s), slot = order.indexOf(i);
+      return { c: i, x: b.x0 + slot * (w + gap), y: b.y, w, h: b.h, icon: p[i][0], off: !ok, glow: A.glow ? A.glow(i) : false,
+        label: ok ? p[i][1] + (cost && String(cost).length <= 9 && !(A.hideCost && A.hideCost(S.step)) ? " " + cost : "") : "Not enough" };
     }),
-    hint: A.hint,
+    hint: (A.hints && A.hints[S.step]) || A.hint,
   };
 }
 const HAND = (x, y) => ({ icon: "✋", label: "Drag your hand", x, y });
@@ -541,7 +572,7 @@ const ROWS = {
   "L-fallback": { item: HAND(36, 96), box: { x0: 76, x1: 296, y: 14, h: 104 }, hint: "Drag your hand: use your saved hours, or keep them.",
     days: { 2: [["🫙", "Show a jar"], ["🤐", "Keep it vague"]], 4: [["⏰", "Wake Theo"], ["😴", "Let him sleep"]], 5: [["🫙", "Open ALL"], ["1️⃣", "Just the oldest"]], 6: [["🥞", "Fort & pancakes"], ["🧹", "Tidy pantry"]] } },
   M8: { item: COIN(100, 100), box: { x0: 128, y: 44, h: 84 }, hint: "Drag the coin. Your wallet is listening.",
-    days: { 3: [["🎁", "Save for Mom"], ["🥿", "Light-up slippers"]], 4: [["🎁", "Buy her present"], ["💌", "Make a card"]] } },
+    days: { 1: [["🚶", "Walk past it"], ["🛒", "Buy it"]], 2: [["🤐", "Zip it shut"], ["📦", "Grab a box"]], 3: [["🎁", "Save for Mom"], ["🥿", "Light-up slippers"]], 4: [["🎁", "Buy her present"], ["💌", "Make a card"]] } },
   "M-jobs": { item: COIN(90, 100), hint: "Drag the coin. Coins with a job stay.",
     days: { 1: [["🏷️", "Tag: HEATER"], ["👖", "Pocket them"]], 2: [["🏷️", "Tag: FOOD"], ["👋", "Let them go"]], 3: [["🔧", "Pay the repair"], ["👧", "Ask sister"]] } },
   "M-hours": { item: HAND(90, 100), hint: "Drag your hand. Every price is hours of your life.",
@@ -557,9 +588,20 @@ const ROWS = {
   "L-hum": { item: WORDS(92, 100), box: { x0: 116 }, hint: "Drag your voice to what you'll do.",
     days: { 2: [["🙋", "“Me!”"], ["🎵", "Hum along"], ["🎹", "Hide"]], 6: [["🎵", "Hum for her"], ["👏", "Clap"], ["🙈", "Cover eyes"]] } },
   "M-rhyme": { item: COIN(100, 86), box: { x0: 134 }, hint: "Drag the coin to your choice.",
-    days: { 2: [["🤝", "Lend her"], ["🎈", "Maybe soon!"], ["✋", "Say no"]], 7: [["🚌", "Ride the bus"], ["🚶", "Walk home"]] } },
+    // offer days: finish the offer with a word tile; the one that rhymes is cheap. The Rhyme Book makes it glow
+    items: { 0: WORDS(100, 86), 1: WORDS(100, 86), 4: WORDS(100, 86), 5: WORDS(100, 86), 6: WORDS(100, 86) },
+    hints: { 0: "Finish your offer. A rhyme for HAT costs less.", 1: "Finish your offer. A rhyme for CAKE costs less.", 4: "Finish your offer. A rhyme for BOAT costs less.", 5: "Finish your offer. A rhyme for KITE costs less.", 6: "Finish your offer. A rhyme for CONE costs less." },
+    orders: { 0: [1, 0, 2], 4: [1, 0, 2], 6: [1, 0, 2] },
+    glow: i => i === 0 && has("rhyme-book") && [0, 1, 4, 5, 6].includes(S.step),
+    hideCost: step => [0, 1, 4, 5, 6].includes(step), // prices would give the rhyme away; you hear the price after you offer
+    days: { 0: [["💬", "“…that?”"], ["💬", "“…for less?”"], ["🚶", "Skip it"]], 1: [["💬", "“…sake!”"], ["💬", "“…I'll just pay.”"], ["🚶", "Skip it"]],
+      2: [["🤝", "Lend her"], ["🎈", "Maybe soon!"], ["✋", "Say no"]], 4: [["💬", "“…my coat!”"], ["💬", "“…the money.”"], ["🚶", "Skip it"]],
+      5: [["💬", "“…two coins right?”"], ["💬", "“…give it to me.”"], ["🚶", "Skip it"]], 6: [["💬", "“…on my own!”"], ["💬", "“…vanilla, please.”"], ["🚶", "Skip it"]], 7: [["🚌", "Ride the bus"], ["🚶", "Walk home"]] } },
   "L-echo": { item: HAND(100, 100), box: { x0: 126 }, hint: "Drag your hand. Promises cost Saturday hours.",
-    days: { 4: [["🤝", "Keep my word"], ["🤒", "Pretend sick"]], 5: [["🤝", "Keep my word"], ["🙈", "Ignore it"]], 6: [["🤝", "Keep my word"], ["📵", "Let it ring"]], 7: [["🎡", "Go to the fair"], ["🛋️", "Stay home"]] } },
+    items: { 0: WORDS(100, 100), 1: WORDS(100, 100), 2: WORDS(100, 100) },
+    hints: { 0: "Throw your promise. Big ones echo back bigger.", 1: "Throw your promise. Big ones echo back bigger.", 2: "Throw your promise. Big ones echo back bigger." },
+    days: { 0: [["🤝", "Sure, I'll help!"], ["📣", "Forever, promise!"], ["🤷", "Maybe, if I can"]], 1: [["✏️", "One this week"], ["📣", "A hundred!"], ["🤷", "Maybe someday"]],
+      2: [["📣", "Every single day!"], ["📅", "On Sundays"], ["🤷", "I'll try"]], 4: [["🤝", "Keep my word"], ["🤒", "Pretend sick"]], 5: [["🤝", "Keep my word"], ["🙈", "Ignore it"]], 6: [["🤝", "Keep my word"], ["📵", "Let it ring"]], 7: [["🎡", "Go to the fair"], ["🛋️", "Stay home"]] } },
 };
 
 const ACTS = {

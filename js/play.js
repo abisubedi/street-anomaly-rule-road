@@ -64,6 +64,7 @@ const Play = {
     if (T.id === "M-shadow" && S.s.lb > 50) heavyNext();
     if (document.getElementById("actitem")) actGame();
     if (T.id === "L1" && st && st.choices) sayGame(st); // Hushwick: hold a line to say it, one word token per beat
+    if (st && S.phase === "step") { if (st.loop) loopGame(st); if (st.tiptoe) tiptoeGame(st); if (st.tune) tuneGame(st); }
   },
 };
 
@@ -108,7 +109,7 @@ function catchGame(st) {
     const r = box.getBoundingClientRect(), fx = (p.clientX - r.left) / r.width;
     if (Math.abs(fx - jx) * r.width > 60) { jx = clamp(fx); place(); }
     ax = p.clientX; aj = jx;
-    if (e.pointerId !== undefined && box.setPointerCapture) box.setPointerCapture(e.pointerId);
+    try { box.setPointerCapture(e.pointerId); } catch {}
     if (e.cancelable) e.preventDefault();
   };
   const onMove = e => {
@@ -169,7 +170,7 @@ function dragGame(st) {
     else { chip.style.transition = "transform .25s cubic-bezier(.3,1.5,.5,1)"; chip.style.transform = ""; setTimeout(() => { chip.style.transition = ""; }, 260); }
   };
   if (window.PointerEvent) {
-    chip.addEventListener("pointerdown", e => { chip.setPointerCapture(e.pointerId); down(e); });
+    chip.addEventListener("pointerdown", e => { try { chip.setPointerCapture(e.pointerId); } catch {} down(e); });
     chip.addEventListener("pointermove", move); chip.addEventListener("pointerup", up); chip.addEventListener("pointercancel", up);
   } else {
     chip.addEventListener("touchstart", down, { passive: false }); chip.addEventListener("touchmove", move, { passive: false }); chip.addEventListener("touchend", up);
@@ -195,7 +196,7 @@ function actGame() {
   const down = e => {
     const p = pt(e); if (!p) return; on = true; sx = p.clientX; sy = p.clientY;
     item.classList.add("lifted"); Sound.tone(520, .06, "triangle", .05);
-    if (e.pointerId !== undefined && item.setPointerCapture) item.setPointerCapture(e.pointerId);
+    try { item.setPointerCapture(e.pointerId); } catch {}
     if (e.cancelable) e.preventDefault();
   };
   const move = e => {
@@ -253,6 +254,104 @@ function sayGame(st) {
     b.addEventListener("contextmenu", e => e.preventDefault()); // a long press shouldn't open the phone's menu
     b.addEventListener("click", e => { if (e.detail === 0) pick(i); }); // keyboard: Enter or Space says it straight away
   });
+}
+
+/* ---------- silent gestures: draw a loop (Petalton), tiptoe (Whisperton), tune a note (Harmonia) ----------
+   Each works on a layer laid over the scene drawing, in the drawing's own units (300 wide, data-h tall),
+   and ends by picking a choice exactly as a tap would, then moving on by itself. */
+const Gest = {
+  at(el, e) { const r = el.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 300, (e.clientY - r.top) / r.height * +el.dataset.h]; },
+  cap(t) { const c = document.querySelector("[data-scene] figcaption"); if (c) c.textContent = t; },
+  done(i, dyn) { if (dyn) pick(-1, dyn); else pick(i); Play.autoNext(); },
+  bind(el, down, move, up) {
+    if (!el || el.dataset.bound) return false; el.dataset.bound = "1";
+    el.addEventListener("pointerdown", e => { if (e.target.closest("[data-act]")) return; try { el.setPointerCapture(e.pointerId); } catch {} e.preventDefault(); down(e); });
+    el.addEventListener("pointermove", e => { e.preventDefault(); move(e); });
+    ["pointerup", "pointercancel"].forEach(v => el.addEventListener(v, e => up(e)));
+    return true;
+  },
+};
+
+// Petalton: one unbroken loop around the bud says sorry. Lifting early just fizzles; try again
+function loopGame(st) {
+  const L = document.getElementById("loop"), cx = L ? +L.dataset.cx : 0, cy = L ? +L.dataset.cy : 0;
+  let pts = null, turn = 0, last = 0;
+  const trail = L && L.querySelector(".trail"), draw = () => trail.setAttribute("points", (pts || []).map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" "));
+  const angle = p => Math.atan2(p[1] - cy, p[0] - cx);
+  Gest.bind(L, e => { pts = [Gest.at(L, e)]; turn = 0; last = angle(pts[0]); draw(); },
+    e => {
+      if (!pts) return; const p = Gest.at(L, e); pts.push(p);
+      let d = angle(p) - last; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; turn += d; last = angle(p); draw();
+      if (Math.abs(turn) > 5.5) { pts = null; Juice.buzz([15, 30, 15]); Gest.done(0); } // most of a full circle
+    },
+    () => { if (!pts) return; pts = null; draw(); if (Math.abs(turn) > 0.6) { Juice.buzz([10]); Gest.cap("Almost! Keep your finger down all the way around the bud."); } });
+}
+
+// Whisperton: tap the bridge tiles left to right. Long presses and rushed taps are stomps: each one cracks the glass
+function tiptoeGame(st) {
+  const L = document.getElementById("tiptoe"), cfg = st.tiptoe, kid = document.getElementById("tipkid");
+  if (!L) return;
+  const N = cfg.taps || 9, allowed = (cfg.cracks || 0) + (Glove.has("muffler") ? 1 : 0), tile = i => 8 + i * 28.4;
+  const next = L.querySelector(".next"), cracks = L.querySelector(".cracks");
+  let at = 0, t0 = 0, aim = -1, lastUp = 0, stomps = 0, over = false;
+  const show = () => { next.setAttribute("x", (tile(at + 1)).toFixed(1)); };
+  Gest.bind(L, e => { if (over) return; const [x] = Gest.at(L, e); aim = Math.floor((x - 8) / 28.4); t0 = performance.now(); },
+    () => {},
+    () => {
+      if (over || aim < 0) return;
+      const now = performance.now(), held = now - t0, rushed = lastUp && now - lastUp < 170;
+      if (aim !== at + 1) { aim = -1; Gest.cap("Step on the next tile, the one glowing."); return; }
+      at = aim; aim = -1; lastUp = now;
+      if (kid) kid.setAttribute("transform", `translate(${(tile(at) - tile(0)).toFixed(1)} 0)`);
+      if (!cfg.intro && (held > 260 || rushed)) {
+        stomps += 1; Juice.buzz([80]); Sound.tone(140, .25, "sawtooth", .05);
+        cracks.insertAdjacentHTML("beforeend", `<path d="M${tile(at) + 4} 109 l6 5 l-2 3 l8 2 M${tile(at) + 14} 110 l5 8" />`);
+        const f = L.closest(".stage"); f.classList.remove("shudder"); void f.offsetWidth; f.classList.add("shudder");
+        Gest.cap(stomps > allowed ? "Too loud. The glass gives way!" : `Stomp! ${allowed - stomps} more and it breaks. Lighter taps.`);
+      } else { Juice.buzz([8]); Sound.tone(1200 + at * 40, .05, "sine", .03); }
+      if (stomps > allowed) { over = true; return Gest.done(Math.max(0, st.choices.findIndex(c => !c.gesture))); }
+      if (at >= N) {
+        over = true;
+        if (cfg.intro) return Gest.done(0);
+        const g = st.choices.find(c => c.gesture);
+        Gest.done(-1, { ...g, fx: s => { if (g.fx) g.fx(s); s.glass -= stomps * cfg.cost; },
+          say: stomps ? `${stomps === 1 ? "One crack" : stomps + " cracks"} under your feet… but you made it across.` : val(g.say, S.s) });
+        return;
+      }
+      show();
+    });
+}
+
+// Harmonia: drag the note up and down the staff and hold it steady. Morning sets your note; later doors want
+// higher, lower, the same note again, or one smooth slide up. The Tuning Fork widens the "same note" window
+function tuneGame(st) {
+  const L = document.getElementById("tune"), cfg = st.tune;
+  if (!L) return;
+  const note = L.querySelector(".note"), ring = L.querySelector(".hold"), base = S.base || 0.5, tol = Glove.has("fork") ? 0.12 : 0.07;
+  const Y = v => 26 + v * 88, V = y => Math.max(0, Math.min(1, (y - 26) / 88));
+  const ok = v => ({ any: true, higher: v < base - 0.12, lower: v > base + 0.12, match: Math.abs(v - base) < tol })[cfg.mode];
+  const C = 2 * Math.PI * 14; ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C;
+  let v = cfg.mode === "slide" ? 0.95 : 0.5, held = false, still = 0, stillV = v, timer = 0, slide = null, over = false;
+  const place = () => note.setAttribute("transform", `translate(203 ${Y(v).toFixed(1)})`);
+  const finish = () => { over = true; held = false; clearInterval(timer); if (cfg.mode === "any") S.base = v; Juice.buzz([25, 40, 25]); Sound.good(); Gest.done(st.choices.findIndex(c => c.gesture)); };
+  const tick = () => {
+    if (!held || over) return clearInterval(timer);
+    const need = (cfg.secs || 1) * 1000, t = ok(v) ? performance.now() - still : 0;
+    ring.style.strokeDashoffset = C * (1 - Math.min(1, t / need)); note.classList.toggle("in", ok(v));
+    if (t >= need) finish();
+  };
+  Gest.bind(L, e => {
+    if (over) return; held = true; v = V(Gest.at(L, e)[1]); place(); still = performance.now(); stillV = v;
+    if (cfg.mode === "slide") slide = { v0: v, t0: performance.now() }; else { clearInterval(timer); timer = setInterval(tick, 50); }
+  }, e => {
+    if (!held || over) return; v = V(Gest.at(L, e)[1]); place();
+    if (Math.abs(v - stillV) > 0.035) { still = performance.now(); stillV = v; } // moving resets the hold
+    if (slide && slide.v0 > 0.62 && v < 0.3 && performance.now() - slide.t0 < 1500) finish();
+  }, () => {
+    if (over || !held) return; held = false; clearInterval(timer); ring.style.strokeDashoffset = C; slide = null;
+    Gest.cap(({ any: "Hold it still a little longer.", higher: "Higher than your line, and hold.", lower: "Lower than your line, and hold.", match: "Find the line from this morning, and hold.", slide: "Start at the bottom and swipe up in one go." })[cfg.mode]);
+  });
+  place();
 }
 
 /* ---------- Leashville: pay the dogs back, smallest first ---------- */
