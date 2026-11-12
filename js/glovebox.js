@@ -47,7 +47,7 @@ function gloveboxPanel() {
 function renderIgnition() {
   return `<section class="ignition">
     <img class="hero-art" src="/img/hero-sign.jpg" width="1100" height="603" alt="Rule Road, on a lit overhead highway sign">
-    <p class="ign-line">Every town has one strange rule.<br>Your first one is a mile away.</p>
+    <p class="ign-line">Every town has one strange law.<br>Your passport's first stamp is a mile away.</p>
     <button class="ignite" data-act="ignite"><span class="key" aria-hidden="true">🔑</span><b>Turn the key</b><span>Start driving</span></button>
     <button class="skipmap" data-act="home">Show me the map instead</button>
   </section>`;

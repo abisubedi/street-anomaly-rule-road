@@ -43,6 +43,9 @@ async function drawCard(T, stars) {
   let y = sy + sh + 160;
   g.textAlign = "center"; g.font = `900 120px ${SIGN}`;
   [0, 1, 2].forEach(i => { g.fillStyle = i < stars ? "#FFD23F" : "#2D3D63"; g.fillText("★", W / 2 + (i - 1) * 140, y); });
+  // the passport verdict, like an ink stamp under the stars
+  y += 78; g.font = `400 46px ${DISP}`; g.fillStyle = { seal: "#E9B949", entered: "#8FB4F0", citation: "#FF5A6A" }[Passport.grade(stars)] || "#FFD23F";
+  g.fillText(`PASSPORT: ${Passport.label(stars).toUpperCase()} · ${T.name.toUpperCase()}`, W / 2, y);
   // your choices as a strip: green helped, yellow neutral, red hurt
   y += 50;
   const n = S.grid.length, sz = Math.min(70, (W - 200) / Math.max(1, n) - 12), gx = W / 2 - (n * (sz + 12) - 12) / 2;
