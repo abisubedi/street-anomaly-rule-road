@@ -550,6 +550,13 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
 .go.auto { position: relative; overflow: hidden; }
 .go.auto::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(0,0,0,.18); animation: autofill var(--auto-ms, 3s) linear forwards; pointer-events: none; }
 @keyframes autofill { to { width: 100%; } }
+/* the rule sign while playing, with the ❓ drawer */
+.rulebar { position: relative; display: flex; align-items: center; gap: 8px; background: var(--sign); color: var(--sign-ink); border-radius: 8px; padding: 4px 4px 4px 10px; box-shadow: 0 0 0 2px var(--sign-ink) inset; }
+.rb-rule { flex: 1; min-width: 0; font: 800 13px/1.2 var(--font-sign); font-size: calc(var(--ts) * 13px); text-transform: uppercase; letter-spacing: .02em; }
+.play-help > summary { width: 32px; height: 32px; font-size: 16px; border-color: var(--sign-ink); background: rgba(255,255,255,.35); }
+.play-help[open] { flex-basis: auto; order: 0; }
+.play-help[open] > summary { margin: 0; }
+.play-help .help-body { position: absolute; z-index: 30; right: 0; left: 0; top: calc(100% + 6px); color: var(--fg); box-shadow: 0 12px 30px rgba(0,0,0,.5); }
 /* silent gestures over the drawing: draw a loop, tiptoe, tune a note */
 .gest { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
 .gest svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
@@ -693,13 +700,13 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=53"></script>
-<script src="/js/juice.js?v=53"></script>
-<script src="/js/road.js?v=53"></script>
-<script src="/js/glovebox.js?v=53"></script>
-<script src="/js/play.js?v=53"></script>
-<script src="/js/sketch.js?v=53"></script>
-<script src="/js/share.js?v=53"></script>
+<script src="/js/compat.js?v=54"></script>
+<script src="/js/juice.js?v=54"></script>
+<script src="/js/road.js?v=54"></script>
+<script src="/js/glovebox.js?v=54"></script>
+<script src="/js/play.js?v=54"></script>
+<script src="/js/sketch.js?v=54"></script>
+<script src="/js/share.js?v=54"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1869,8 +1876,13 @@ function renderTown() {
     </details>`;
   }
   const st = T.steps[S.step];
+  // while playing: the town's rule as a slim road sign, and ❓ for the plain-language explainer, goal and narrator
+  const K = kidOf(T);
+  const rulebar = `<div class="rulebar"><span class="rb-rule">In this town, ${esc(T.rule)}</span>${K ? `<details class="help play-help"><summary aria-label="What does this mean?">❓</summary>
+    <div class="help-body"><p><b>🤔 What does this mean?</b> ${esc(K.what)}</p><p><b>⭐⭐⭐</b> ${esc(K.goal)}</p>${listenBtn(T.id + "-kid")}</div></details>` : ""}</div>`;
   if (st.rehook) {
     return `${topbar(true)}
+    ${rulebar}
     <div class="mini-sign">${T.name} · ${tagLabel}</div>
     ${meters(T, s)}${stage(T, s)}
     <div class="rehook"><div class="k">But here's the part nobody tells you…</div><p>${esc(st.rehook)}</p></div>
@@ -1890,6 +1902,7 @@ function renderTown() {
   const act = !r && typeof actOf === "function" ? actOf(st, s) : null;
   const fold = !r && (act || st.drag || (st.pay && (s.pack || []).length) || st.loop || st.tiptoe || st.tune); // the gesture is the main way to choose; buttons stay one tap away
   return `${topbar(true)}
+  ${rulebar}
   <div class="mini-sign">${T.name} · ${tagLabel}</div>
   ${meters(T, s)}${stage(T, s)}
   ${S.firstRide && !r && kidOf(T) ? `<div class="goal mini">⭐⭐⭐ ${esc(kidOf(T).goal)}</div>` : ""}
@@ -1897,7 +1910,7 @@ function renderTown() {
     <div class="when">${esc(st.when)}${who ? `<span class="role role-${who.toLowerCase()}">${who}</span>` : ""}</div>
     <p class="story">${esc(val(st.text, s))}</p>
     ${st.drag && !r ? dragPanel(st) : ""}
-    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : fold ? `<details class="tapfall"><summary>or tap a button</summary><div class="choices compact">${choices}</div></details>` : `<div class="choices ${r ? "done" : ""}">${choices}</div>`}
+    ${st.play && st.play.kind === "catch" && !S.played && !r ? "" : fold ? `<details class="tapfall"><summary>or tap a button</summary><div class="choices compact">${choices}</div></details>` : `<div class="choices ${r ? "done" : ""} ${T.id === "L1" ? "compact" : ""}">${choices}</div>`}
     ${S.firstRide && !store.get("howto", false) && !r ? `<div class="howto-card first"><b>${act ? "👆 Drag it onto your choice" : "👆 Tap A or B to choose"}</b><span>Then watch your numbers change. Green arrows show which way is good.</span><button class="go ghost" data-act="howto-ok">Got it</button></div>` : ""}
     ${r ? `<div class="result">${S.grid.length ? `<p class="verdict v-${S.grid[S.grid.length - 1]}">${{ g: "👍 Nice choice!", y: "🤔 Okay…", r: "😬 Uh-oh!" }[S.grid[S.grid.length - 1]]}</p>` : ""}<p>${esc(r.say)}</p>${r.night ? `<p class="night">${r.night}</p>` : ""}</div>
       <button class="go" data-act="next">${S.step + 1 < T.steps.length ? (Prefs.coop && nextRole() && nextRole() !== role(T, S.step) ? `Pass the phone to the ${nextRole()} →` : "Next") : "See how it ended"}</button>` : ""}
@@ -1936,7 +1949,7 @@ function render() {
   document.body.classList.toggle("in-town", S.screen === "town");
   document.body.classList.toggle("playing", S.screen === "town" && (S.phase === "step" || S.phase === "result")); // compact layout so a whole day fits on one phone screen
   const cur = S.screen === "town" && S.phase === "step" ? TOWNS[S.t].steps[S.step] : null;
-  document.body.classList.toggle("tight", !!(cur && cur.drag)); // drag days carry an extra panel, so the drawing gives up some room
+  document.body.classList.toggle("tight", !!(cur && (cur.drag || (TOWNS[S.t].id === "L1" && cur.choices)))); // drag days and Hushwick's spoken lines need room, so the drawing gives some up
   $app.innerHTML = (S.screen === "ignition" ? renderIgnition() : S.screen === "home" ? renderHome() : S.screen === "fan" ? renderFan() : renderTown());
   if (S.screen === "fan") bindFan();
   if (S.screen === "home") bindDial();
