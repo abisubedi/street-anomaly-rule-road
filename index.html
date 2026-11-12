@@ -550,6 +550,33 @@ body.playing .result .verdict { font-size: 16px; font-size: calc(var(--ts) * 16p
 .go.auto { position: relative; overflow: hidden; }
 .go.auto::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(0,0,0,.18); animation: autofill var(--auto-ms, 3s) linear forwards; pointer-events: none; }
 @keyframes autofill { to { width: 100%; } }
+html.in-play { overscroll-behavior-y: contain; } /* Android: a downward drag in a town never reloads the page */
+/* very short phones (under 600px tall, like the first iPhone SE): squeeze the chrome, keep the drawing and the action */
+@media (max-height: 600px) {
+  body.in-town .app { padding-left: 10px; padding-right: 10px; }
+  body.in-town .app, body.playing .scene { gap: 6px; }
+  body.in-town .bar .iconbtn { padding: 4px 10px; font-size: 12px; font-size: calc(var(--ts) * 12px); }
+  .rulebar { padding: 2px 2px 2px 8px; }
+  .rb-rule { font-size: 11px; font-size: calc(var(--ts) * 11px); }
+  .play-help > summary { width: 26px; height: 26px; font-size: 13px; }
+  body.playing .meter { padding: 4px 8px; }
+  body.playing .meter .mv { font-size: 18px; font-size: calc(var(--ts) * 18px); }
+  body.playing .meter .track { display: none; }
+  body.playing .stage > svg, body.playing .stage > .act-wrap { max-width: 230px; }
+  body.tight .stage > svg, body.tight .stage > .act-wrap { max-width: 160px; }
+  body.playing .stage figcaption { font-size: 12px; font-size: calc(var(--ts) * 12px); }
+  body.playing .story { font-size: 15px; font-size: calc(var(--ts) * 15px); }
+  body.playing .result { padding-top: 4px; padding-bottom: 4px; }
+  body.playing .result .verdict { display: inline; margin-right: 6px; }
+  body.playing .go { min-height: 44px; }
+  body.playing .choices.compact .choice, body.playing .choice { min-height: 40px; padding-top: 6px; padding-bottom: 6px; font-size: 14px; font-size: calc(var(--ts) * 14px); }
+  .hero .sign-go .rule { font-size: 20px; font-size: calc(var(--ts) * 20px); }
+  .hero .sign-go .rule.long { font-size: 17px; font-size: calc(var(--ts) * 17px); }
+  .film-cap .rule { font-size: 15px; font-size: calc(var(--ts) * 15px); }
+  .hook { font-size: 14px; font-size: calc(var(--ts) * 14px); }
+  body.in-town .goal.mini { font-size: 13px; font-size: calc(var(--ts) * 13px); }
+  .arrive-row .go, .arrive-row .listen { min-height: 44px; }
+}
 /* silent juice */
 .fx-num { position: fixed; z-index: 60; pointer-events: none; font: 800 20px var(--font-num); text-shadow: 0 2px 0 rgba(0,0,0,.5); animation: floatup 1.1s cubic-bezier(.2,.8,.3,1) forwards; }
 .fx-num.up { color: var(--leaf); } .fx-num.down { color: #FF6B76; }
@@ -611,7 +638,7 @@ body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; 
 @keyframes nudge { 0%, 60%, 100% { translate: 0 0; } 30% { translate: 10px -5px; } }
 .choices.compact .choice { min-height: 46px; padding-top: 10px; padding-bottom: 10px; font-size: 16px; font-size: calc(var(--ts) * 16px); }
 /* Hushwick: hold a line to say it; tokens get used up while you hold */
-.choice.hold { position: relative; overflow: hidden; }
+.choice.hold { position: relative; overflow: hidden; touch-action: none; -webkit-touch-callout: none; } /* a long press is the gesture: no iOS menu, no scroll */
 .choice.hold .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255,210,63,.22); pointer-events: none; }
 .choice.hold .cost::after { content: " · hold"; opacity: .7; }
 .stage-words [data-tok] { transition: opacity .12s, transform .12s; transform-box: fill-box; transform-origin: center; }
@@ -714,13 +741,13 @@ body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=56"></script>
-<script src="/js/juice.js?v=56"></script>
-<script src="/js/road.js?v=56"></script>
-<script src="/js/glovebox.js?v=56"></script>
-<script src="/js/play.js?v=56"></script>
-<script src="/js/sketch.js?v=56"></script>
-<script src="/js/share.js?v=56"></script>
+<script src="/js/compat.js?v=57"></script>
+<script src="/js/juice.js?v=57"></script>
+<script src="/js/road.js?v=57"></script>
+<script src="/js/glovebox.js?v=57"></script>
+<script src="/js/play.js?v=57"></script>
+<script src="/js/sketch.js?v=57"></script>
+<script src="/js/share.js?v=57"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1963,6 +1990,7 @@ function render() {
   document.body.classList.toggle("party", Prefs.party);
   document.body.classList.toggle("in-town", S.screen === "town");
   document.body.classList.toggle("playing", S.screen === "town" && (S.phase === "step" || S.phase === "result")); // compact layout so a whole day fits on one phone screen
+  document.documentElement.classList.toggle("in-play", S.screen === "town" && S.phase !== "end"); // no pull-to-refresh mid-town
   const cur = S.screen === "town" && S.phase === "step" ? TOWNS[S.t].steps[S.step] : null;
   const drain = S.screen === "town" && TOWNS[S.t].id === "L3" && S.s && (S.phase === "step" || S.phase === "result"); // Chargeville: low battery, low colour
   document.body.classList.toggle("drain", !!drain);
