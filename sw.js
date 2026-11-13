@@ -1,6 +1,6 @@
 // Rule Road offline support. Bump VERSION whenever index.html changes so players get the new towns.
-const VERSION = "rule-road-v63";
-const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/img/hero-sign.jpg", "/img/open-road.jpg", "/img/tape.jpg", "/js/compat.js?v=63", "/js/juice.js?v=63", "/js/road.js?v=63", "/js/glovebox.js?v=63", "/js/passport.js?v=63", "/js/play.js?v=63", "/js/sketch.js?v=63", "/js/share.js?v=63"];
+const VERSION = "rule-road-v64";
+const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/img/hero-sign.jpg", "/img/open-road.jpg", "/img/tape.jpg", "/js/compat.js?v=64", "/js/juice.js?v=64", "/js/road.js?v=64", "/js/glovebox.js?v=64", "/js/passport.js?v=64", "/js/play.js?v=64", "/js/sketch.js?v=64", "/js/share.js?v=64"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

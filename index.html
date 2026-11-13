@@ -637,15 +637,17 @@ html.in-play { overscroll-behavior-y: contain; } /* Android: a downward drag in 
 .pv-good .kid .face-base, .pv-bad .kid .face-base { opacity: 0; }
 .pv-good .kid .face-good, .pv-bad .kid .face-bad { opacity: 1; }
 /* a red Again stamp beside a citation */
-.again-stamp { position: absolute; left: -8px; top: -14px; z-index: 3; rotate: -7deg; padding: 6px 10px; border: 3px double #C8102E; border-radius: 6px; background: rgba(241,232,208,.95); color: #C8102E; font: 700 14px var(--font-display); font-size: calc(var(--ts) * 14px); letter-spacing: .03em; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,.3); }
+.again-stamp { position: absolute; left: -8px; top: -14px; z-index: 3; rotate: -7deg; min-height: 48px; min-width: 48px; padding: 6px 12px; border: 3px double #C8102E; border-radius: 6px; background: rgba(241,232,208,.95); color: #C8102E; font: 700 14px var(--font-display); font-size: calc(var(--ts) * 14px); letter-spacing: .03em; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,.3); }
 .again-stamp:focus-visible { outline: 3px solid var(--sign); outline-offset: 3px; }
 .again-stamp.slam2 { animation: slam .45s cubic-bezier(.2,1.5,.4,1) .75s both; }
 /* wordless picture bubble over a day's drawing */
 .picto { position: absolute; left: 8px; top: 8px; z-index: 4; display: flex; align-items: center; gap: 3px; padding: 4px 8px 5px; background: #F1E8D0; color: #14130C; border: 2px solid #14130C; border-radius: 14px; box-shadow: 0 3px 0 rgba(0,0,0,.35); font-size: 17px; line-height: 1; pointer-events: none; transform-origin: 12px 100%; animation: pop .35s cubic-bezier(.3,1.6,.5,1) .15s both; max-width: calc(100% - 16px); }
 .picto::after { content: ""; position: absolute; left: 14px; bottom: -8px; border: 7px solid transparent; border-top-color: #14130C; border-bottom: 0; }
+.picto.r { left: auto; right: 8px; transform-origin: calc(100% - 12px) 100%; }
+.picto.r::after { left: auto; right: 14px; }
 .picto b { font-weight: 800; font-family: var(--font-num); font-size: 14px; white-space: nowrap; }
 .picto .pa { font-style: normal; font-size: 12px; opacity: .55; margin: 0 1px; }
-@media (max-height: 600px) { .picto { font-size: 14px; padding: 3px 6px; } .picto b { font-size: 12px; } }
+@media (max-height: 600px) { .picto { font-size: 16px; padding: 3px 6px; } .picto b { font-size: 13px; } }
 /* silent juice */
 .fx-num { position: fixed; z-index: 60; pointer-events: none; font: 800 20px var(--font-num); text-shadow: 0 2px 0 rgba(0,0,0,.5); animation: floatup 1.1s cubic-bezier(.2,.8,.3,1) forwards; }
 .fx-num.up { color: var(--leaf); } .fx-num.down { color: #FF6B76; }
@@ -810,14 +812,14 @@ body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=63"></script>
-<script src="/js/juice.js?v=63"></script>
-<script src="/js/road.js?v=63"></script>
-<script src="/js/glovebox.js?v=63"></script>
-<script src="/js/passport.js?v=63"></script>
-<script src="/js/play.js?v=63"></script>
-<script src="/js/sketch.js?v=63"></script>
-<script src="/js/share.js?v=63"></script>
+<script src="/js/compat.js?v=64"></script>
+<script src="/js/juice.js?v=64"></script>
+<script src="/js/road.js?v=64"></script>
+<script src="/js/glovebox.js?v=64"></script>
+<script src="/js/passport.js?v=64"></script>
+<script src="/js/play.js?v=64"></script>
+<script src="/js/sketch.js?v=64"></script>
+<script src="/js/share.js?v=64"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
