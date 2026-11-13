@@ -795,14 +795,14 @@ body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=60"></script>
-<script src="/js/juice.js?v=60"></script>
-<script src="/js/road.js?v=60"></script>
-<script src="/js/glovebox.js?v=60"></script>
-<script src="/js/passport.js?v=60"></script>
-<script src="/js/play.js?v=60"></script>
-<script src="/js/sketch.js?v=60"></script>
-<script src="/js/share.js?v=60"></script>
+<script src="/js/compat.js?v=61"></script>
+<script src="/js/juice.js?v=61"></script>
+<script src="/js/road.js?v=61"></script>
+<script src="/js/glovebox.js?v=61"></script>
+<script src="/js/passport.js?v=61"></script>
+<script src="/js/play.js?v=61"></script>
+<script src="/js/sketch.js?v=61"></script>
+<script src="/js/share.js?v=61"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -2206,7 +2206,10 @@ $app.addEventListener("click", async e => {
     Sound.pluck(); startTown(i);
   }
   else if (act === "daily") { Sound.pluck(); startTown(dailyTown(), { free: true, daily: true }); }
-  else if (act === "again") { Sound.pluck(); startTown(S.t, { free: true, daily: S.daily }); }
+  else if (act === "again") { // instant retry: you've read the sign, so go straight back to Day 1
+    Sound.pluck(); Juice.buzz([12]); startTown(S.t, { free: true, daily: S.daily });
+    Voice.stop(); S.phase = "step"; S.step = 0; enterStep(); render(); window.scrollTo(0, 0);
+  }
   else if (act === "begin") { Voice.stop(); S.phase = "step"; S.step = 0; enterStep(); Sound.pluck(); render(); }
   else if (act === "pick") { Juice.tap(); pick(+b.dataset.c); }
   else if (act === "next") { next(); window.scrollTo({ top: 0, behavior: "smooth" }); }
