@@ -215,6 +215,8 @@ const Preview = {
       fig.classList.add(`pv-${m.k}-${b > a ? "up" : "down"}`);
     });
     if (r.after.opened && !r.before.opened) fig.classList.add("pv-opened");
+    const score = T.meters.reduce((sum, m) => { const d = r.after[m.k] - r.before[m.k]; if (!d || typeof d !== "number") return sum; const w = dirOf(T, m.k) === "down" ? -1 : dirOf(T, m.k) === "up" || !kidOf(T) ? 1 : 0; return sum + Math.sign(d) * w; }, 0);
+    if (score) fig.classList.add(score > 0 ? "pv-good" : "pv-bad"); // the traveler's face reacts before you let go
     fig.classList.add("previewing"); fig.style.setProperty("--pvtilt", (toward || 0) * 1.2 + "deg");
     if (SCENE_PREVIEW[T.id]) SCENE_PREVIEW[T.id](fig, r.before, r.after);
     Juice.buzz([5]);

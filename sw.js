@@ -1,6 +1,6 @@
 // Rule Road offline support. Bump VERSION whenever index.html changes so players get the new towns.
-const VERSION = "rule-road-v61";
-const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/img/hero-sign.jpg", "/img/open-road.jpg", "/img/tape.jpg", "/js/compat.js?v=61", "/js/juice.js?v=61", "/js/road.js?v=61", "/js/glovebox.js?v=61", "/js/passport.js?v=61", "/js/play.js?v=61", "/js/sketch.js?v=61", "/js/share.js?v=61"];
+const VERSION = "rule-road-v63";
+const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png", "/img/hero-sign.jpg", "/img/open-road.jpg", "/img/tape.jpg", "/js/compat.js?v=63", "/js/juice.js?v=63", "/js/road.js?v=63", "/js/glovebox.js?v=63", "/js/passport.js?v=63", "/js/play.js?v=63", "/js/sketch.js?v=63", "/js/share.js?v=63"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -37,17 +37,6 @@ self.addEventListener("fetch", e => {
       const start = m[1] ? +m[1] : Math.max(0, size - +m[2]), end = m[1] && m[2] ? Math.min(+m[2], size - 1) : size - 1;
       return new Response(buf.slice(start, end + 1), { status: 206, headers: {
         "Content-Type": "video/mp4", "Content-Range": `bytes ${start}-${end}/${size}`, "Content-Length": String(end - start + 1), "Accept-Ranges": "bytes" } });
-    }));
-    return;
-  }
-  // Narrator clips: the audio element asks for byte ranges, so cache and serve whole files by path.
-  if (url.origin === location.origin && url.pathname.startsWith("/voice/")) {
-    e.respondWith(caches.open(VERSION).then(async c => {
-      const hit = await c.match(url.pathname);
-      if (hit) return hit;
-      const res = await fetch(url.pathname);
-      if (res.status === 200) c.put(url.pathname, res.clone());
-      return res;
     }));
     return;
   }

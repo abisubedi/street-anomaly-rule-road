@@ -631,6 +631,21 @@ html.in-play { overscroll-behavior-y: contain; } /* Android: a downward drag in 
 .border-verdict.g-seal { color: #8A5A00; } .border-verdict.g-entered { color: #2F5DA8; } .border-verdict.g-citation { color: #C8102E; }
 .tag-stamp { font: 800 11px var(--font-sign); text-transform: uppercase; letter-spacing: .06em; border: 1.5px solid currentColor; border-radius: 6px; padding: 1px 6px; rotate: -3deg; }
 .tag-stamp.g-seal { color: var(--gold); } .tag-stamp.g-entered { color: #8FB4F0; } .tag-stamp.g-citation { color: #FF6B76; }
+/* the traveler's face during a drag preview */
+.kid .face { transition: opacity .15s; }
+.kid .face-good, .kid .face-bad { opacity: 0; }
+.pv-good .kid .face-base, .pv-bad .kid .face-base { opacity: 0; }
+.pv-good .kid .face-good, .pv-bad .kid .face-bad { opacity: 1; }
+/* a red Again stamp beside a citation */
+.again-stamp { position: absolute; left: -8px; top: -14px; z-index: 3; rotate: -7deg; padding: 6px 10px; border: 3px double #C8102E; border-radius: 6px; background: rgba(241,232,208,.95); color: #C8102E; font: 700 14px var(--font-display); font-size: calc(var(--ts) * 14px); letter-spacing: .03em; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,.3); }
+.again-stamp:focus-visible { outline: 3px solid var(--sign); outline-offset: 3px; }
+.again-stamp.slam2 { animation: slam .45s cubic-bezier(.2,1.5,.4,1) .75s both; }
+/* wordless picture bubble over a day's drawing */
+.picto { position: absolute; left: 8px; top: 8px; z-index: 4; display: flex; align-items: center; gap: 3px; padding: 4px 8px 5px; background: #F1E8D0; color: #14130C; border: 2px solid #14130C; border-radius: 14px; box-shadow: 0 3px 0 rgba(0,0,0,.35); font-size: 17px; line-height: 1; pointer-events: none; transform-origin: 12px 100%; animation: pop .35s cubic-bezier(.3,1.6,.5,1) .15s both; max-width: calc(100% - 16px); }
+.picto::after { content: ""; position: absolute; left: 14px; bottom: -8px; border: 7px solid transparent; border-top-color: #14130C; border-bottom: 0; }
+.picto b { font-weight: 800; font-family: var(--font-num); font-size: 14px; white-space: nowrap; }
+.picto .pa { font-style: normal; font-size: 12px; opacity: .55; margin: 0 1px; }
+@media (max-height: 600px) { .picto { font-size: 14px; padding: 3px 6px; } .picto b { font-size: 12px; } }
 /* silent juice */
 .fx-num { position: fixed; z-index: 60; pointer-events: none; font: 800 20px var(--font-num); text-shadow: 0 2px 0 rgba(0,0,0,.5); animation: floatup 1.1s cubic-bezier(.2,.8,.3,1) forwards; }
 .fx-num.up { color: var(--leaf); } .fx-num.down { color: #FF6B76; }
@@ -795,14 +810,14 @@ body.drain .app { filter: saturate(var(--sat, 1)); transition: filter .9s ease; 
   <filter id="ink" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="ink-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
 </defs></svg>
 
-<script src="/js/compat.js?v=61"></script>
-<script src="/js/juice.js?v=61"></script>
-<script src="/js/road.js?v=61"></script>
-<script src="/js/glovebox.js?v=61"></script>
-<script src="/js/passport.js?v=61"></script>
-<script src="/js/play.js?v=61"></script>
-<script src="/js/sketch.js?v=61"></script>
-<script src="/js/share.js?v=61"></script>
+<script src="/js/compat.js?v=63"></script>
+<script src="/js/juice.js?v=63"></script>
+<script src="/js/road.js?v=63"></script>
+<script src="/js/glovebox.js?v=63"></script>
+<script src="/js/passport.js?v=63"></script>
+<script src="/js/play.js?v=63"></script>
+<script src="/js/sketch.js?v=63"></script>
+<script src="/js/share.js?v=63"></script>
 <script>
 /* ---------- towns: one strange rule each, from the channel's idea bank ---------- */
 const TOWNS = [
@@ -1730,29 +1745,8 @@ const Sound = {
 };
 
 /* ---------- narrator: the Street Anomaly host, pre-recorded in the channel's voice (/voice/<key>.mp3) ---------- */
-const Voice = {
-  on: true, key: null, el: null,
-  init() { try { this.on = localStorage.getItem("rule-road-voice") === "on"; } catch {} }, // silent unless you switch the narrator on
-  save() { try { localStorage.setItem("rule-road-voice", this.on ? "on" : "off"); } catch {} },
-  say(key, force) {
-    if ((!this.on && !force) || CLIPS_GONE.has(key)) return;
-    if (!this.el) {
-      this.el = new Audio(); this.el.preload = "auto";
-      ["play", "pause", "ended"].forEach(ev => this.el.addEventListener(ev, () => this.paint()));
-    }
-    this.key = key; this.el.src = `/voice/${key}.mp3`;
-    const p = this.el.play(); if (p && p.catch) p.catch(() => { this.key = null; this.paint(); });
-  },
-  stop() { if (this.el && !this.el.paused) this.el.pause(); this.key = null; this.paint(); },
-  playing(key) { return !!(this.el && !this.el.paused && !this.el.ended && this.key === key); },
-  paint() {
-    document.querySelectorAll('[data-act="say"]').forEach(b => { const on = this.playing(b.dataset.k); b.textContent = on ? "■ Stop" : "▶ Listen"; b.setAttribute("aria-pressed", on); });
-  },
-};
-Voice.init();
-// recordings that no longer match their (shortened) text were retired; no Listen button for those
-const CLIPS_GONE = new Set(["M2-end", "L2-end", "L4-end", "M4-end", "L5-end", "L-fallback-end", "M8-end", "M-chain-end", "M-shadow-end"]);
-const listenBtn = key => CLIPS_GONE.has(key) ? "" : `<button class="listen" data-act="say" data-k="${key}" aria-pressed="false">▶ Listen</button>`;
+// Rule Road has no spoken narration. Voice is a silent stand-in so older call sites stay harmless
+const Voice = { on: false, el: null, say() {}, stop() {}, playing() { return false; }, paint() {} };
 
 /* ---------- state ---------- */
 let S = { screen: "home", t: 0, step: 0, phase: "arrive", s: null, res: null, stars: loadStars(), fan: { rule: "", lesson: "" },
@@ -1773,7 +1767,6 @@ function topbar(back) {
     ${back ? `<button class="iconbtn" data-act="home" aria-label="Back to Rule Road">← Road</button>` : `<div class="brand"><b>Street Anomaly</b> · Rule Road</div>`}
     <span class="toggles">
       <button class="iconbtn tsize" data-act="tsize" aria-label="Text size: ${TS_NAMES[TS.i]}">${["Aa", "Aa+", "Aa++"][TS.i]}</button>
-      <button class="iconbtn sw" data-act="voice" aria-pressed="${Voice.on}" aria-label="Narrator voice ${Voice.on ? "on" : "off"}">Voice</button>
       <button class="iconbtn sw" data-act="sound" aria-pressed="${Sound.on}" aria-label="Sound effects ${Sound.on ? "on" : "off"}">Sound</button>
     </span>
   </div>`;
@@ -1822,7 +1815,6 @@ function renderHome() {
   <section class="hero">
     <img class="hero-art" src="/img/hero-sign.jpg" width="1100" height="603" alt="Rule Road, on a lit overhead highway sign">
     <p>Every town has one strange law. Live by it, get your passport stamped, and don't collect citations.</p>
-    <div class="listen-row">${listenBtn("intro")}</div>
   </section>
   ${gloveNews("home")}
   <button class="daily ${done ? "done" : ""}" data-act="daily">
@@ -1920,10 +1912,9 @@ function renderTown() {
     <p class="story hook">${esc(T.hook)}</p>
     ${K ? `<div class="goal mini">⭐⭐⭐ ${esc(K.goal)}</div>` : ""}
     <div class="arrive-row">
-      ${listenBtn(T.id + "-arrive")}
       <details class="help" ${fresh ? "open" : ""}><summary aria-label="Help">❓</summary>
         <div class="help-body">
-          ${K ? `<p><b>🤔 What does this mean?</b> ${esc(K.what)}</p>${listenBtn(T.id + "-kid")}` : ""}
+          ${K ? `<p><b>🤔 What does this mean?</b> ${esc(K.what)}</p>` : ""}
           <ol class="howto"><li><span>🪧</span>Read the town's strange rule.</li><li><span>👆</span>Drag onto your choice, or tap a button.</li><li><span>⬆</span>Watch your numbers. Green arrows show which way is good.</li><li><span>⚠️</span>Halfway through, a red card shows the catch.</li></ol>
           ${Glove.forTown(T).map(it => `<p>${it.icon} <b>${esc(it.name)}</b> is on: ${esc(it.what)}</p>`).join("")}
           ${Prefs.coop ? `<p>🚗 Road trip: the <b>Driver</b> picks, the <b>Navigator</b> does the talking. Swap when the game says so.</p>` : ""}
@@ -1948,6 +1939,7 @@ function renderTown() {
     <figure class="polaroid">
       ${stage(T, s)}
       ${Passport.stamp(T, n, "slam pol-stamp")}
+      ${n === 1 ? `<button class="again-stamp slam2" data-act="again" aria-label="Try ${esc(T.name)} again">↺ Try again</button>` : ""}
       <p class="border-verdict g-${Passport.grade(n)}">${Passport.verdict(n)}</p>
       <figcaption>${esc(T.ending(s))}</figcaption>
     </figure>
@@ -1964,7 +1956,6 @@ function renderTown() {
       <div class="more-body">
         ${n < 3 && kidOf(T) ? `<div class="goal"><span class="goal-k">For 3 stars next time</span>${esc(kidOf(T).goal)}</div>` : ""}
         <p class="cta">${esc(T.cta)}</p>
-        ${listenBtn(T.id + "-end") ? `<div class="listen-row">${listenBtn(T.id + "-end")}<span>Hear the ending</span></div>` : ""}
         <div class="sharebox">
           <label for="alias">Your name on the challenge link</label>
           <div class="row"><input id="alias" maxlength="20" placeholder="Optional" value="${esc(Prefs.name)}"><button class="go" data-act="share">Share result</button></div>
@@ -1978,7 +1969,7 @@ function renderTown() {
   // while playing: the town's rule as a slim road sign, and ❓ for the plain-language explainer, goal and narrator
   const K = kidOf(T);
   const rulebar = `<div class="rulebar"><span class="rb-rule"><b class="rb-no">${Passport.order(S.t)} · By order of the mayor</b>In this town, ${esc(T.rule)}</span>${K ? `<details class="help play-help"><summary aria-label="What does this mean?">❓</summary>
-    <div class="help-body"><p><b>🤔 What does this mean?</b> ${esc(K.what)}</p><p><b>⭐⭐⭐</b> ${esc(K.goal)}</p>${listenBtn(T.id + "-kid")}</div></details>` : ""}</div>`;
+    <div class="help-body"><p><b>🤔 What does this mean?</b> ${esc(K.what)}</p><p><b>⭐⭐⭐</b> ${esc(K.goal)}</p></div></details>` : ""}</div>`;
   if (st.rehook) {
     return `${topbar(true)}
     ${rulebar}
@@ -2188,14 +2179,12 @@ $app.addEventListener("click", async e => {
   const act = b.dataset.act;
   if (act === "install") { if (installEvt) { installEvt.prompt(); installEvt.userChoice.finally(() => { installEvt = null; render(); }); } return; }
   if (act === "hideinstall") { installHidden = true; try { localStorage.setItem("rule-road-install-hidden", "1"); } catch {} render(); return; }
-  if (act === "say") { const k = b.dataset.k; Voice.playing(k) ? Voice.stop() : Voice.say(k, true); return; }
   if (act === "ignite") { ignite(); return; }
   if (act === "equip-new") { Juice.buzz([25, 40, 25]); const id = b.dataset.id; if (Glove.on.indexOf(id) < 0) Glove.toggle(id); Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.burst(b, 8, "money"); Sound.good(); render(); return; }
   if (act === "glove-later") { Glove.markSeen(Glove.fresh().map(x => x.id)); Juice.tap(); render(); return; }
   if (act === "equip") { const it = ITEMS.find(x => x.id === b.dataset.id); if (!it || !Glove.open(it)) { Juice.penalty(); return; } Glove.toggle(it.id); Glove.markSeen([it.id]); Juice.tap(); Sound.pluck(); render(); return; }
   if (act === "howto-ok") { store.set("howto", true); Juice.tap(); render(); return; }
   if (act === "tsize") { TS.i = (TS.i + 1) % 3; store.set("ts", TS.i); TS.apply(); Juice.tap(); render(); return; }
-  if (act === "voice") { Voice.on = !Voice.on; Voice.save(); if (!Voice.on) Voice.stop(); render(); return; }
   if (act === "sound") { Sound.on = !Sound.on; store.set("sound", Sound.on); Sound.init(); if (Sound.on) Sound.pluck(); render(); return; }
   Sound.init();
   if (act === "home") { S.screen = "home"; Sound.pluck(); Voice.stop(); render(); window.scrollTo(0, 0); }

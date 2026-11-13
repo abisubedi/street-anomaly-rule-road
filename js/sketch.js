@@ -81,7 +81,7 @@ const Sk = {
   kid(x, g, mood, o = {}) {
     const arms = o.arms || (mood === "happy" ? "M58 92 L44 76 M58 92 L72 76" : mood === "worried" ? "M58 92 L46 70 M58 92 L70 70" : "M58 94 L46 108 M58 94 L80 100");
     return `<g class="kid" transform="translate(${x} ${g}) scale(${o.scale || 1}) translate(-58 -128)">
-      <circle cx="60" cy="76" r="12" fill="${SUN}" opacity=".9"/><circle cx="58" cy="74" r="12" fill="none" stroke="${INK}" stroke-width="1.8"/>${KID_FACES[mood] || KID_FACES.calm}
+      <circle cx="60" cy="76" r="12" fill="${SUN}" opacity=".9"/><circle cx="58" cy="74" r="12" fill="none" stroke="${INK}" stroke-width="1.8"/><g class="face face-base">${KID_FACES[mood] || KID_FACES.calm}</g><g class="face face-good">${KID_FACES.happy}</g><g class="face face-bad">${KID_FACES.worried}</g>
       ${o.shades ? `<path d="M46 71 h24" stroke="${DARK}" stroke-width="1.6"/><rect x="47" y="69" width="9" height="6" rx="2" fill="${DARK}"/><rect x="60" y="69" width="9" height="6" rx="2" fill="${DARK}"/>` : ""}
       <path d="M58 86 L58 112 M58 112 L49 128 M58 112 L67 128 ${arms}" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
       ${o.scarf ? `<path d="M49 86 Q58 92 67 86 L67 91 Q58 97 49 91 Z" fill="${RED}" stroke="${INK}" stroke-width="1"/><path d="M62 92 l2 12 l5 -1 l-3 -11 Z" fill="${RED}" stroke="${INK}" stroke-width="1"/>` : ""}
@@ -109,9 +109,18 @@ const Sk = {
     const layer = act ? Sk.actLayer(act, h) : o.overlay || "";
     return `<figure class="stage stage-${id} sketch ${o.cls || ""}" data-scene="${id}" data-val="${val}" data-town="${esc(TOWNS[S.t].name)}" aria-label="${label}">
       ${layer ? `<div class="act-wrap">${draw}${svg ? "" : o.html || ""}${layer}</div>${svg ? o.html || "" : ""}` : draw + (o.html || "")}
+      ${S.phase === "step" && PICTO[TOWNS[S.t].id] && PICTO[TOWNS[S.t].id][S.step] ? `<div class="picto" aria-hidden="true">${PICTO[TOWNS[S.t].id][S.step].map(t => t === ">" ? '<i class="pa">➜</i>' : `<b>${t}</b>`).join("")}</div>` : ""}
       <figcaption>${act ? act.hint : cap}</figcaption>
     </figure>`;
   },
+};
+
+/* ---------- wordless picture bubbles: each day's dilemma in icons (pilot: Doubleton, Inchwick, Hushwick).
+   ">" draws an arrow. Swap these for hand-drawn icons when the art arrives. */
+const PICTO = {
+  M1: { 0: ["🪙", ">", "🫙", "🍬"], 1: ["👵", "🪙", ">", "⭐", "2🪙"], 3: ["👦", "🫙", ">", "🔓", "🔢"], 4: ["🎡", "5🪙"], 5: ["👨", "+3🪙", ">", "📕", "4🪙"], 6: ["🧒", "😢", ">", "🥪", "5🪙"], 7: ["🏎️", "15🪙", ">", "⌛"] },
+  "M-shrink": { 1: ["🦆", "💡", ">", "🏠", "−1″"], 2: ["👟", "👟", "👟", ">", "−3″"], 3: ["⏱️", "1:00", ">", "−2″"], 4: ["📦", "📦", ">", "🎁", "🏠"] },
+  L1: { 0: ["👩", "🍳", ">", "💬"], 1: ["🚌", "🧒", "😢"], 3: ["🧒", "😂", ">", "👟"], 4: ["👩‍🏫", "3×4", ">", "✋"], 5: ["👧", "🖍️", "🟣"], 6: ["🏃", "📣", ">", "🙋"], 7: ["👨", "🔥", "🍝", "😞"], 8: ["📞", "👴", "❤️"] },
 };
 
 /* ---------- Doubleton and Halfnight: the coin jar ---------- */
